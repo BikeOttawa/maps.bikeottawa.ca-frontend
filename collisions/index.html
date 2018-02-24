@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>Ottawa Collision Map</title>
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.0/mapbox-gl.css' rel='stylesheet' />
+    <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
+    <style>
+        body { margin:0; padding:0; }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+        .loader {
+            margin: 0 0 0 0 ;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+        }
+        svg path,
+        svg rect {
+            fill: #FF0000;
+        }
+        /* Dark attribution */
+
+        .mapboxgl-ctrl.mapboxgl-ctrl-attrib {
+           background: rgba(0, 0, 0, .8);
+        }
+
+        .mapboxgl-ctrl.mapboxgl-ctrl-attrib a {
+           color: #fff;
+        }
+        /* Dark popup */
+
+        .mapboxgl-popup-content {
+           background-color: #444;
+           color: #fff;
+           margin-left: 5px;
+           margin-top: 2px;
+           margin-bottom: 2px;
+           margin-right: 5px;
+           z-index: 1000;
+        }
+
+    </style>
+</head>
+<body>
+<div id='map'></div>
+<div class = 'fill-lighten3 col3 pad2x row5 rounded-toggle pin-right'>
+  <form>
+    <h5>Year</h5>
+    <div class='rounded-toggle inline'>
+      <input type='radio' name='year' id='yearAll' value='yearAll' checked='checked'>
+      <label for='yearAll' >All</label>
+      <input type='radio' name='year' id='year2014' value='year2014' >
+      <label for='year2014' >2014</label>
+      <input type='radio' name='year' id='year2015' value='year2015'>
+      <label for='year2015' >2015</label>
+      <input type='radio' name='year' id='year2016' value='year2016'>
+      <label for='year2016' >2016</label>
+    </div>
+    <h5>Collisions involving</h5>
+    <div class='rounded-toggle inline'>
+      <input type='radio' name='collisions' id='col_peds' value='col_peds' checked='checked'>
+      <label for='col_peds' >Pedestrians</label>
+      <input type='radio' name='collisions' id='col_bikes' value='col_bikes'>
+      <label for='col_bikes' >Cyclists</label>
+      <input type='radio' name='collisions' id='col_total' value='col_total'>
+      <label for='col_total' >Drivers</label>
+    </div>
+    <h5>Most dangerous</h5>
+    <div class='rounded-toggle inline' style='height:33px'>
+      <div id='min_cols' style='width: 20px'>1</div>
+      <fieldset>
+        <input id='min_col_slider' type='range' value='1' min='1' max='7' step='1'>
+      </fieldset>
+      <div id='max_cols'>7</div>
+    </div>
+  </form>
+</div>
+<div class="loader loader--style1" title="0" id="loader">
+        <svg version="1.1" id="loader-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="40px" height="40px" viewBox="0 0 40 40" enable-background="new 0 0 40 40" xml:space="preserve">
+            <path opacity="0.2" fill="#000" d="M20.201,5.169c-8.254,0-14.946,6.692-14.946,14.946c0,8.255,6.692,14.946,14.946,14.946
+    s14.946-6.691,14.946-14.946C35.146,11.861,28.455,5.169,20.201,5.169z M20.201,31.749c-6.425,0-11.634-5.208-11.634-11.634
+    c0-6.425,5.209-11.634,11.634-11.634c6.425,0,11.633,5.209,11.633,11.634C31.834,26.541,26.626,31.749,20.201,31.749z" />
+            <path fill="#000" d="M26.013,10.047l1.654-2.866c-2.198-1.272-4.743-2.012-7.466-2.012h0v3.312h0
+    C22.32,8.481,24.301,9.057,26.013,10.047z">
+                <animateTransform attributeType="xml" attributeName="transform" type="rotate" from="0 20 20" to="360 20 20" dur="0.5s" repeatCount="indefinite" />
+            </path>
+        </svg>
+    </div>
+</div>
+
+<script>
+const years = [
+    {id:"yearAll", url: 'data/collisionsbylocationTotals.geojson', year:-1},
+    {id:"year2014", url: 'data/collisionsbylocation2014.geojson', year:2014},
+    {id:"year2015", url: 'data/collisionsbylocation2015.geojson', year:2015},
+    {id:"year2016", url: 'data/collisionsbylocation2016.geojson', year:2016},
+  ];
+
+let activeLayer = 0
+
+mapboxgl.accessToken = 'pk.eyJ1IjoienpwdGljaGthIiwiYSI6ImNqN2FubTQ5ejBpZDAyd285MmZsdHN3d3IifQ.dc6SvmJLcl7KGPQlBYFj-g';
+const map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/dark-v8',
+    center: [-75.697927,45.417431],
+    zoom: 13,
+    //pitch: 40,
+    minZoom: 10,
+    maxZoom: 17,
+    maxBounds: [[-76.385193,44.963826],[-75.011902,45.614998]]
+});
+
+let gPopup;
+map.once('style.load', function () {
+
+    init()
+    map.addControl(new mapboxgl.NavigationControl(),'bottom-right');
+
+
+    map.on('mousemove', function(e) {
+        var features = map.queryRenderedFeatures(e.point, {
+                    layers: years.map(y=>y.id)
+                });
+        map.getCanvas().style.cursor = (features.length) ? 'pointer' : '';
+    });
+
+    map.on('click', function(e) {
+      var features = map.queryRenderedFeatures(e.point, {
+                  layers: years.map(y=>y.id)
+              });
+      if (!features.length) {
+          return;
+      }
+      var props = features[0].properties;
+      let popup ='<h3>Collisionss</h3><hr>'
+      //let popup ='<h3>'+props.location+'</h3><hr>'
+      popup+='Drivers: '+props.col_total+'<br>'
+      popup+='Pedestrians: '+props.col_peds+'<br>'
+      popup+='Cyclists: '+props.col_bikes+'<br>'
+
+      gPopup = new mapboxgl.Popup()
+      .setLngLat(e.lngLat)
+      .setHTML(popup)
+      .addTo(map)
+    });
+
+});
+
+function init() {
+
+  years.forEach(function (layer, i) {
+
+    map.addSource(layer.id, {
+        type: 'geojson',
+        data: layer.url
+    });
+
+    map.addLayer({
+       'id': layer.id,
+       'type': 'circle',
+       'source': layer.id,
+       'paint': {
+          "circle-color": [
+              "interpolate",
+              ["linear"],
+              ["get", "col_peds"],
+              1, "yellow",
+              6, "red"
+          ],
+          'circle-radius': [
+            "interpolate",
+            ["linear"],
+            ["zoom"],
+            10, [                     //at min zoom
+                "interpolate",
+                ["exponential", 0.8],
+                ["get", "col_peds"],
+                1, 1,                 //1 collision = 1 pixel
+                30, 5                 //30 collisions = 5 pixels
+            ],
+            17, [                     //at max zoom
+                "interpolate",
+                ["exponential", 0.8],
+                ["get", "col_peds"],
+                1, 8,                  //1 collision = 5 pixels
+                30, 40                 //30 collisions = 40 pixels
+            ]
+          ],
+          'circle-opacity': 0.8,
+          'circle-blur': 0.4,
+
+       },
+       'filter': ['>=', 'col_peds', 1]
+    }, 'waterway-label');
+  })
+}
+
+function updateSlider(){
+  const type = map.getFilter(years[activeLayer].id)[1]
+  const max = years[activeLayer][type]
+  document.getElementById('min_col_slider').setAttribute("max", max);
+  document.getElementById('max_cols').innerHTML = max;
+  const min = document.getElementById('min_cols').textContent
+  if(min>max) {
+    setMinColFilter(max)
+    document.getElementById('min_col_slider').setAttribute("value", max);
+  }
+}
+
+function showLayer(layerName){
+  years.forEach(function (layer, i) {
+    if(layerName==layer.id){
+      map.setLayoutProperty(layer.id, 'visibility', 'visible');
+      activeLayer = i
+      updateSlider()
+    }
+    else{
+      map.setLayoutProperty(layer.id, 'visibility', 'none');
+    }
+  });
+}
+
+function toggleLayer (checkbox) {
+  showLayer(checkbox.currentTarget.id);
+  if(typeof gPopup != 'undefined') gPopup.remove()
+}
+
+function toggleFilters (checkbox) {
+  years.forEach(function (layer, i) {
+    const filter = map.getFilter(layer.id)
+    if(filter.length) filter[1]=checkbox.currentTarget.id
+    map.setFilter(layer.id, filter)
+
+    const color = map.getPaintProperty(layer.id, 'circle-color')
+    color[2][1] = checkbox.currentTarget.id
+    map.setPaintProperty(layer.id, 'circle-color', color)
+
+    const radius = map.getPaintProperty(layer.id, 'circle-radius')
+    radius[4][2][1] = checkbox.currentTarget.id
+    radius[6][2][1] = checkbox.currentTarget.id
+    map.setPaintProperty(layer.id, 'circle-radius', radius)
+  });
+  updateSlider()
+  if(typeof gPopup != 'undefined') gPopup.remove()
+}
+
+function setMinColFilter(min)
+{
+  years.forEach(function (layer, i) {
+    const filter = map.getFilter(layer.id)
+    filter[2] = min
+    map.setFilter(layer.id, filter)
+  })
+  document.getElementById('min_cols').innerHTML = min;
+}
+
+document.getElementById('year2014').onclick = toggleLayer
+document.getElementById('year2015').onclick = toggleLayer
+document.getElementById('year2016').onclick = toggleLayer
+document.getElementById('yearAll').onclick = toggleLayer
+
+document.getElementById('col_peds').onclick = toggleFilters
+document.getElementById('col_total').onclick = toggleFilters
+document.getElementById('col_bikes').onclick = toggleFilters
+
+document.getElementById('min_col_slider').addEventListener('input', function(e) {
+    const min = parseInt(e.target.value, 10);
+    setMinColFilter(min)
+});
+
+map.on('load', function(e) {
+
+  years.forEach(function (layer, i) {
+    const features = map.querySourceFeatures(layer.id)
+    layer.col_peds = Math.max.apply(Math,features.map(function(o){return o.properties.col_peds;}))
+    layer.col_bikes = Math.max.apply(Math,features.map(function(o){return o.properties.col_bikes;}))
+    layer.col_total = Math.max.apply(Math,features.map(function(o){return o.properties.col_total;}))
+
+  })
+  document.getElementById("loader").style.visibility = "hidden";
+  showLayer(years[0].id)
+
+})
+
+
+</script>
+
+</body>
+</html>

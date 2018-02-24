@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>Ottawa Cycling Isochrones</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.0/mapbox-gl.css' rel='stylesheet' />
+    <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
+    <style>
+        #app { position:absolute; top:0; right:0; bottom:0; left:0; }
+        #map { position:absolute; top:0; right:0; bottom:0; left:0; }
+        #legend { font-weight: 300; font-size: 13px; z-index: 300; padding: 10px; position: absolute; text-align: center; color: #222; bottom: 20px; left: 50%; margin-left: -120px; width: 320px; background: rgba(255,255,255,0.75); }
+        .legend-caption { display: inline-block; }
+        .legend-item { display: inline-block; width: 30px; text-align: center; font-size: 12px; }
+      /*#m3 { background: rgba(0, 170, 255, 1); }
+        #m6 { background: rgba(0, 170, 255, 0.6); }
+        #m9 { background: rgba(0, 170, 255, 0.4); }
+        #m12 { background: rgba(0, 170, 255, 0.2); }
+        #m15 { background: rgba(0, 170, 255, 0.1); }*/
+        #m3 { background: #0055DB; }
+        #m6 { background: #3276DE; }
+        #m9 { background: #6497E2; }
+        #m12 { background: #96B8E6; }
+        #m15 { background: #C8D9EA; }
+        .mapboxgl-popup-content { color:#000 }
+    </style>
+</head>
+<body>
+  <div id='app' class='col12 contain fill-navy dark clip'>
+    <div id='map'></div>
+    <div class='pin-left pad2'>
+      <a href='#settings' class='button'>Settings</a>
+    </div>
+    <div id="legend">
+      <div class="legend-caption"><span class="lang-en" style="display: block;">Reachable&nbsp;in&nbsp;</span></div>
+      <div id="m3" class="legend-item">3</div><div id="m6" class="legend-item">6</div><div id="m9" class="legend-item">9</div><div id="m12" class="legend-item">12</div><div id="m15" class="legend-item">15</div>
+      <div class="legend-caption"><span class="lang-en" style="display: block;">&nbsp;minutes</span></div>
+    </div>
+    <div id='settings' class='col4 pad2 fill-darken3 pin-left offcanvas-left animate scroll-styled'>
+      <a href='#' class='fill-darken2 pad1 icon close button fr'></a>
+      <div class='clearfix'></div>
+      <form>
+        <h5>Cycling Level of Stress</h5>
+        <div class='rounded-toggle inline'>
+          <input type='radio' name='dir' id='lts1' value='lts1'>
+          <label for='lts1' >LTS-1</label>
+          <input type='radio' name='dir' id='lts2' value='lts2'>
+          <label for='lts2' >LTS-2</label>
+          <input type='radio' name='dir' id='lts3' value='lts3'>
+          <label for='lts3' >LTS-3</label>
+          <input type='radio' name='dir' id='lts4' value='lts4' checked='checked'>
+          <label for='lts4' >LTS-4</label>
+        </div><br><br>
+        <h5>Travel time</h5>
+        <fieldset class='intervals checkbox-pill clearfix'>
+          <input type='checkbox' id='i3' checked='checked' value=3>
+          <label for='i3' class='button icon check quiet'>3m</label>
+          <input type='checkbox' id='i6' checked='checked' value=6>
+          <label for='i6' class='button icon check quiet'>6m</label>
+          <input type='checkbox' id='i9' checked='checked' value=9>
+          <label for='i9' class='button icon check quiet'>9m</label>
+          <input type='checkbox' id='i12' checked='checked' value=12>
+          <label for='i12' class='button icon check quiet'>12m</label>
+          <input type='checkbox' id='i15' checked='checked' value=15>
+          <label for='i15' class='button icon check quiet'>15m</label>
+        </fieldset>
+        <h5>Details</h5>
+        <div class='rounded-toggle inline'>
+          <input type='radio' name='details' id='details-low' value='4'>
+          <label for='details-low' >Low</label>
+          <input type='radio' name='details' id='details-medium' value='2' checked='checked'>
+          <label for='details-medium' >Medium</label>
+          <input type='radio' name='details' id='details-high' value='1'>
+          <label for='details-high' >High</label>
+        </div><br><br>
+        <h5>Street legend</h5>
+        <fieldset class='checkbox-pill clearfix '>
+          <input type='checkbox' id='legend-lts1'>
+          <label for='legend-lts1' id='legend-lts1-label' class='button icon check quiet col12' style="text-align:left;">LTS-1</label>
+          <input type='checkbox' id='legend-lts2'>
+          <label for='legend-lts2' id='legend-lts2-label' class='button icon check quiet col12' style="text-align:left;">LTS-2</label>
+          <input type='checkbox' id='legend-lts3'>
+          <label for='legend-lts3' id='legend-lts3-label' class='button icon check quiet col12' style="text-align:left;">LTS-3</label>
+          <input type='checkbox' id='legend-lts4'>
+          <label for='legend-lts4' id='legend-lts4-label' class='button icon check quiet col12' style="text-align:left;">LTS-4</label>
+        </fieldset>
+
+      </form>
+    </div>
+  </div>
+
+  <script>
+    var args = location.search.replace(/^\?/,'').split('&').reduce(function(o, param) {
+      var keyvalue=param.split('=');
+      o[keyvalue[0]] = keyvalue[1];
+      return o;
+    }, {});
+
+    //mapboxgl.accessToken = args.access_token || localStorage.accessToken;
+    mapboxgl.accessToken = 'pk.eyJ1IjoienpwdGljaGthIiwiYSI6ImNqN2FubTQ5ejBpZDAyd285MmZsdHN3d3IifQ.dc6SvmJLcl7KGPQlBYFj-g';
+    var mapEl = document.getElementById('map');
+
+
+
+    var map = new mapboxgl.Map({
+        container: mapEl,
+        style: 'mapbox://styles/mapbox/light-v8',
+        center: [-75.697927,45.417431],
+        zoom: 13,
+        minZoom: 10,
+        maxZoom: 17,
+        maxBounds: [[-76.385193,44.963826],[-75.011902,45.614998]]
+    });
+
+    map.addControl(new mapboxgl.ScaleControl({
+        maxWidth: 100,
+        unit: 'metric'
+    }), 'bottom-right');
+
+    var isDragging;
+    var isCursorOverPoint;
+
+    var canvas = map.getCanvasContainer();
+
+    var point = {
+        "type": "FeatureCollection",
+        "features": [{
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [-75.697927,45.417431]
+            }
+        }]
+    };
+    var gridSource = {
+        "type": "FeatureCollection",
+        "features": []
+    };
+
+
+
+    function mouseDown() {
+        if (!isCursorOverPoint) return;
+
+        isDragging = true;
+
+        // Set a cursor indicator
+        canvas.style.cursor = 'grab';
+
+        // Mouse events
+        map.on('mousemove', onMove);
+        map.once('mouseup', onUp);
+    }
+
+    function onMove(e) {
+        if (!isDragging) return;
+        var coords = e.lngLat;
+
+        // Set a UI indicator for dragging.
+        canvas.style.cursor = 'grabbing';
+        point.features[0].geometry.coordinates = [coords.lng, coords.lat];
+        map.getSource('point').setData(point);
+    }
+
+    function onUp(e) {
+
+        canvas.style.cursor = '';
+
+        // Unbind mouse events
+        map.off('mousemove', onMove);
+    }
+
+    var isochroneLayers = [
+          {time:15, color:'#C8D9EA', opacity:1},
+          {time:12, color:'#96B8E6', opacity:1},
+          {time:9, color:'#6497E2', opacity:1},
+          {time:6, color:'#3276DE', opacity:1},
+          {time:3, color:'#0055DB', opacity:1},
+          {time:0, color:'#ff9933', opacity:1}
+        ];
+    var ltsLayers = [
+          {id:"legend-lts1", name:'LTS 1 - Suitable for children', color:'#0099cc', opacity:0.9, tileset:'mapbox://zzptichka.53bf2frg', layer:'level_1-45ccc2'},
+          {id:"legend-lts2", name:'LTS-2 - Low stress', color:'#1C7C54', opacity:0.9, tileset:'mapbox://zzptichka.771hbw7i', layer:'level_2-18vk61'},
+          {id:"legend-lts3", name:'LTS-3 - Medium stress', color:'#F0C808', opacity:0.9, tileset:'mapbox://zzptichka.5jgkszgd', layer:'level_3-97ctwn'},
+          {id:"legend-lts4", name:'LTS-4 - High stress', color:'#DD5454', opacity:0.9, tileset:'mapbox://zzptichka.4ioiilcy', layer:'level_4-b8wity'}
+        ];
+
+    map.on('style.load', function () {
+      map.addSource('grid', {
+          "type" : "geojson",
+          "data": gridSource
+      });
+
+      map.addSource('point', {
+          "type": "geojson",
+          "data": point
+      });
+
+      ltsLayers.forEach(function (layer, i) {
+
+        map.addLayer({
+          "id": layer.id,
+          "type": "line",
+          "source": {
+              type: 'vector',
+              url: layer.tileset,
+          },
+          "source-layer": layer.layer,
+          "layout": {
+              "line-join": "round",
+              "line-cap": "round"
+          },
+          "paint": {
+              "line-color": layer.color,
+              "line-width": 2
+          }
+        });
+        map.setLayoutProperty(layer.id, 'visibility', 'none');
+        document.getElementById(layer.id+'-label').innerHTML = '<span style="display: inline-block;width:50px; height:8px;background-color: '+layer.color+'"></span>&nbsp;'+layer.name;
+      });
+
+      isochroneLayers.forEach(function (layer, i) {
+        if(i==isochroneLayers.length-1){
+          map.addLayer({
+            'id': 'grid-' + i,
+            "type": "circle",
+            'source': 'grid',
+            "paint": {
+              "circle-radius": 10,
+              "circle-color": layer.color
+            },
+            'filter': [
+              'all',
+              ['==', '$type', 'Point']
+            ]
+          })
+        }
+        else{
+
+          map.addLayer({
+            'id': 'grid-' + i,
+            'type': 'fill',
+            'source': 'grid',
+            'layout': {},
+            'paint': {
+              'fill-color': layer.color,
+              'fill-opacity': layer.opacity,
+              'fill-outline-color': "#0088ff"
+            },
+            'filter': [
+              'all',
+              ['==', '$type', 'Polygon'],
+              ['<=', 'time', layer.time]
+            ]
+          }, 'road-path');
+        }
+      });
+
+      map.addLayer({
+          "id": "point",
+          "type": "circle",
+          "source": "point",
+          "paint": {
+              "circle-radius": 10,
+              "circle-color": "#333"
+          }
+      });
+
+      map.on('mouseenter', 'point', function() {
+          map.setPaintProperty('point', 'circle-color', '#999');
+          canvas.style.cursor = 'move';
+          isCursorOverPoint = true;
+          map.dragPan.disable();
+      });
+
+      map.on('mousedown', mouseDown);
+
+      map.on('mouseleave', 'point', function(e) {
+        map.setPaintProperty('point', 'circle-color', '#333');
+        canvas.style.cursor = '';
+        isCursorOverPoint = false;
+        map.dragPan.enable();
+
+
+      });
+
+      function fetchIsochrones() {
+
+        const pLng = point.features[0].geometry.coordinates[0];
+        const pLat = point.features[0].geometry.coordinates[1];
+        mapEl.classList.add('loading');
+        var intervals = Array.from(
+          document.querySelectorAll('.intervals input[type="checkbox"]:checked')
+        ).map(function(el) { return el.value });
+
+        var params = {
+          lng: pLng,
+          lat: pLat,
+          radius: 3,
+          deintersect: 'true',
+          concavity: 2,
+          lengthThreshold: 0,
+          units: 'kilometers',
+          cellSize: document.querySelector('input[name="details"]:checked').value * 0.03,
+          dir: document.querySelector('input[name="dir"]:checked').value,
+        };
+
+        var url = new URL("http://ec2-34-214-224-151.us-west-2.compute.amazonaws.com:4000");
+        Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+        (intervals.length > 0 ? intervals : [3, 6, 9, 12, 15]).forEach(interval => url.searchParams.append('intervals', interval));
+
+        console.groupCollapsed(pLng, pLat);
+        console.time('request');
+        fetch(url)
+          .then(response => response.json())
+          .then((data) => {
+            console.log(data);
+            console.timeEnd('request');
+            console.groupEnd();
+            map.getSource('grid').setData(data);
+            mapEl.classList.remove('loading');
+
+            //point.features[0].geometry.coordinates = data.features[5].geometry.coordinates;
+            //map.getSource('point').setData(point);
+          })
+          .catch((error) => {
+            console.error(error);
+            mapEl.classList.remove('loading');
+          });
+
+      }
+
+      map.on('mouseup', function(e) {
+        if (!isDragging) return;
+        isDragging = false;
+
+        fetchIsochrones();
+
+      });
+
+      function toggleLayer (checkbox) {
+        map.setLayoutProperty(checkbox.currentTarget.id, 'visibility', checkbox.currentTarget.checked?'visible':'none');
+      }
+
+      document.getElementById('lts1').onchange = fetchIsochrones
+      document.getElementById('lts2').onchange = fetchIsochrones
+      document.getElementById('lts3').onchange = fetchIsochrones
+      document.getElementById('lts4').onchange = fetchIsochrones
+      document.getElementById('details-low').onchange = fetchIsochrones
+      document.getElementById('details-medium').onchange = fetchIsochrones
+      document.getElementById('details-high').onchange = fetchIsochrones
+      document.getElementById('legend-lts1').onclick = toggleLayer
+      document.getElementById('legend-lts2').onclick = toggleLayer
+      document.getElementById('legend-lts3').onclick = toggleLayer
+      document.getElementById('legend-lts4').onclick = toggleLayer
+
+
+    });
+
+  </script>
+
+</body>
+</html>

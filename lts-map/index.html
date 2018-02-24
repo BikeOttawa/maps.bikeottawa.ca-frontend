@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>Ottawa cycling stress map</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.0/mapbox-gl.css' rel='stylesheet' />
+    <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
+    <style>
+        body { margin:0; padding:0; }
+        #app { position:absolute; top:0; right:0; bottom:0; left:0; }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+        .loader {
+            margin: 0 0 0 0 ;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+        }
+        svg path,
+        svg rect {
+            fill: #FF0000;
+        }
+    </style>
+</head>
+<body>
+<div id='app' class='col12 contain clip'>
+<div id='map'></div>
+<div id='legend' class='col4 pad2 row5 pin-right offcanvas-right '>
+  <form>
+    <h5>Street legend</h5>
+    <fieldset class='checkbox-pill clearfix '>
+      <input type='checkbox' id='lts1' checked='checked'>
+      <label for='lts1' id='lts1-label' class='button icon check quiet col12' style="text-align:left;">LTS-1</label>
+      <input type='checkbox' id='lts2' checked='checked'>
+      <label for='lts2' id='lts2-label' class='button icon check quiet col12' style="text-align:left;">LTS-2</label>
+      <input type='checkbox' id='lts3' checked='checked'>
+      <label for='lts3' id='lts3-label' class='button icon check quiet col12' style="text-align:left;">LTS-3</label>
+      <input type='checkbox' id='lts4' checked='checked'>
+      <label for='lts4' id='lts4-label' class='button icon check quiet col12' style="text-align:left;">LTS-4</label>
+    </fieldset>
+
+  </form>
+</div>
+<div class="loader loader--style1" title="0" id="loader">
+        <svg version="1.1" id="loader-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="40px" height="40px" viewBox="0 0 40 40" enable-background="new 0 0 40 40" xml:space="preserve">
+            <path opacity="0.2" fill="#000" d="M20.201,5.169c-8.254,0-14.946,6.692-14.946,14.946c0,8.255,6.692,14.946,14.946,14.946
+    s14.946-6.691,14.946-14.946C35.146,11.861,28.455,5.169,20.201,5.169z M20.201,31.749c-6.425,0-11.634-5.208-11.634-11.634
+    c0-6.425,5.209-11.634,11.634-11.634c6.425,0,11.633,5.209,11.633,11.634C31.834,26.541,26.626,31.749,20.201,31.749z" />
+            <path fill="#000" d="M26.013,10.047l1.654-2.866c-2.198-1.272-4.743-2.012-7.466-2.012h0v3.312h0
+    C22.32,8.481,24.301,9.057,26.013,10.047z">
+                <animateTransform attributeType="xml" attributeName="transform" type="rotate" from="0 20 20" to="360 20 20" dur="0.5s" repeatCount="indefinite" />
+            </path>
+        </svg>
+    </div>
+</div>
+
+<script>
+var ltsLayers = [
+    {id:"lts1", url: 'data/level_1.json', name:'LTS 1 - Suitable for children', color:'#0099cc', opacity:0.9, tileset:'mapbox://zzptichka.53bf2frg', layer:'level_1-45ccc2'},
+    {id:"lts2", url: 'data/level_2.json', name:'LTS-2 - Low stress', color:'#1C7C54', opacity:0.9, tileset:'mapbox://zzptichka.771hbw7i', layer:'level_2-18vk61'},
+    {id:"lts3", url: 'data/level_3.json', name:'LTS-3 - Medium stress', color:'#F0C808', opacity:0.9, tileset:'mapbox://zzptichka.5jgkszgd', layer:'level_3-97ctwn'},
+    {id:"lts4", url: 'data/level_4.json', name:'LTS-4 - High stress', color:'#DD5454', opacity:0.9, tileset:'mapbox://zzptichka.4ioiilcy', layer:'level_4-b8wity'}
+  ];
+
+
+mapboxgl.accessToken = 'pk.eyJ1IjoienpwdGljaGthIiwiYSI6ImNqN2FubTQ5ejBpZDAyd285MmZsdHN3d3IifQ.dc6SvmJLcl7KGPQlBYFj-g';
+var map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/light-v8',
+    center: [-75.697927,45.417431],
+    zoom: 13,
+    minZoom: 10,
+    maxZoom: 17,
+    maxBounds: [[-76.385193,44.963826],[-75.011902,45.614998]]
+});
+
+function init() {
+
+  ltsLayers.forEach(function (layer, i) {
+
+    map.addSource(layer.id, {
+        type: 'geojson',
+        data: layer.url,
+        buffer: 0,
+        maxzoom: 17
+    });
+
+    map.addLayer({
+      "id": layer.id,
+      "type": "line",
+      'source': layer.id,
+      "layout": {
+          "line-join": "round",
+          "line-cap": "round"
+      },
+      "paint": {
+          "line-color": layer.color,
+          "line-width": 2,
+          "line-opacity": layer.opacity
+      }
+    });
+    document.getElementById(layer.id+'-label').innerHTML = '<span style="display: inline-block;width:50px; height:8px;background-color: '+layer.color+'"></span>&nbsp;'+layer.name;
+  });
+
+  map.addSource('highlight', { type: 'geojson' , data: null});
+  map.addLayer({
+     "id": "highlight",
+     "type": "line",
+     "source": 'highlight',
+     "paint": {
+         "line-color": "#df42f4",
+         "line-width": 5,
+         "line-opacity": 0.5
+     }
+ });
+}
+
+
+function toggleLayer (checkbox) {
+    map.setLayoutProperty(checkbox.currentTarget.id, 'visibility', checkbox.currentTarget.checked?'visible':'none');
+  }
+
+document.getElementById('lts1').onclick = toggleLayer
+document.getElementById('lts2').onclick = toggleLayer
+document.getElementById('lts3').onclick = toggleLayer
+document.getElementById('lts4').onclick = toggleLayer
+
+function addStressLayerToMap (layer) {
+  const xhr = new XMLHttpRequest()
+  xhr.open('GET', layer.url)
+  xhr.setRequestHeader('Content-Type', 'application/json')
+  xhr.onload = function () {
+    if (xhr.status === 200) {
+      const data = JSON.parse(xhr.responseText)
+      tree.load(data)
+
+    } else {
+      alert('Request failed.  Returned status of ' + xhr.status)
+    }
+  }
+  xhr.send()
+}
+
+map.once('style.load', function () {
+
+    init()
+    map.addControl(new mapboxgl.NavigationControl(),'bottom-right');
+    map.addControl(new mapboxgl.ScaleControl(), 'bottom-left');
+});
+
+let i=0
+map.on('click', function(e) {
+
+    var features = map.queryRenderedFeatures(e.point, {
+                layers: ltsLayers.map(l=>l.id)
+            });
+    if (!features.length) {
+        return;
+    }
+    var feature = features[0];
+    displayOsmElementInfo(features[0].properties.id, e.lngLat);
+
+    //TODO: highlight using filters
+    map.getSource('highlight').setData(feature);
+
+});
+
+map.on('mousemove', function(e) {
+    var features = map.queryRenderedFeatures(e.point, {
+                layers: ltsLayers.map(l=>l.id)
+            });
+    map.getCanvas().style.cursor = (features.length) ? 'pointer' : '';
+});
+map.on('load', function(e) {
+    document.getElementById("loader").style.visibility = "hidden";
+})
+
+function displayOsmElementInfo(element, lngLat) {
+  if(typeof element == 'undefined') return;
+  const xhr = new XMLHttpRequest()
+  xhr.open('GET','https://api.openstreetmap.org/api/0.6/'+element)
+  xhr.onload = function () {
+    let popup = '<b><a href="https://www.openstreetmap.org/' + element + '" target="_blank">' + element + '</a></b><hr>'
+    if (xhr.status === 200) {
+      const xmlDOM = new DOMParser().parseFromString(xhr.responseText, 'text/xml');
+      const tags = xmlDOM.getElementsByTagName("tag");
+      for(let i=0; i<tags.length; i++)
+      {
+        popup += tags[i].attributes["k"].value+": <b>"+tags[i].attributes["v"].value+'</b><br>';
+      }
+    } else {
+      popup += 'Failed to request details from osm.org';
+    }
+    var pop = new mapboxgl.Popup()
+    .setLngLat(lngLat)
+    .setHTML(popup)
+    .addTo(map)
+  }
+  xhr.send()
+}
+
+
+
+</script>
+
+</body>
+</html>
