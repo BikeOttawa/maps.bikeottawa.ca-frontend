@@ -1,6 +1,7 @@
 /*
 Merlin - Responsive One Page Template
 Version: 1.0
+https://merlin.halibegic.info/
 By: Hasan Alibegic, hasan461@gmail.com
 License: Apache License v2.0
 */
@@ -31,7 +32,6 @@ h6 {
 a {
     color: #2d2d2d;
     text-decoration:underline;
-    text-decoration-style: dotted;
     cursor: pointer;
 }
 
@@ -105,99 +105,6 @@ a:focus {
     margin-right: 1rem;
 }
 
-.loader {
-    position: fixed;
-    z-index: 999;
-    width: 100%;
-    height: 100%;
-    background: #fff;
-}
-
-.loading {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 4rem;
-    height: 4rem;
-    margin: -2rem 0 0 -2rem;
-    text-indent: -9999rem;
-    border-radius: 50%;
-    background: #233b6f;
-    background: -moz-linear-gradient(left, #233b6f 10%, rgba(35,59,111, 0) 42%);
-    background: -webkit-linear-gradient(left, #233b6f 10%, rgba(35,59,111, 0) 42%);
-    background: -o-linear-gradient(left, #233b6f 10%, rgba(35,59,111, 0) 42%);
-    background: -ms-linear-gradient(left, #233b6f 10%, rgba(35,59,111, 0) 42%);
-    background: linear-gradient(to right, #233b6f 10%, rgba(35,59,111, 0) 42%);
-    -webkit-animation: loading 1s infinite linear;
-    animation: loading 1s infinite linear;
-    -webkit-transform: translateZ(0);
-    -ms-transform: translateZ(0);
-    transform: translateZ(0);
-}
-
-.loading:before {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 50%;
-    height: 50%;
-    content: "";
-    background: #233b6f;
-    border-radius: 100% 0 0 0;
-}
-
-.loading:after {
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    margin: auto;
-    width: 94%;
-    height: 94%;
-    content: "";
-    background: #fff;
-    border-radius: 50%;
-}
-
-.navbar-light {
-    margin-bottom: 0;
-    background: #fff;
-    -webkit-box-shadow: 0 0 2px 0 rgba(0, 0, 0, .2);
-    -moz-box-shadow: 0 0 2px 0 rgba(0, 0, 0, .2);
-    box-shadow: 0 0 2px 0 rgba(0, 0, 0, .2);
-}
-
-.navbar-light .navbar-brand {
-    font-weight: bold;
-    color: #666;
-    text-transform: uppercase;
-}
-
-.navbar-light .navbar-nav .nav-link {
-    font-weight: bold;
-    text-transform: uppercase;
-}
-
-.navbar-light .navbar-nav .active > .nav-link,
-.navbar-light .navbar-nav .active > .nav-link:hover,
-.navbar-light .navbar-nav .active > .nav-link:focus {
-    color: #227fe8;
-    background: transparent;
-}
-
-.navbar-light .navbar-toggler {
-    border-color: transparent;
-}
-
-.navbar-light.fixed {
-    position: fixed;
-    top: 0;
-    z-index: 99;
-    width: 100%;
-    border-bottom-color: transparent;
-}
-
 .page {
     position: relative;
     overflow: hidden;
@@ -267,133 +174,6 @@ a:focus {
     margin-bottom: 4rem;
 }
 
-#portfolio {
-    width: 100%;
-}
-
-#portfolio .filters {
-    margin-top: 4rem;
-    margin-bottom: 4rem;
-}
-
-#portfolio .filters li a {
-    color: #999;
-    font-weight: bold;
-    text-transform: uppercase;
-}
-
-#portfolio .filters li a:hover,
-#portfolio .filters li a:focus {
-    color: #333;
-}
-
-#portfolio .filters li a.active {
-    color: #227fe8;
-}
-
-#portfolio .items li {
-    position: relative;
-    float: left;
-    width: 100%;
-    overflow: hidden;
-}
-
-#portfolio .items li a img {
-    width: 100%;
-    -webkit-transition: all .4s ease-in-out;
-    -moz-transition: all .4s ease-in-out;
-    -o-transition: all .4s ease-in-out;
-    transition: all .4s ease-in-out;
-}
-
-#portfolio .items li a .overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #000;
-    background: rgba(0, 0, 0, .6);
-    -webkit-transition: all .4s ease-in-out;
-    -moz-transition: all .4s ease-in-out;
-    -o-transition: all .4s ease-in-out;
-    transition: all .4s ease-in-out;
-    opacity: 0;
-}
-
-#portfolio .items li a .overlay span {
-    position: absolute;
-    left: 1rem;
-    bottom: 1rem;
-    color: #fff;
-    text-transform: uppercase;
-}
-
-#portfolio .items li a:hover .overlay {
-    opacity: 1;
-}
-
-#portfolio .items li a:hover img {
-    -webkit-transform: scale(1.1);
-    -moz-transform: scale(1.1);
-    -ms-transform: scale(1.1);
-    -o-transform: scale(1.1);
-    transform: scale(1.1);
-}
-
-#clients {
-    color: #fff;
-    background: #233b6f;
-}
-
-#testimonials .item {
-    margin-bottom: 2rem;
-}
-
-#testimonials .quote {
-    padding: 0 2rem;
-}
-
-#testimonials .quote:before {
-    margin-right: 1rem;
-    font-family: fontawesome;
-    content: "\f10d";
-}
-
-#testimonials .client {
-    color: #ccc;
-}
-
-#testimonials .carousel-indicators {
-    bottom: 0;
-    margin-bottom: 0;
-}
-
-#testimonials .carousel-indicators li {
-    width: .8rem;
-    max-width: .8rem;
-    height: .8rem;
-    background: transparent;
-    border: 1px solid #a6a6a6;
-    -webkit-border-radius: 2px;
-    -moz-border-radius: 2px;
-    border-radius: 2px;
-    -webkit-transition: all .25s linear;
-    -moz-transition: all .25s linear;
-    -o-transition: all .25s linear;
-    transition: all .25s linear;
-}
-
-#testimonials .carousel-indicators li:hover,
-#testimonials .carousel-indicators li:focus {
-    border-color: #fff;
-}
-
-#testimonials .carousel-indicators .active {
-    background: #f5b76a;
-    border-color: #fff;
-}
-
 #about .content {
     margin-bottom: 0;
 }
@@ -439,32 +219,6 @@ a:focus {
 #about .teammate .bio a:hover,
 #about .teammate .bio a:focus {
     color: #222;
-}
-
-#contact {
-    background: url(../img/cover/contact.jpg);
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: cover;
-}
-
-#contact,
-#contact a,
-#contact a:hover,
-#contact a:focus {
-    color: #fff
-}
-
-#contact .heading .border {
-    background: #fff
-}
-
-#contact a {
-    display: block;
-}
-
-#contact i {
-    margin: 4rem 0 1rem;
 }
 
 #footer {
