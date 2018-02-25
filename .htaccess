@@ -1,0 +1,4 @@
+# Use PHP5.6 as default
+AddHandler application/x-httpd-php56 .php
+
+Header set Content-Security-Policy "default-src * 'unsafe-inline' 'unsafe-eval' data: blob:"
