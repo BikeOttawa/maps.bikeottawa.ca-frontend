@@ -1,34 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta charset='utf-8' />
+    <title>Ottawa cycling stress map</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.0/mapbox-gl.js'></script>
+    <script  data-cfasync="false" src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.0/mapbox-gl.css' rel='stylesheet' />
     <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
-    <title>Ottawa cycling stress map</title>
     <style>
         body { margin:0; padding:0; }
         #app { position:absolute; top:0; right:0; bottom:0; left:0; }
         #map { position:absolute; top:0; bottom:0; width:100%; }
-        .loader {
-            margin: 0 0 0 0 ;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-        }
-        svg path,
-        svg rect {
-            fill: #FF0000;
-        }
     </style>
 </head>
 <body>
 <div id='app' class='col12 contain clip'>
 <div id='map'></div>
-<div id='legend' class='col4 pad2 row5 pin-right '>
+<div id='legend' class='col4 pad2 row5 pin-right  '>
   <form>
-    <h5>Street legend</h5>
+    <h5>Levels of Stress</h5>
     <fieldset class='checkbox-pill clearfix '>
       <input type='checkbox' id='lts1' checked='checked'>
       <label for='lts1' id='lts1-label' class='button icon check quiet col12' style="text-align:left;">LTS-1</label>
@@ -42,17 +33,8 @@
 
   </form>
 </div>
-<div class="loader loader--style1" title="0" id="loader">
-        <svg version="1.1" id="loader-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="40px" height="40px" viewBox="0 0 40 40" enable-background="new 0 0 40 40" xml:space="preserve">
-            <path opacity="0.2" fill="#000" d="M20.201,5.169c-8.254,0-14.946,6.692-14.946,14.946c0,8.255,6.692,14.946,14.946,14.946
-    s14.946-6.691,14.946-14.946C35.146,11.861,28.455,5.169,20.201,5.169z M20.201,31.749c-6.425,0-11.634-5.208-11.634-11.634
-    c0-6.425,5.209-11.634,11.634-11.634c6.425,0,11.633,5.209,11.633,11.634C31.834,26.541,26.626,31.749,20.201,31.749z" />
-            <path fill="#000" d="M26.013,10.047l1.654-2.866c-2.198-1.272-4.743-2.012-7.466-2.012h0v3.312h0
-    C22.32,8.481,24.301,9.057,26.013,10.047z">
-                <animateTransform attributeType="xml" attributeName="transform" type="rotate" from="0 20 20" to="360 20 20" dur="0.5s" repeatCount="indefinite" />
-            </path>
-        </svg>
-    </div>
+<div class="loading" title="loading..." id="loader">
+
 </div>
 
 <script>
@@ -126,22 +108,6 @@ document.getElementById('lts2').onclick = toggleLayer
 document.getElementById('lts3').onclick = toggleLayer
 document.getElementById('lts4').onclick = toggleLayer
 
-function addStressLayerToMap (layer) {
-  const xhr = new XMLHttpRequest()
-  xhr.open('GET', layer.url)
-  xhr.setRequestHeader('Content-Type', 'application/json')
-  xhr.onload = function () {
-    if (xhr.status === 200) {
-      const data = JSON.parse(xhr.responseText)
-      tree.load(data)
-
-    } else {
-      alert('Request failed.  Returned status of ' + xhr.status)
-    }
-  }
-  xhr.send()
-}
-
 map.once('style.load', function () {
 
     init()
@@ -149,7 +115,6 @@ map.once('style.load', function () {
     map.addControl(new mapboxgl.ScaleControl(), 'bottom-left');
 });
 
-let i=0
 map.on('click', function(e) {
 
     var features = map.queryRenderedFeatures(e.point, {
@@ -181,14 +146,21 @@ function displayOsmElementInfo(element, lngLat) {
   const xhr = new XMLHttpRequest()
   xhr.open('GET','https://api.openstreetmap.org/api/0.6/'+element)
   xhr.onload = function () {
-    let popup = '<b><a href="https://www.openstreetmap.org/' + element + '" target="_blank">' + element + '</a></b><hr>'
+    let popup = '<h4><a href="https://www.openstreetmap.org/' + element + '" target="_blank">' + element + '</a></h4><hr><ul>'
     if (xhr.status === 200) {
       const xmlDOM = new DOMParser().parseFromString(xhr.responseText, 'text/xml');
       const tags = xmlDOM.getElementsByTagName("tag");
       for(let i=0; i<tags.length; i++)
       {
-        popup += tags[i].attributes["k"].value+": <b>"+tags[i].attributes["v"].value+'</b><br>';
+        if(tags[i].attributes["k"].value == 'source') continue;   //skip non-important tags
+        if(tags[i].attributes["k"].value == 'name:fr') continue;
+        if(tags[i].attributes["k"].value == 'operator') continue;
+        popup += '<li>'+tags[i].attributes["k"].value+": <b>"+tags[i].attributes["v"].value+'</b></li>';
       }
+      popup+='</ul><hr><div id="clickme" class="quiet text-right small">Suggest an edit</div>';
+      popup+='<div id="fform" class="hidden"><form id="feedback"><p><textarea id="comment" name="comment" class="small" style="padding:3px"></textarea></p>';
+      popup+='<input type="hidden" name="link" value="https://www.openstreetmap.org/' + element + '">';
+      popup+='<p id="result"></p><input type="submit" value="Submit" /></form></div>';
     } else {
       popup += 'Failed to request details from osm.org';
     }
@@ -196,13 +168,40 @@ function displayOsmElementInfo(element, lngLat) {
     .setLngLat(lngLat)
     .setHTML(popup)
     .addTo(map)
+
+    $( "#clickme" ).click(function() {
+      $(this).toggle('slow');
+      $( "#fform" ).toggle('slow');
+    });
+    var request;
+  	$("#feedback").submit(function(event){
+  		if (request) {
+  			request.abort();
+  		}
+  		var $form = $(this);
+  		var $inputs = $form.find("input, select, button, textarea");
+  		var serializedData = $form.serialize();
+	    $inputs.prop("disabled", true);
+  		$('#result').text('Sending ...');
+  		request = $.ajax({
+  			url: "https://script.google.com/macros/s/AKfycbya64PfAcZ36ia3dJpleAxokuPRFPa9X-3j9nR1M2mZgBdRx94y/exec",
+  			type: "post",
+  			data: serializedData
+  		});
+  		request.done(function (response, textStatus, jqXHR){
+  			$('#result').html('Thanks! We\'ll look into it</a>');
+  		}).fail(function (jqXHR, textStatus, errorThrown){
+  			$('#result').html('An error occured. Try again later.');
+  		}).always(function () {
+  			$inputs.prop("disabled", false);
+  		});
+  		event.preventDefault();
+  	});
   }
   xhr.send()
 }
 
-
-
 </script>
-
+<!--https://docs.google.com/spreadsheets/d/1Rx1SjhWXwkMsHFAioP9XE42Or9S7Ob7JYPLUzSMe-T8/edit?usp=sharing -->
 </body>
 </html>
