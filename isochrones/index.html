@@ -313,7 +313,8 @@
           dir: document.querySelector('input[name="dir"]:checked').value,
         };
 
-        var url = new URL("http://ec2-34-214-224-151.us-west-2.compute.amazonaws.com:4000");
+        //var url = new URL("http://ec2-34-214-224-151.us-west-2.compute.amazonaws.com:4000");
+        var url = new URL("http://maps.bikeottawa.ca:4000");
         Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
         (intervals.length > 0 ? intervals : [3, 6, 9, 12, 15]).forEach(interval => url.searchParams.append('intervals', interval));
 
