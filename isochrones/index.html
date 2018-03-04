@@ -24,13 +24,17 @@
 <body>
   <div id='app' class='col12 contain clip'>
     <div id='map'></div>
+    <div id='error' class='note error contain col8 margin2 hidden pad2'>
+      <h3>Error</h3>
+      <p>Something went wrong. Either server didn't respond or the request was blocked by your browser. <br>Try to allow insecure content via address bar in your browser.</p>
+    </div>
     <div class='pin-left pad2'>
       <a href='#settings' class='button'>Settings</a>
     </div>
     <div id="legend">
-      <div class="legend-caption"><span class="lang-en" style="display: block;">Reachable&nbsp;in&nbsp;</span></div>
+      <div class="legend-caption"><span class="lang-en">Reachable&nbsp;in&nbsp;</span></div>
       <div id="m3" class="legend-item">3</div><div id="m6" class="legend-item">6</div><div id="m9" class="legend-item">9</div><div id="m12" class="legend-item">12</div><div id="m15" class="legend-item">15</div>
-      <div class="legend-caption"><span class="lang-en" style="display: block;">&nbsp;minutes</span></div>
+      <div class="legend-caption"><span class="lang-en" >&nbsp;minutes</span></div>
     </div>
     <div id='settings' class='col4 pad2 fill-darken2 pin-left offcanvas-left animate scroll-styled'>
       <a href='#' class='fill-darken2 pad1 icon close button fr'></a>
@@ -294,6 +298,7 @@
 
       function fetchIsochrones() {
 
+        document.getElementById('error').style="display:hidden";
         const pLng = point.features[0].geometry.coordinates[0];
         const pLat = point.features[0].geometry.coordinates[1];
         mapEl.classList.add('loading');
@@ -334,6 +339,7 @@
           })
           .catch((error) => {
             console.error(error);
+            document.getElementById('error').style="display:block";
             mapEl.classList.remove('loading');
           });
 
