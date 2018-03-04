@@ -13,12 +13,7 @@
         #legend { font-weight: 300; font-size: 13px; z-index: 300; padding: 10px; position: absolute; text-align: center; color: #222; bottom: 20px; left: 50%; margin-left: -120px; width: 320px; background: rgba(255,255,255,0.75); }
         .legend-caption { display: inline-block; }
         .legend-item { display: inline-block; width: 30px; text-align: center; font-size: 12px; }
-      /*#m3 { background: rgba(0, 170, 255, 1); }
-        #m6 { background: rgba(0, 170, 255, 0.6); }
-        #m9 { background: rgba(0, 170, 255, 0.4); }
-        #m12 { background: rgba(0, 170, 255, 0.2); }
-        #m15 { background: rgba(0, 170, 255, 0.1); }*/
-        #m3 { background: #0055DB; }
+          #m3 { background: #0055DB; }
         #m6 { background: #3276DE; }
         #m9 { background: #6497E2; }
         #m12 { background: #96B8E6; }
@@ -27,7 +22,7 @@
     </style>
 </head>
 <body>
-  <div id='app' class='col12 contain fill-navy dark clip'>
+  <div id='app' class='col12 contain clip'>
     <div id='map'></div>
     <div class='pin-left pad2'>
       <a href='#settings' class='button'>Settings</a>
@@ -37,12 +32,12 @@
       <div id="m3" class="legend-item">3</div><div id="m6" class="legend-item">6</div><div id="m9" class="legend-item">9</div><div id="m12" class="legend-item">12</div><div id="m15" class="legend-item">15</div>
       <div class="legend-caption"><span class="lang-en" style="display: block;">&nbsp;minutes</span></div>
     </div>
-    <div id='settings' class='col4 pad2 fill-darken3 pin-left offcanvas-left animate scroll-styled'>
+    <div id='settings' class='col4 pad2 fill-darken2 pin-left offcanvas-left animate scroll-styled'>
       <a href='#' class='fill-darken2 pad1 icon close button fr'></a>
       <div class='clearfix'></div>
       <form>
         <h5>Cycling Level of Stress</h5>
-        <div class='rounded-toggle inline'>
+        <div class='rounded-toggle inline '>
           <input type='radio' name='dir' id='lts1' value='lts1'>
           <label for='lts1' >LTS-1</label>
           <input type='radio' name='dir' id='lts2' value='lts2'>
@@ -53,7 +48,7 @@
           <label for='lts4' >LTS-4</label>
         </div><br><br>
         <h5>Travel time</h5>
-        <fieldset class='intervals checkbox-pill clearfix'>
+        <fieldset class='intervals checkbox-pill clearfix '>
           <input type='checkbox' id='i3' checked='checked' value=3>
           <label for='i3' class='button icon check quiet'>3m</label>
           <input type='checkbox' id='i6' checked='checked' value=6>
@@ -89,6 +84,8 @@
       </form>
     </div>
   </div>
+  <script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v2.2.0/mapbox-gl-geocoder.min.js'></script>
+  <link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v2.2.0/mapbox-gl-geocoder.css' type='text/css' />
 
   <script>
     var args = location.search.replace(/^\?/,'').split('&').reduce(function(o, param) {
@@ -117,6 +114,14 @@
         maxWidth: 100,
         unit: 'metric'
     }), 'bottom-right');
+
+    const geocoder = new MapboxGeocoder({
+        accessToken: mapboxgl.accessToken,
+        bbox: [-76.385193,44.963826,-75.011902,45.614998],
+        zoom: 13
+    })
+
+    map.addControl(geocoder)
 
     var isDragging;
     var isCursorOverPoint;
@@ -267,6 +272,8 @@
           }
       });
 
+      fetchIsochrones();
+
       map.on('mouseenter', 'point', function() {
           map.setPaintProperty('point', 'circle-color', '#999');
           canvas.style.cursor = 'move';
@@ -355,7 +362,11 @@
       document.getElementById('legend-lts3').onclick = toggleLayer
       document.getElementById('legend-lts4').onclick = toggleLayer
 
-
+      geocoder.on('result', function(ev) {
+        point.features[0].geometry.coordinates = ev.result.geometry.coordinates;
+        map.getSource('point').setData(ev.result.geometry);
+        fetchIsochrones();
+    });
     });
 
   </script>
