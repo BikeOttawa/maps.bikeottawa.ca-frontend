@@ -192,8 +192,9 @@ function displayOsmElementInfo(element, lngLat) {
   			$('#result').html('Thanks! We\'ll look into it</a>');
   		}).fail(function (jqXHR, textStatus, errorThrown){
   			$('#result').html('An error occured. Try again later.');
+        $inputs.prop("disabled", false);
   		}).always(function () {
-  			$inputs.prop("disabled", false);
+  			
   		});
   		event.preventDefault();
   	});
