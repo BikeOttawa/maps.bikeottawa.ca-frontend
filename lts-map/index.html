@@ -39,10 +39,10 @@
 
 <script>
 var ltsLayers = [
-    {id:"lts1", url: 'data/level_1.json', name:'LTS 1 - Suitable for children', color:'#0099cc', opacity:0.9, tileset:'mapbox://zzptichka.53bf2frg', layer:'level_1-45ccc2'},
-    {id:"lts2", url: 'data/level_2.json', name:'LTS-2 - Low stress', color:'#1C7C54', opacity:0.9, tileset:'mapbox://zzptichka.771hbw7i', layer:'level_2-18vk61'},
-    {id:"lts3", url: 'data/level_3.json', name:'LTS-3 - Medium stress', color:'#F0C808', opacity:0.9, tileset:'mapbox://zzptichka.5jgkszgd', layer:'level_3-97ctwn'},
-    {id:"lts4", url: 'data/level_4.json', name:'LTS-4 - High stress', color:'#DD5454', opacity:0.9, tileset:'mapbox://zzptichka.4ioiilcy', layer:'level_4-b8wity'}
+    {id:"lts1", name:'LTS 1 - Suitable for children', color:'#0099cc', opacity:0.9, tileset:'mapbox://zzptichka.53bf2frg', layer:'53bf2frg'},
+    {id:"lts2", name:'LTS-2 - Low stress', color:'#1C7C54', opacity:0.9, tileset:'mapbox://zzptichka.771hbw7i', layer:'771hbw7i'},
+    {id:"lts3", name:'LTS-3 - Medium stress', color:'#F0C808', opacity:0.9, tileset:'mapbox://zzptichka.5jgkszgd', layer:'5jgkszgd'},
+    {id:"lts4", name:'LTS-4 - High stress', color:'#DD5454', opacity:0.9, tileset:'mapbox://zzptichka.4ioiilcy', layer:'4ioiilcy'}
   ];
 
 
@@ -60,18 +60,14 @@ var map = new mapboxgl.Map({
 function init() {
 
   ltsLayers.forEach(function (layer, i) {
-
-    map.addSource(layer.id, {
-        type: 'geojson',
-        data: layer.url,
-        buffer: 0,
-        maxzoom: 17
-    });
-
     map.addLayer({
       "id": layer.id,
       "type": "line",
-      'source': layer.id,
+      "source": {
+          type: 'vector',
+          url: layer.tileset,
+      },
+      "source-layer": layer.layer,
       "layout": {
           "line-join": "round",
           "line-cap": "round"
@@ -83,6 +79,7 @@ function init() {
       }
     });
     document.getElementById(layer.id+'-label').innerHTML = '<span style="display: inline-block;width:50px; height:8px;background-color: '+layer.color+'"></span>&nbsp;'+layer.name;
+
   });
 
   map.addSource('highlight', { type: 'geojson' , data: null});
@@ -194,7 +191,7 @@ function displayOsmElementInfo(element, lngLat) {
   			$('#result').html('An error occured. Try again later.');
         $inputs.prop("disabled", false);
   		}).always(function () {
-  			
+
   		});
   		event.preventDefault();
   	});
