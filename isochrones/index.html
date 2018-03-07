@@ -323,8 +323,9 @@
 
         //var url = new URL("http://ec2-34-214-224-151.us-west-2.compute.amazonaws.com:4000");
         var url = new URL("https://maps.bikeottawa.ca:3000");
-        Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
-        (intervals.length > 0 ? intervals : [3, 6, 9, 12, 15]).forEach(interval => url.searchParams.append('intervals', interval));
+        url.href+='?'
+        Object.keys(params).forEach(key => url.href+=key+'='+params[key]+'&');
+        (intervals.length > 0 ? intervals : [3, 6, 9, 12, 15]).forEach(interval => url.href+='intervals='+interval+'&');
 
         console.groupCollapsed(pLng, pLat);
         console.time('request');
