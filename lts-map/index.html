@@ -121,9 +121,9 @@ map.on('click', function(e) {
         return;
     }
     var feature = features[0];
-    displayOsmElementInfo(features[0].properties.id, e.lngLat);
-
-    //TODO: highlight using filters
+    displayOsmElementInfo(feature.properties.id, e.lngLat);
+    window.history.replaceState(null, null, window.location.pathname+'?&lat='+e.lngLat.lat+'&lng='+e.lngLat.lng+'&id='+feature.properties.id);
+      //TODO: highlight using filters
     map.getSource('highlight').setData(feature);
 
 });
@@ -136,6 +136,17 @@ map.on('mousemove', function(e) {
 });
 map.on('load', function(e) {
     document.getElementById("loader").style.visibility = "hidden";
+    url = new URLSearchParams(window.location.href)
+    const lat = url.get('lat')
+    const lng = url.get('lng')
+    if(typeof(lat)!='undefined' &&typeof(lng)!='undefined'){
+      map.flyTo({center: [lng, lat]})
+      map.once('moveend', function(){
+          map.fire("click", {point : map.project([lng, lat]), lngLat: {lng:lng, lat:lat}});
+      });
+
+    }
+
 })
 
 function displayOsmElementInfo(element, lngLat) {
@@ -156,7 +167,7 @@ function displayOsmElementInfo(element, lngLat) {
       }
       popup+='</ul><hr><div id="clickme" class="quiet text-right small">Suggest an edit</div>';
       popup+='<div id="fform" class="hidden"><form id="feedback"><p><textarea id="comment" name="comment" class="small" style="padding:3px"></textarea></p>';
-      popup+='<input type="hidden" name="link" value="https://www.openstreetmap.org/' + element + '">';
+      popup+='<input type="hidden" name="link" value="' + window.location.href + '">';
       popup+='<p id="result"></p><input type="submit" value="Submit" /></form></div>';
     } else {
       popup += 'Failed to request details from osm.org';
