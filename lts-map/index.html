@@ -139,7 +139,7 @@ map.on('load', function(e) {
     url = new URLSearchParams(window.location.href)
     const lat = url.get('lat')
     const lng = url.get('lng')
-    if(typeof(lat)!='undefined' &&typeof(lng)!='undefined'){
+    if(lat && lng){
       map.flyTo({center: [lng, lat]})
       map.once('moveend', function(){
           map.fire("click", {point : map.project([lng, lat]), lngLat: {lng:lng, lat:lat}});
