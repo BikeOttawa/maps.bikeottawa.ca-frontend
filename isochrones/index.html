@@ -279,6 +279,18 @@
           }
       });
 
+      url = new URLSearchParams(window.location.href)
+      const lat = url.get('lat')
+      const lng = url.get('lng')
+      const lts = url.get('lts')
+      if(lat && lng){
+        map.flyTo({center: [lng, lat]})
+        point.features[0].geometry.coordinates = [lng, lat];
+        map.getSource('point').setData(point.features[0].geometry);
+        document.getElementById(lts?lts:'lts4').checked = true;
+
+      }
+
       fetchIsochrones();
 
       map.on('mouseenter', 'point', function() {
@@ -346,6 +358,7 @@
             document.getElementById('error').style="display:block";
             mapEl.classList.remove('loading');
           });
+        window.history.replaceState(null, null, window.location.pathname+'?&lat='+pLat+'&lng='+pLng+'&lts='+params.dir);
 
       }
 
