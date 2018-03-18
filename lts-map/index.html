@@ -168,6 +168,7 @@ function displayOsmElementInfo(element, lngLat) {
       popup+='</ul><hr><div id="clickme" class="quiet text-right small">Suggest an edit</div>';
       popup+='<div id="fform" class="hidden"><form id="feedback"><p><textarea id="comment" name="comment" class="small" style="padding:3px"></textarea></p>';
       popup+='<input type="hidden" name="link" value="' + window.location.href + '">';
+      popup+='<input type="hidden" name="osm_link" value="https://www.openstreetmap.org/' + element + '">';
       popup+='<p id="result"></p><input type="submit" value="Submit" /></form></div>';
     } else {
       popup += 'Failed to request details from osm.org';
