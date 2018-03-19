@@ -149,12 +149,30 @@
         "type": "FeatureCollection",
         "features": []
     };
+    var routePoint = {
+        "type": "Feature",
+        "properties":{title:'N/A'},
+        "geometry": {
+            "type": "Point",
+            "coordinates": [0,0]
+        }
+    };
+    var routeLine = {
+        "type": "Feature",
+        "properties":{title:'N/A'},
+        "geometry": {
+            "type": "LineString",
+            "coordinates": [[0,0]]
+        }
+
+    };
 
 
 
     function mouseDown() {
         if (!isCursorOverPoint) return;
         map.getSource('route').setData({"type": "Feature","geometry": {"type": "Point","coordinates": [ 0, 0 ]}})
+        map.getSource('route-point').setData({"type": "Feature","geometry": {"type": "Point","coordinates": [ 0, 0 ]}})
         isDragging = true;
 
         // Set a cursor indicator
@@ -279,21 +297,35 @@
           }
       });
 
-      map.addSource('route', { type: 'geojson' , data: null});
+      map.addSource('route', { type: 'geojson' , data: routeLine});
       map.addLayer({
          "id": "route",
          "type": "line",
          "source": 'route',
+         "layout":{
+             "line-cap": "round"
+         },
          "paint": {
              "line-color": "#333",
              "line-width": 3,
              "line-opacity": 1
          }
       });
+
+      map.addSource('route-point', { type: 'geojson' , data: routePoint});
       map.addLayer({
-          "id": "label",
+          "id": "route-point",
+          "type": "circle",
+          "source": "route-point",
+          "paint": {
+              "circle-radius": 5,
+              "circle-color": "#333"
+          }
+      });
+      map.addLayer({
+          "id": "route-label",
           "type": "symbol",
-          "source": "route",
+          "source": "route-point",
           "layout": {
               "text-field": '{title}',
               "text-size": 14,
@@ -304,7 +336,6 @@
             "text-halo-width": 2
           }
       });
-
       url = new URLSearchParams(window.location.href)
       const lat = url.get('lat')
       const lng = url.get('lng')
@@ -357,12 +388,12 @@
             }
 
             if (data.routes[0]){
-              data.routes[0].type='Feature'
-              data.routes[0].properties = {title:buildTitle(data.routes[0].duration, data.routes[0].distance)}
-              map.getSource('route').setData(data.routes[0]);
-
+              routeLine.geometry.coordinates = data.routes[0].geometry.coordinates
+              map.getSource('route').setData(routeLine);
+              routePoint.geometry.coordinates = data.waypoints[data.waypoints.length - 1].location
+              routePoint.properties.title = buildTitle(data.routes[0].duration, data.routes[0].distance)
+              map.getSource('route-point').setData(routePoint)
             }
-            //dispatch(destinationPoint(data.waypoints[data.waypoints.length - 1].location));
           } else {
             return
           }
