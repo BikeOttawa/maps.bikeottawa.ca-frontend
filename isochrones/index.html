@@ -154,7 +154,7 @@
 
     function mouseDown() {
         if (!isCursorOverPoint) return;
-
+        map.getSource('route').setData({"type": "Feature","geometry": {"type": "Point","coordinates": [ 0, 0 ]}})
         isDragging = true;
 
         // Set a cursor indicator
@@ -279,6 +279,32 @@
           }
       });
 
+      map.addSource('route', { type: 'geojson' , data: null});
+      map.addLayer({
+         "id": "route",
+         "type": "line",
+         "source": 'route',
+         "paint": {
+             "line-color": "#333",
+             "line-width": 3,
+             "line-opacity": 1
+         }
+      });
+      map.addLayer({
+          "id": "label",
+          "type": "symbol",
+          "source": "route",
+          "layout": {
+              "text-field": '{title}',
+              "text-size": 14,
+              "text-offset": [0,-2]
+          },
+          "paint": {
+            "text-halo-color": "#fff",
+            "text-halo-width": 2
+          }
+      });
+
       url = new URLSearchParams(window.location.href)
       const lat = url.get('lat')
       const lng = url.get('lng')
@@ -302,6 +328,10 @@
 
       map.on('mousedown', mouseDown);
 
+      map.on('click', function(e) {
+          fetchRoute(e.lngLat)
+      });
+
       map.on('mouseleave', 'point', function(e) {
         map.setPaintProperty('point', 'circle-color', '#333');
         canvas.style.cursor = '';
@@ -310,6 +340,45 @@
 
 
       });
+
+      const request = new XMLHttpRequest();
+
+      function fetchRoute(lngLat) {
+        const query = encodeURIComponent([point.features[0].geometry.coordinates.join(','),[lngLat.lng, lngLat.lat].join(',')].join(';'));
+        const api = "https://maps.bikeottawa.ca/route/v1/"+document.querySelector('input[name="dir"]:checked').value
+        request.abort();
+        request.open('GET', api + '/'+ query + '?alternatives=false&steps=true&geometries=geojson', true);
+        request.onload = function () {
+          if (request.status >= 200 && request.status < 400) {
+            var data = JSON.parse(request.responseText);
+
+            if (data.error) {
+              return
+            }
+
+            if (data.routes[0]){
+              data.routes[0].type='Feature'
+              data.routes[0].properties = {title:buildTitle(data.routes[0].duration, data.routes[0].distance)}
+              map.getSource('route').setData(data.routes[0]);
+
+            }
+            //dispatch(destinationPoint(data.waypoints[data.waypoints.length - 1].location));
+          } else {
+            return
+          }
+        };
+
+        request.onerror = function () {
+          return
+        };
+
+        request.send();
+      }
+      function buildTitle(duration, distance){
+        let ret = Math.floor(duration / 60).toString() + ':'+('00'+Math.floor(duration % 60)).slice(-2)
+        ret += '\n'+Math.floor(distance)+'m'
+        return ret
+      }
 
       function fetchIsochrones() {
 
@@ -358,7 +427,7 @@
             document.getElementById('error').style="display:block";
             mapEl.classList.remove('loading');
           });
-        window.history.replaceState(null, null, window.location.pathname+'?&lat='+pLat+'&lng='+pLng+'&lts='+params.dir);
+        window.history.replaceState(null, null, window.location.pathname+'?&lat='+pLat+'&lng='+pLng+'&lts='+params.dir+'&');
 
       }
 
@@ -390,7 +459,7 @@
         point.features[0].geometry.coordinates = ev.result.geometry.coordinates;
         map.getSource('point').setData(ev.result.geometry);
         fetchIsochrones();
-    });
+      });
     });
 
   </script>
