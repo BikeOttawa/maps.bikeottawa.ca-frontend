@@ -17,7 +17,12 @@
 <body>
 <div id='app' class='col12 contain clip'>
 <div id='map'></div>
-<div id='legend' class='col3 row5 right'>
+<div id='legendbtn'>
+  <a href='#legend' class='button fill-darken2 icon bike' onclick="$('#legendbtn').hide()"></a>
+</div>
+<div id='legend' class='col4 offcanvas-left'>
+  <a href='#' class='fill-darken2 icon close button'  onclick="$('#legendbtn').show()"></a>
+  <div class='clearfix'></div>
   <form>
     <h5>Levels of Stress</h5>
     <fieldset class='checkbox-pill clearfix '>
