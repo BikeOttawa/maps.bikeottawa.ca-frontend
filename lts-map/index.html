@@ -160,13 +160,12 @@ function addDateToAttribution(){
       var data = JSON.parse(request.responseText);
       if(data && data instanceof Array){
         const date = new Date(data.find(x => x.id === 'zzptichka.53bf2frg').modified)
-        $('.mapboxgl-ctrl-attrib').prepend('<a href="https://bikeottawa.ca">© BikeOttawa</a> ')
+        $('.mapboxgl-ctrl-attrib').html('<a href="https://bikeottawa.ca">© BikeOttawa</a> <a href="https://www.mapbox.com/about/maps/" target="_blank">© Mapbox</a> <a href="http://www.openstreetmap.org/about/" target="_blank">© OpenStreetMap</a>')
         $('.mapboxgl-ctrl-attrib').append(' ['+date.toLocaleString()+']')
       }
     }
   }
   request.send()
-  //document.getElementById('mapboxgl-ctrl-attrib').innerHTML += '© BikeOttawa 2018-05-30'
 }
 
 function displayOsmElementInfo(element, lngLat) {
