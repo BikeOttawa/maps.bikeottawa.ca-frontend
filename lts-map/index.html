@@ -5,7 +5,7 @@
     <title>Ottawa cycling stress map</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.0/mapbox-gl.js'></script>
-    <script  data-cfasync="false" src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script  data-cfasync="false" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.0/mapbox-gl.css' rel='stylesheet' />
     <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
     <style>
@@ -54,7 +54,8 @@ var map = new mapboxgl.Map({
     zoom: 13,
     minZoom: 10,
     maxZoom: 17,
-    maxBounds: [[-76.385193,44.963826],[-75.011902,45.614998]]
+    maxBounds: [[-76.385193,44.963826],[-75.011902,45.614998]],
+    attributionControl: false
 });
 
 function init() {
@@ -110,6 +111,7 @@ map.once('style.load', function () {
     init()
     map.addControl(new mapboxgl.NavigationControl(),'bottom-right');
     map.addControl(new mapboxgl.ScaleControl(), 'bottom-left');
+    map.addControl(new mapboxgl.AttributionControl({compact: true }), 'bottom-right');
 });
 
 map.on('click', function(e) {
@@ -135,6 +137,7 @@ map.on('mousemove', function(e) {
     map.getCanvas().style.cursor = (features.length) ? 'pointer' : '';
 });
 map.on('load', function(e) {
+    addDateToAttribution()
     document.getElementById("loader").style.visibility = "hidden";
     url = new URLSearchParams(window.location.href)
     const lat = url.get('lat')
@@ -148,6 +151,23 @@ map.on('load', function(e) {
     }
 
 })
+
+function addDateToAttribution(){
+  const request = new XMLHttpRequest()
+  request.open('GET','https://api.mapbox.com/tilesets/v1/zzptichka?access_token=sk.eyJ1IjoienpwdGljaGthIiwiYSI6ImNqZjA3ZWZocjA5aDMydms5bDkxemt2cmsifQ.VoqGzC_Cd3JIzP6tph5i8g')
+  request.onload = function () {
+    if (request.status >= 200 && request.status < 400) {
+      var data = JSON.parse(request.responseText);
+      if(data && data instanceof Array){
+        const date = new Date(data.find(x => x.id === 'zzptichka.53bf2frg').modified)
+        $('.mapboxgl-ctrl-attrib').prepend('<a href="https://bikeottawa.ca">© BikeOttawa</a> ')
+        $('.mapboxgl-ctrl-attrib').append(' ['+date.toLocaleString()+']')
+      }
+    }
+  }
+  request.send()
+  //document.getElementById('mapboxgl-ctrl-attrib').innerHTML += '© BikeOttawa 2018-05-30'
+}
 
 function displayOsmElementInfo(element, lngLat) {
   if(typeof element == 'undefined') return;
