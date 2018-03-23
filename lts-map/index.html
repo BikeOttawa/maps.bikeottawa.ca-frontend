@@ -6,6 +6,7 @@
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.0/mapbox-gl.js'></script>
     <script  data-cfasync="false" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src='stressmodel.js'></script>
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.0/mapbox-gl.css' rel='stylesheet' />
     <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
     <style>
@@ -182,13 +183,18 @@ function displayOsmElementInfo(element, lngLat) {
     if (xhr.status === 200) {
       const xmlDOM = new DOMParser().parseFromString(xhr.responseText, 'text/xml');
       const tags = xmlDOM.getElementsByTagName("tag");
+      const ltsWay = {id:element, tags:{}}
       for(let i=0; i<tags.length; i++)
       {
         if(tags[i].attributes["k"].value == 'source') continue;   //skip non-important tags
         if(tags[i].attributes["k"].value == 'name:fr') continue;
         if(tags[i].attributes["k"].value == 'operator') continue;
-        popup += '<li>'+tags[i].attributes["k"].value+": <b>"+tags[i].attributes["v"].value+'</b></li>';
+        popup += '<li>'+tags[i].attributes["k"].value+": <b>"+tags[i].attributes["v"].value+'</b></li>\n';
+        ltsWay.tags[tags[i].attributes["k"].value] = tags[i].attributes["v"].value
       }
+      const ltsEval = evaluateLTS(ltsWay)
+      popup+='<li><div id="showLtsWhy">LTS: <b>'+ltsEval.lts+'</b></div></li>\n'
+      popup+='<li><div id="ltsWhy" class="hidden">'+ltsEval.message.replace('\n','<br>')+'</div></li>\n'
       popup+='</ul><hr><div id="clickme" class="quiet text-right small">Suggest an edit</div>';
       popup+='<div id="fform" class="hidden"><form id="feedback"><p><textarea id="comment" name="comment" class="small" style="padding:3px"></textarea></p>';
       popup+='<input type="hidden" name="link" value="' + window.location.href + '">';
@@ -201,7 +207,9 @@ function displayOsmElementInfo(element, lngLat) {
     .setLngLat(lngLat)
     .setHTML(popup)
     .addTo(map)
-
+    $( "#showLtsWhy" ).click(function() {
+      $( "#ltsWhy" ).toggle('slow');
+    });
     $( "#clickme" ).click(function() {
       $(this).toggle('slow');
       $( "#fform" ).toggle('slow');
