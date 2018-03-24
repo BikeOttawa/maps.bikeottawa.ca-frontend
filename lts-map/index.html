@@ -194,7 +194,7 @@ function displayOsmElementInfo(element, lngLat) {
       }
       const ltsEval = evaluateLTS(ltsWay)
       popup+='<li><div id="showLtsWhy">LTS: <b>'+ltsEval.lts+'</b></div></li>\n'
-      popup+='<li><div id="ltsWhy" class="hidden">'+ltsEval.message.replace('\n','<br>')+'</div></li>\n'
+      popup+='<div id="ltsWhy" class="hidden"><li>'+ltsEval.message.join('</li><li>')+'</li></div>\n'
       popup+='</ul><hr><div id="clickme" class="quiet text-right small">Suggest an edit</div>';
       popup+='<div id="fform" class="hidden"><form id="feedback"><p><textarea id="comment" name="comment" class="small" style="padding:3px"></textarea></p>';
       popup+='<input type="hidden" name="link" value="' + window.location.href + '">';
