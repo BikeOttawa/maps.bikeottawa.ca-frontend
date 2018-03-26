@@ -192,7 +192,7 @@ function displayOsmElementInfo(element, lngLat) {
         popup += '<li>'+tags[i].attributes["k"].value+": <b>"+tags[i].attributes["v"].value+'</b></li>\n';
         ltsWay.tags[tags[i].attributes["k"].value] = tags[i].attributes["v"].value
       }
-      const ltsEval = evaluateLTS(ltsWay)
+      const ltsEval = stressmodel.evaluateLTS(ltsWay)
       popup+='<li><div id="showLtsWhy">LTS: <b>'+ltsEval.lts+'</b></div></li>\n'
       popup+='<div id="ltsWhy" class="hidden"><li>'+ltsEval.message.join('</li><li>')+'</li></div>\n'
       popup+='</ul><hr><div id="clickme" class="quiet text-right small">Suggest an edit</div>';
