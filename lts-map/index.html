@@ -202,9 +202,11 @@ function displayOsmElementInfo(element, lngLat) {
         popup += '<li>'+tags[i].attributes["k"].value+": <b>"+tags[i].attributes["v"].value+'</b></li>\n';
         ltsWay.tags[tags[i].attributes["k"].value] = tags[i].attributes["v"].value
       }
+      showMapillaryImage(lngLat)
       const ltsEval = stressmodel.evaluateLTS(ltsWay)
       popup+='<li><div id="showLtsWhy">LTS: <b>'+ltsEval.lts+'</b></div></li>\n'
       popup+='<div id="ltsWhy" class="hidden"><li>'+ltsEval.message.join('</li><li>')+'</li></div>\n'
+      popup+='<li><div id="showMapillary"></div></li>'
       popup+='<li><div id="showGoogle"><img class="enlarge-onhover" src="https://maps.googleapis.com/maps/api/streetview?size=640x400&fov=120&pitch=-30&key=AIzaSyDXbZYWFjz5Nr8N1c0OoTA_YFYCyV0V6Fs&location='+lngLat.lat+','+lngLat.lng+'"></div></li>'
       popup+='</ul><hr><div id="clickme" class="quiet text-right small">Suggest an edit</div>';
       popup+='<div id="fform" class="hidden"><form id="feedback"><p><textarea id="comment" name="comment" class="small" style="padding:3px"></textarea></p>';
@@ -254,6 +256,22 @@ function displayOsmElementInfo(element, lngLat) {
   xhr.send()
 }
 
+
+
+function showMapillaryImage(lngLat) {
+  const xhr = new XMLHttpRequest()
+  xhr.open('GET','https://a.mapillary.com/v3/images/?radius=10&per_page=1&client_id=TG1sUUxGQlBiYWx2V05NM0pQNUVMQTo2NTU3NTBiNTk1NzM1Y2U2&closeto='+lngLat.lng+','+lngLat.lat)
+  xhr.onload = function () {
+    if (xhr.status === 200) {
+      const result = JSON.parse(xhr.responseText)
+      if(!result.features || result.features.length==0){
+        return
+      }
+      document.getElementById('showMapillary').innerHTML = '<img class="enlarge-onhover" src="https://d1cuyjsrcm0gby.cloudfront.net/'+result.features[0].properties.key+'/thumb-640.jpg">'
+    }
+  }
+  xhr.send()
+}
 </script>
 <!--https://docs.google.com/spreadsheets/d/1Rx1SjhWXwkMsHFAioP9XE42Or9S7Ob7JYPLUzSMe-T8/edit?usp=sharing -->
 </body>
