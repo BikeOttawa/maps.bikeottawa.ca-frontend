@@ -260,7 +260,7 @@ function displayOsmElementInfo(element, lngLat) {
 
 function showMapillaryImage(lngLat) {
   const xhr = new XMLHttpRequest()
-  xhr.open('GET','https://a.mapillary.com/v3/images/?radius=10&per_page=1&client_id=TG1sUUxGQlBiYWx2V05NM0pQNUVMQTo2NTU3NTBiNTk1NzM1Y2U2&closeto='+lngLat.lng+','+lngLat.lat)
+  xhr.open('GET','https://a.mapillary.com/v3/images/?radius=15&per_page=1&client_id=TG1sUUxGQlBiYWx2V05NM0pQNUVMQTo2NTU3NTBiNTk1NzM1Y2U2&closeto='+lngLat.lng+','+lngLat.lat)
   xhr.onload = function () {
     if (xhr.status === 200) {
       const result = JSON.parse(xhr.responseText)
