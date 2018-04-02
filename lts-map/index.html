@@ -49,7 +49,7 @@
 
   </form>
 </div>
-<div class="loading" title="loading..." id="loader">
+<div class="loading" title="loading..." id="loader"></div>
 
 </div>
 
@@ -155,9 +155,22 @@ map.on('mousemove', function(e) {
 map.on('load', function(e) {
     addDateToAttribution()
     document.getElementById("loader").style.visibility = "hidden";
-    url = new URLSearchParams(window.location.href)
-    const lat = url.get('lat')
-    const lng = url.get('lng')
+    //url = new URLSearchParams(window.location.href)
+    url = (function(a) {    //workaround for edge that doesn't support URLSearchParams
+        if (a == "") return {};
+        var b = {};
+        for (var i = 0; i < a.length; ++i)
+        {
+            var p=a[i].split('=', 2);
+            if (p.length == 1)
+                b[p[0]] = "";
+            else
+                b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+        }
+        return b;
+    })(window.location.search.substr(1).split('&'));
+    const lat = url['lat']
+    const lng = url['lng']
     if(lat && lng){
       map.flyTo({center: [lng, lat]})
       map.once('moveend', function(){
