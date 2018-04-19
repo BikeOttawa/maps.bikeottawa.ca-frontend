@@ -46,13 +46,17 @@
       <input type='checkbox' id='lts4' checked='checked'>
       <label for='lts4' id='lts4-label' class='button icon check quiet col12' style="text-align:left;">LTS-4</label>
     </fieldset>
-    <h5 style="background-color: rgba(255,255,255,0.5)"><img src="../img/bikeottawa-square.png" style="width:100px; height:100px;float: right">This map is a production of Bike Ottawa with funding by councillor Jeff Leiper.</h5>
-  </form>
+    </form>
+    <div class='center pad2'>
+    	<a href='https://bikeottawa.ca'><img src="../img/logos/bikeottawa.png" style="width:32px; height:32px;"></a>
+      <a href='https://github.com/BikeOttawa/maps.bikeottawa.ca-frontend'><img src="../img/logos/github.png" style="width:32px; height:32px;"></a>
+      <a href='https://twitter.com/BikeOttawa'><img src="../img/logos/twitter.png" style="width:32px; height:32px;"></a>
+    </div>
 </div>
 <div class="loading" title="loading..." id="loader"></div>
 
 </div>
-	
+
 <script>
 var ltsLayers = [
     {id:"lts1", name:'LTS 1 - Suitable for children', color:'#0099cc', opacity:0.9, tileset:'mapbox://zzptichka.53bf2frg', layer:'53bf2frg'},
@@ -111,7 +115,7 @@ function init() {
      }
  });
 }
-	
+
 function toggleLayer (checkbox) {
     map.setLayoutProperty(checkbox.currentTarget.id, 'visibility', checkbox.currentTarget.checked?'visible':'none');
   }
