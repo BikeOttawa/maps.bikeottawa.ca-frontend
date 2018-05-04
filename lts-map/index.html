@@ -186,12 +186,12 @@ map.on('load', function(e) {
 
 function addDateToAttribution(){
   const request = new XMLHttpRequest()
-  request.open('GET','https://api.mapbox.com/tilesets/v1/zzptichka?access_token=sk.eyJ1IjoienpwdGljaGthIiwiYSI6ImNqZjA3ZWZocjA5aDMydms5bDkxemt2cmsifQ.VoqGzC_Cd3JIzP6tph5i8g')
+  request.open('GET','https://api.mapbox.com/tilesets/v1/bikeottawa?access_token=sk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdyYTJmN2EwMmtoMzJwc3JxM2hoZ3ozIn0.YB1JNmncsPvktmgGU_zK8A')
   request.onload = function () {
     if (request.status >= 200 && request.status < 400) {
       var data = JSON.parse(request.responseText);
       if(data && data instanceof Array){
-        const date = new Date(data.find(x => x.id === 'zzptichka.53bf2frg').modified)
+        const date = new Date(data.find(x => x.id === 'bikeottawa.7gev94ax').modified)
         $('.mapboxgl-ctrl-attrib').html('<a href="https://bikeottawa.ca">© BikeOttawa</a> <a href="https://www.mapbox.com/about/maps/" target="_blank">© Mapbox</a> <a href="http://www.openstreetmap.org/about/" target="_blank">© OpenStreetMap</a>')
         $('.mapboxgl-ctrl-attrib').append(' ['+date.toLocaleString()+']')
       }
