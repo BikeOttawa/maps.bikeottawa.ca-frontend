@@ -21,10 +21,10 @@
 <div id='app' class='col12 contain clip'>
 <div id='map'></div>
 <div id='legendbtn' class='pin-right pad2 '>
-  <a href='#legend' class='button' onclick="document.getElementById('legendbtn').style.display='none'">Legend</a>
+  <a href='#legend' class='button fill-darken2 icon menu' onclick="$('#legendbtn').toggle()"></a>
 </div>
 <div id='legend' class='col4 pad2 pin-right offcanvas-right scroll-styled'>
-  <a href='#' class='fill-darken2 pad1 icon close button fr' onclick="document.getElementById('legendbtn').style.display='block'"></a>
+  <a href='#' class='fill-darken2 pad1 icon close button fr' onclick="$('#legendbtn').toggle()"></a>
   <div class='clearfix'></div>
   <form>
     <h5>Street legend</h5>
