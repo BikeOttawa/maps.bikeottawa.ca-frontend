@@ -28,30 +28,32 @@
 <body>
 <div id='app' class='col12 contain clip'>
 <div id='map'></div>
-<div id='legendbtn' class='pin-right pad2 '>
-  <a href='#legend' class='button fill-darken2 icon menu' onclick="$('#legendbtn').toggle()"></a>
-</div>
-<div id='legend' class='col4 pad2 pin-right offcanvas-right scroll-styled'>
-  <a href='#' class='fill-darken2 pad1 icon close button fr' onclick="$('#legendbtn').toggle()"></a>
-  <div class='clearfix'></div>
-  <form>
-    <h5>Levels of Stress</h5>
-    <fieldset class='checkbox-pill clearfix '>
-      <input type='checkbox' id='lts1' checked='checked'>
-      <label for='lts1' id='lts1-label' class='button icon check quiet col12' style="text-align:left;">LTS-1</label>
-      <input type='checkbox' id='lts2' checked='checked'>
-      <label for='lts2' id='lts2-label' class='button icon check quiet col12' style="text-align:left;">LTS-2</label>
-      <input type='checkbox' id='lts3' checked='checked'>
-      <label for='lts3' id='lts3-label' class='button icon check quiet col12' style="text-align:left;">LTS-3</label>
-      <input type='checkbox' id='lts4' checked='checked'>
-      <label for='lts4' id='lts4-label' class='button icon check quiet col12' style="text-align:left;">LTS-4</label>
-    </fieldset>
-    </form>
-    <div class='center pad2'>
-    	<a href='https://bikeottawa.ca'><img src="../img/logos/bikeottawa.png" style="width:32px; height:32px;"></a>
-      <a href='https://github.com/BikeOttawa/maps.bikeottawa.ca-frontend'><img src="../img/logos/github.png" style="width:32px; height:32px;"></a>
-      <a href='https://twitter.com/BikeOttawa'><img src="../img/logos/twitter.png" style="width:32px; height:32px;"></a>
+<div class='col4 pad1  scroll-styled pin-topright dark '>
+  <div id='legendbtn' class='fill-darken2 pad1 icon menu button fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
+  <div id='legend' class='fill-darken2 hidden round'>
+    <div id='closebtn' class='fill-darken2 pad1 icon close button fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
+    <div class='clearfix'></div>
+    <div class='pad1'>
+      <h5>Levels of Stress</h5>
+      <form>
+      <fieldset class='checkbox-pill clearfix '>
+        <input type='checkbox' id='lts1' checked='checked'>
+        <label for='lts1' id='lts1-label' class='button icon check quiet col12' style="text-align:left;">LTS-1</label>
+        <input type='checkbox' id='lts2' checked='checked'>
+        <label for='lts2' id='lts2-label' class='button icon check quiet col12' style="text-align:left;">LTS-2</label>
+        <input type='checkbox' id='lts3' checked='checked'>
+        <label for='lts3' id='lts3-label' class='button icon check quiet col12' style="text-align:left;">LTS-3</label>
+        <input type='checkbox' id='lts4' checked='checked'>
+        <label for='lts4' id='lts4-label' class='button icon check quiet col12' style="text-align:left;">LTS-4</label>
+      </fieldset>
+      </form>
+      <div class='center pad2'>
+      	<a href='https://bikeottawa.ca'><img src="../img/logos/bikeottawa.png" style="width:32px; height:32px;"></a>
+        <a href='https://github.com/BikeOttawa/maps.bikeottawa.ca-frontend'><img src="../img/logos/github.png" style="width:32px; height:32px;"></a>
+        <a href='https://twitter.com/BikeOttawa'><img src="../img/logos/twitter.png" style="width:32px; height:32px;"></a>
+      </div>
     </div>
+  </div>
 </div>
 <div class="loading" title="loading..." id="loader"></div>
 
@@ -284,7 +286,7 @@ function showMapillaryImage(lngLat) {
       if(!result.features || result.features.length==0){
         return
       }
-      document.getElementById('showMapillary').innerHTML = '<img class="enlarge-onhover" src="https://d1cuyjsrcm0gby.cloudfront.net/'+result.features[0].properties.key+'/thumb-640.jpg">'
+      document.getElementById('showMapillary').innerHTML = '<a href="https://www.mapillary.com/app/?focus=photo&pKey='+result.features[0].properties.key+'"><img class="enlarge-onhover" src="https://d1cuyjsrcm0gby.cloudfront.net/'+result.features[0].properties.key+'/thumb-640.jpg"></a>'
     }
   }
   xhr.send()
