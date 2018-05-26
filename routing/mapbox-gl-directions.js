@@ -5816,8 +5816,9 @@ function fetchDirections() {
         dispatch(setDirections(data.routes));
 
         // Revise origin / destination points
-        dispatch(originPoint(data.waypoints[0].location));
-        dispatch(destinationPoint(data.waypoints[data.waypoints.length - 1].location));
+        //dispatch(originPoint(data.waypoints[0].location));
+        //dispatch(destinationPoint(data.waypoints[data.waypoints.length - 1].location));
+        //instead - draw dotted lines to actual endpoints
       } else {
         dispatch(setDirections([]));
         return dispatch(setError(JSON.parse(request.responseText).message));
@@ -6318,7 +6319,7 @@ Geocoder.prototype = {
   _setInput: function _setInput(input) {
     if (!input) return;
     if ((typeof input === 'undefined' ? 'undefined' : _typeof(input)) === 'object' && input.length) {
-      input = [_utils2.default.wrap(input[0]), _utils2.default.wrap(input[1])].join();
+      input = [_utils2.default.wrap(input[0]).toFixed(5), _utils2.default.wrap(input[1]).toFixed(5)].join();
     }
 
     // Set input value to passed value and clear everything else.
@@ -7367,7 +7368,8 @@ var style = [{
   },
   'paint': {
     'line-color': '#bbb',
-    'line-width': 4
+    'line-width': 5,
+    'line-opacity': 0.9
   },
   'filter': ['all', ['in', '$type', 'LineString'], ['in', 'route', 'alternate']]
 }, {
@@ -7380,7 +7382,8 @@ var style = [{
   },
   'paint': {
     'line-color': '#9c27e4',
-    'line-width': 4
+    'line-width': 5,
+    'line-opacity': 0.6
   },
   'filter': ['all', ['in', '$type', 'LineString'], ['in', 'route', 'selected']]
 }, {
