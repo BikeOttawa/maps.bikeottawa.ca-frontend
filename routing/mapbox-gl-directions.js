@@ -5816,8 +5816,9 @@ function fetchDirections() {
         dispatch(setDirections(data.routes));
 
         // Revise origin / destination points
-        dispatch(originPoint(data.waypoints[0].location));
-        dispatch(destinationPoint(data.waypoints[data.waypoints.length - 1].location));
+        //dispatch(originPoint(data.waypoints[0].location));
+        //dispatch(destinationPoint(data.waypoints[data.waypoints.length - 1].location));
+        //instead - draw dotted lines to actual endpoints
       } else {
         dispatch(setDirections([]));
         return dispatch(setError(JSON.parse(request.responseText).message));
