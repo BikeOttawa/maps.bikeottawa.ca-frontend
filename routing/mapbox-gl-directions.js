@@ -6318,7 +6318,7 @@ Geocoder.prototype = {
   _setInput: function _setInput(input) {
     if (!input) return;
     if ((typeof input === 'undefined' ? 'undefined' : _typeof(input)) === 'object' && input.length) {
-      input = [_utils2.default.wrap(input[0]), _utils2.default.wrap(input[1])].join();
+      input = [_utils2.default.wrap(input[0]).toFixed(5), _utils2.default.wrap(input[1]).toFixed(5)].join();
     }
 
     // Set input value to passed value and clear everything else.
