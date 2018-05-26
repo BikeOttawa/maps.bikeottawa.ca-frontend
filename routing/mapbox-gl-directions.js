@@ -7367,7 +7367,8 @@ var style = [{
   },
   'paint': {
     'line-color': '#bbb',
-    'line-width': 4
+    'line-width': 5,
+    'line-opacity': 0.9
   },
   'filter': ['all', ['in', '$type', 'LineString'], ['in', 'route', 'alternate']]
 }, {
@@ -7380,7 +7381,8 @@ var style = [{
   },
   'paint': {
     'line-color': '#9c27e4',
-    'line-width': 4
+    'line-width': 5,
+    'line-opacity': 0.6
   },
   'filter': ['all', ['in', '$type', 'LineString'], ['in', 'route', 'selected']]
 }, {
