@@ -60,12 +60,29 @@ var ltsLayers = [
 mapboxgl.accessToken = 'pk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdqaWxrN3gwZXQ4MnFxbjAwZXRpbG8zIn0.XhAdk2ASwdipubccCWTfoQ';
 var map = new mapboxgl.Map({
     container: 'map',
-    style: 'mapbox://styles/mapbox/light-v8',
+    style: 'mapbox://styles/mapbox/outdoors-v9',
+    /*style: {
+       "version": 8,
+       "sources": {
+           "raster-tiles": {
+               "type": "raster",
+               "url": "mapbox://bikeottawa.satellite",
+               "tileSize": 256
+           }
+       },
+       "layers": [{
+           "id": "simple-tiles",
+           "type": "raster",
+           "source": "raster-tiles",
+           "minzoom": 10,
+           "maxzoom": 22
+       }]
+    },*/
     center: [-75.697927,45.417431],
     zoom: 13,
     minZoom: 10,
-    maxZoom: 17,
-    maxBounds: [[-76.385193,44.963826],[-75.011902,45.614998]]
+    maxZoom: 22,
+maxBounds: [[-76.385193,44.963826],[-75.011902,45.614998]]
 });
 
 map.addControl(new mapboxgl.GeolocateControl({
