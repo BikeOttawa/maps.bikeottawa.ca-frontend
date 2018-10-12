@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>Ottawa cycling stress map</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.0/mapbox-gl.js'></script>
+    <script  data-cfasync="false" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.0/mapbox-gl.css' rel='stylesheet' />
+    <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
+    <style>
+        body { margin:0; padding:0; }
+        #app { position:absolute; top:0; right:0; bottom:0; left:0; }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+        .enlarge-onhover {
+             width: 160px;
+             height: 100px;
+             transition-duration: 0.5s; /* delays for 1 second */
+             -webkit-transition-duration: 0.5s; /* for Safari & Chrome */
+        }
+        .enlarge-onhover:hover {
+             width: 640px;
+             height: 400px;
+        }
+    </style>
+</head>
+<body>
+<div id='app' class='col12 contain clip'>
+<div id='map'></div>
+<div class='col4 pad1  scroll-styled pin-topright  '>
+  <div id='legendbtn' class='fill-darken2 pad1 icon bolt button fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
+  <div id='legend' class='fill-lighten3 hidden round'>
+    <div id='closebtn' class='fill-darken2 pad1 icon close button fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
+    <div class='clearfix'></div>
+    <div class='pad1'>
+      <h3>Desire Paths</h3><hr>
+<div class='small'>
+<p>A desire path is a path created as a result of erosion caused by foot or bicycle traffic.</p>
+<p>The path usually represents the shortest route between an origin and destination. Desire paths emerge as shortcuts where paved ways take a circuitous route, have gaps, or are non-existent.</p>
+<p>Having a map of such shortcuts helps us keep track of missing links and advocate for better cycling and walking network in the city. Help us to maintain it by suggesting those that are missing on the map!</p><br></div>
+<div class='center'><img src="https://d1cuyjsrcm0gby.cloudfront.net/I_zRog72zCi7fgGG8e_Asw/thumb-320.jpg"></div>
+
+      <div class='center pad2'>
+      	<a href='https://bikeottawa.ca'><img src="https://maps.bikeottawa.ca/img/logos/bikeottawa.png" style="width:32px; height:32px;"></a>
+        <a href='https://github.com/BikeOttawa/maps.bikeottawa.ca-frontend'><img src="https://maps.bikeottawa.ca/img/logos/github.png" style="width:32px; height:32px;"></a>
+        <a href='https://twitter.com/BikeOttawa'><img src="https://maps.bikeottawa.ca/img/logos/twitter.png" style="width:32px; height:32px;"></a>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="loading" title="loading..." id="loader"></div>
+
+</div>
+
+<script>
+var ltsLayers = [
+    {id:"desire", name:'Desire lanes', color:'#DD5454', opacity:0.9, width:4, tileset:'mapbox://bikeottawa.4hnbbuhd', layer:'4hnbbuhd'}
+    ];
+
+
+  mapboxgl.accessToken = 'pk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdqaWxrN3gwZXQ4MnFxbjAwZXRpbG8zIn0.XhAdk2ASwdipubccCWTfoQ';
+  var map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/satellite-streets-v9',
+    center: [-75.697927,45.417431],
+    zoom: 13,
+    minZoom: 10,
+    maxZoom: 20,
+    maxBounds: [[-76.385193,44.963826],[-75.011902,45.614998]],
+    attributionControl: false
+});
+
+function init() {
+
+  ltsLayers.forEach(function (layer, i) {
+    map.addLayer({
+      "id": layer.id,
+      "type": "line",
+      "source": {
+          type: 'vector',
+          url: layer.tileset,
+      },
+      "source-layer": layer.layer,
+      "layout": {
+          "line-join": "round",
+          "line-cap": "round"
+      },
+      "paint": {
+          "line-color": layer.color,
+          "line-width": layer.width,
+          "line-opacity": layer.opacity
+      }
+    });
+  //  document.getElementById(layer.id+'-label').innerHTML = '<span style="display: inline-block;width:50px; height:8px;background-color: '+layer.color+'"></span>&nbsp;'+layer.name;
+
+  });
+
+  map.addSource('highlight', { type: 'geojson' , data: null});
+  map.addLayer({
+     "id": "highlight",
+     "type": "line",
+     "source": 'highlight',
+     "paint": {
+         "line-color": "#df42f4",
+         "line-width": 5,
+         "line-opacity": 0.5
+     }
+ });
+}
+
+function toggleLayer (checkbox) {
+    map.setLayoutProperty(checkbox.currentTarget.id, 'visibility', checkbox.currentTarget.checked?'visible':'none');
+  }
+
+
+map.once('style.load', function () {
+
+    init()
+    map.addControl(new mapboxgl.NavigationControl(),'bottom-right');
+    map.addControl(new mapboxgl.ScaleControl(), 'bottom-left');
+    map.addControl(new mapboxgl.AttributionControl({compact: true }), 'bottom-right');
+});
+
+map.on('click', function(e) {
+
+    var features = map.queryRenderedFeatures(e.point, {
+                layers: ltsLayers.map(l=>l.id)
+            });
+    if (!features.length || typeof features[0].properties.id == 'undefined')
+    {
+        displayFeedbackPopup(e.lngLat);
+        window.history.replaceState(null, null, window.location.pathname+'?&lat='+e.lngLat.lat+'&lng='+e.lngLat.lng);
+        return;
+    }
+    var feature = features[0];
+    displayOsmElementInfo(feature.properties.id, e.lngLat);
+    window.history.replaceState(null, null, window.location.pathname+'?&lat='+e.lngLat.lat+'&lng='+e.lngLat.lng+'&id='+feature.properties.id);
+      //TODO: highlight using filters
+    map.getSource('highlight').setData(feature);
+
+});
+
+map.on('mousemove', function(e) {
+    var features = map.queryRenderedFeatures(e.point, {
+                layers: ltsLayers.map(l=>l.id)
+            });
+    map.getCanvas().style.cursor = (features.length) ? 'pointer' : '';
+});
+map.on('load', function(e) {
+    addDateToAttribution()
+    document.getElementById("loader").style.visibility = "hidden";
+    //url = new URLSearchParams(window.location.href)
+    url = (function(a) {    //workaround for edge that doesn't support URLSearchParams
+        if (a == "") return {};
+        var b = {};
+        for (var i = 0; i < a.length; ++i)
+        {
+            var p=a[i].split('=', 2);
+            if (p.length == 1)
+                b[p[0]] = "";
+            else
+                b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+        }
+        return b;
+    })(window.location.search.substr(1).split('&'));
+    const lat = url['lat']
+    const lng = url['lng']
+    if(lat && lng){
+      map.flyTo({center: [lng, lat]})
+      map.once('moveend', function(){
+          map.fire("click", {point : map.project([lng, lat]), lngLat: {lng:lng, lat:lat}});
+      });
+
+    }
+
+})
+
+function addDateToAttribution(){
+  const request = new XMLHttpRequest()
+  request.open('GET','https://api.mapbox.com/tilesets/v1/bikeottawa?access_token=sk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdyYTJmN2EwMmtoMzJwc3JxM2hoZ3ozIn0.YB1JNmncsPvktmgGU_zK8A')
+  request.onload = function () {
+    if (request.status >= 200 && request.status < 400) {
+      var data = JSON.parse(request.responseText);
+      if(data && data instanceof Array){
+        const date = new Date(data.find(x => x.id === 'bikeottawa.4hnbbuhd').modified)
+        $('.mapboxgl-ctrl-attrib').html('<a href="https://bikeottawa.ca">© BikeOttawa</a> <a href="https://www.mapbox.com/about/maps/" target="_blank">© Mapbox</a> <a href="http://www.openstreetmap.org/about/" target="_blank">© OpenStreetMap</a>')
+        $('.mapboxgl-ctrl-attrib').append(' ['+date.toLocaleString()+']')
+      }
+    }
+  }
+  request.send()
+}
+
+function displayFeedbackPopup(lngLat){
+  let popup = '<ul>';
+  showMapillaryImage(lngLat)
+  popup+='<li><div id="showMapillary"></div></li>'
+  popup+='<li><div id="showGoogle"><a href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint='+lngLat.lat+','+lngLat.lng
+  popup+='"><img class="enlarge-onhover" src="https://maps.googleapis.com/maps/api/streetview?size=640x400&fov=120&pitch=-30&key=AIzaSyDXbZYWFjz5Nr8N1c0OoTA_YFYCyV0V6Fs&location='+lngLat.lat+','+lngLat.lng+'"></a></div></li>'
+  popup+='</ul><hr><div id="clickme" class="quiet text-left small">Suggest a new path</div>';
+  popup+='<div id="fform" class=""><form id="feedback"><p><textarea id="comment" name="comment" class="small" style="padding:3px"></textarea></p>';
+  popup+='<input type="hidden" name="link" value="' + window.location.href + '">';
+  popup+='<p id="result"></p><input type="submit" value="Submit" /></form></div>';
+
+  const pop = new mapboxgl.Popup()
+  .setLngLat(lngLat)
+  .setHTML(popup)
+  .addTo(map);
+  let request;
+  $("#feedback").submit(function(event){
+    if (request) {
+      request.abort();
+    }
+    const $form = $(this);
+    const $inputs = $form.find("input, select, button, textarea");
+    const serializedData = $form.serialize();
+    $inputs.prop("disabled", true);
+    $('#result').text('Sending ...');
+    request = $.ajax({
+      url: "https://script.google.com/macros/s/AKfycbya64PfAcZ36ia3dJpleAxokuPRFPa9X-3j9nR1M2mZgBdRx94y/exec",
+      type: "post",
+      data: serializedData
+    });
+    request.done(function (response, textStatus, jqXHR){
+      $('#result').html('Thanks! We\'ll look into it</a>');
+    }).fail(function (jqXHR, textStatus, errorThrown){
+      $('#result').html('An error occured. Try again later.');
+      $inputs.prop("disabled", false);
+    }).always(function () {
+
+    });
+    event.preventDefault();
+  });
+}
+
+function displayOsmElementInfo(element, lngLat) {
+  const xhr = new XMLHttpRequest()
+  xhr.open('GET','https://api.openstreetmap.org/api/0.6/'+element)
+  xhr.onload = function () {
+    let popup = '<h4><a href="https://www.openstreetmap.org/' + element + '" target="_blank">' + element + '</a></h4><hr><ul>'
+    if (xhr.status === 200) {
+      const xmlDOM = new DOMParser().parseFromString(xhr.responseText, 'text/xml');
+      const tags = xmlDOM.getElementsByTagName("tag");
+      const ltsWay = {id:element, tags:{}}
+      for(let i=0; i<tags.length; i++)
+      {
+        if(tags[i].attributes["k"].value == 'source') continue;   //skip non-important tags
+        if(tags[i].attributes["k"].value == 'name:fr') continue;
+        if(tags[i].attributes["k"].value == 'operator') continue;
+        popup += '<li>'+tags[i].attributes["k"].value+": <b>"+tags[i].attributes["v"].value+'</b></li>\n';
+        ltsWay.tags[tags[i].attributes["k"].value] = tags[i].attributes["v"].value
+      }
+      showMapillaryImage(lngLat)
+      popup+='<li><div id="showMapillary"></div></li>'
+      popup+='<li><div id="showGoogle"><a href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint='+lngLat.lat+','+lngLat.lng
+      popup+='"><img class="enlarge-onhover" src="https://maps.googleapis.com/maps/api/streetview?size=640x400&fov=120&pitch=-30&key=AIzaSyDXbZYWFjz5Nr8N1c0OoTA_YFYCyV0V6Fs&location='+lngLat.lat+','+lngLat.lng+'"></a></div></li>'
+      popup+='</ul><hr><div id="clickme" class="quiet text-left small">Suggest an edit</div>';
+      popup+='<div id="fform" class=""><form id="feedback"><p><textarea id="comment" name="comment" class="small" style="padding:3px"></textarea></p>';
+      popup+='<input type="hidden" name="link" value="' + window.location.href + '">';
+      popup+='<input type="hidden" name="osm_link" value="https://www.openstreetmap.org/' + element + '">';
+      popup+='<p id="result"></p><input type="submit" value="Submit" /></form></div>';
+    } else {
+      popup += 'Failed to request details from osm.org';
+    }
+    var pop = new mapboxgl.Popup()
+    .setLngLat(lngLat)
+    .setHTML(popup)
+    .addTo(map)
+
+    var request;
+  	$("#feedback").submit(function(event){
+  		if (request) {
+  			request.abort();
+  		}
+  		var $form = $(this);
+  		var $inputs = $form.find("input, select, button, textarea");
+  		var serializedData = $form.serialize();
+	    $inputs.prop("disabled", true);
+  		$('#result').text('Sending ...');
+  		request = $.ajax({
+  			url: "https://script.google.com/macros/s/AKfycbya64PfAcZ36ia3dJpleAxokuPRFPa9X-3j9nR1M2mZgBdRx94y/exec",
+  			type: "post",
+  			data: serializedData
+  		});
+  		request.done(function (response, textStatus, jqXHR){
+  			$('#result').html('Thanks! We\'ll look into it</a>');
+  		}).fail(function (jqXHR, textStatus, errorThrown){
+  			$('#result').html('An error occured. Try again later.');
+        $inputs.prop("disabled", false);
+  		}).always(function () {
+
+  		});
+  		event.preventDefault();
+  	});
+  }
+  xhr.send()
+}
+
+
+
+function showMapillaryImage(lngLat) {
+  const xhr = new XMLHttpRequest()
+  xhr.open('GET','https://a.mapillary.com/v3/images/?radius=15&per_page=1&client_id=TG1sUUxGQlBiYWx2V05NM0pQNUVMQTo2NTU3NTBiNTk1NzM1Y2U2&closeto='+lngLat.lng+','+lngLat.lat)
+  xhr.onload = function () {
+    if (xhr.status === 200) {
+      const result = JSON.parse(xhr.responseText)
+      if(!result.features || result.features.length==0){
+        return
+      }
+      document.getElementById('showMapillary').innerHTML = '<a href="https://www.mapillary.com/app/?focus=photo&pKey='+result.features[0].properties.key+'"><img class="enlarge-onhover" src="https://d1cuyjsrcm0gby.cloudfront.net/'+result.features[0].properties.key+'/thumb-640.jpg"></a>'
+    }
+  }
+  xhr.send()
+}
+</script>
+<!--https://docs.google.com/spreadsheets/d/1Rx1SjhWXwkMsHFAioP9XE42Or9S7Ob7JYPLUzSMe-T8/edit?usp=sharing -->
+</body>
+</html>
