@@ -191,7 +191,6 @@
     function onMove(e) {
         if (!isDragging) return;
         var coords = e.lngLat;
-
         // Set a UI indicator for dragging.
         canvas.style.cursor = 'grabbing';
         point.features[0].geometry.coordinates = [coords.lng, coords.lat];
@@ -292,14 +291,19 @@
         }
       });
 
-      map.addLayer({
-          "id": "point",
-          "type": "circle",
-          "source": "point",
-          "paint": {
-              "circle-radius": 10,
-              "circle-color": "#333"
+      map.loadImage("/img/bike-icon.png", function(error, image) {
+        if (error) throw error;
+        map.addImage("custom-marker", image);
+
+        map.addLayer({
+            "id": "point",
+            "type": "symbol",
+            "source": "point",
+            layout: {
+            "icon-image": "custom-marker",
+            "icon-size": 1
           }
+        });
       });
 
       map.addSource('route', { type: 'geojson' , data: routeLine});
@@ -366,10 +370,10 @@
 
       }
 
-      fetchIsochrones();
+    //  fetchIsochrones();
 
       map.on('mouseenter', 'point', function() {
-          map.setPaintProperty('point', 'circle-color', '#999');
+          //map.setPaintProperty('point', 'circle-color', '#999');
           canvas.style.cursor = 'move';
           isCursorOverPoint = true;
           map.dragPan.disable();
@@ -382,7 +386,7 @@
       });
 
       map.on('mouseleave', 'point', function(e) {
-        map.setPaintProperty('point', 'circle-color', '#333');
+      //  map.setPaintProperty('point', 'circle-color', '#333');
         canvas.style.cursor = '';
         isCursorOverPoint = false;
         map.dragPan.enable();
@@ -432,9 +436,13 @@
       function fetchIsochrones() {
 
         document.getElementById('error').style="display:hidden";
-        const pLng = point.features[0].geometry.coordinates[0];
-        const pLat = point.features[0].geometry.coordinates[1];
-        mapEl.classList.add('loading');
+        let pLng = point.features[0].geometry.coordinates[0];
+        let pLat = point.features[0].geometry.coordinates[1];
+        /*const pt = map.project(point.features[0].geometry.coordinates)
+        pt.y+=15
+        const coords = map.unproject(pt);
+        [pLng,pLat]=[coords.lng,coords.lat]
+        */mapEl.classList.add('loading');
         var intervals = Array.from(
           document.querySelectorAll('.intervals input[type="checkbox"]:checked')
         ).map(function(el) { return el.value });
