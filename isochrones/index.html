@@ -28,6 +28,10 @@
       <h3>Error</h3>
       <p>Something went wrong. Either our server didn't respond or the request was blocked by your browser. <br>Please refresh the page and <a target="_blank" href="https://bikeottawa.ca/index.php/about-bike-ottawa/contact-us">contact Bike Ottawa</a> if this error doesn't go away.</p>
     </div>
+    <div id='info' class='note warning contain col8 margin2 pad2'>
+      <h3>Hi!</h3>
+      <p>Drag the bike icon or enter an address, then choose acceptable level of traffic stress</p>
+    </div>
     <div class='pin-left pad2'>
       <a href='#settings' class='button fill-darken2 icon menu'></a>
     </div>
@@ -191,7 +195,6 @@
     function onMove(e) {
         if (!isDragging) return;
         var coords = e.lngLat;
-
         // Set a UI indicator for dragging.
         canvas.style.cursor = 'grabbing';
         point.features[0].geometry.coordinates = [coords.lng, coords.lat];
@@ -292,14 +295,19 @@
         }
       });
 
-      map.addLayer({
-          "id": "point",
-          "type": "circle",
-          "source": "point",
-          "paint": {
-              "circle-radius": 10,
-              "circle-color": "#333"
+      map.loadImage("/img/bike-icon.png", function(error, image) {
+        if (error) throw error;
+        map.addImage("custom-marker", image);
+
+        map.addLayer({
+            "id": "point",
+            "type": "symbol",
+            "source": "point",
+            layout: {
+            "icon-image": "custom-marker",
+            "icon-size": 0.75
           }
+        });
       });
 
       map.addSource('route', { type: 'geojson' , data: routeLine});
@@ -366,10 +374,10 @@
 
       }
 
-      fetchIsochrones();
+    //  fetchIsochrones();
 
       map.on('mouseenter', 'point', function() {
-          map.setPaintProperty('point', 'circle-color', '#999');
+          //map.setPaintProperty('point', 'circle-color', '#999');
           canvas.style.cursor = 'move';
           isCursorOverPoint = true;
           map.dragPan.disable();
@@ -382,7 +390,7 @@
       });
 
       map.on('mouseleave', 'point', function(e) {
-        map.setPaintProperty('point', 'circle-color', '#333');
+      //  map.setPaintProperty('point', 'circle-color', '#333');
         canvas.style.cursor = '';
         isCursorOverPoint = false;
         map.dragPan.enable();
@@ -432,9 +440,14 @@
       function fetchIsochrones() {
 
         document.getElementById('error').style="display:hidden";
-        const pLng = point.features[0].geometry.coordinates[0];
-        const pLat = point.features[0].geometry.coordinates[1];
-        mapEl.classList.add('loading');
+        document.getElementById('info').classList.add('hidden');
+        let pLng = point.features[0].geometry.coordinates[0];
+        let pLat = point.features[0].geometry.coordinates[1];
+        /*const pt = map.project(point.features[0].geometry.coordinates)
+        pt.y+=15
+        const coords = map.unproject(pt);
+        [pLng,pLat]=[coords.lng,coords.lat]
+        */mapEl.classList.add('loading');
         var intervals = Array.from(
           document.querySelectorAll('.intervals input[type="checkbox"]:checked')
         ).map(function(el) { return el.value });
