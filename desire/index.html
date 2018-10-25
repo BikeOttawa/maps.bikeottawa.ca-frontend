@@ -199,7 +199,7 @@ function displayFeedbackPopup(lngLat){
   popup+='"><img class="enlarge-onhover" src="https://maps.googleapis.com/maps/api/streetview?size=640x400&fov=120&pitch=-30&key=AIzaSyDXbZYWFjz5Nr8N1c0OoTA_YFYCyV0V6Fs&location='+lngLat.lat+','+lngLat.lng+'"></a></div></li>'
   popup+='</ul><hr><div id="clickme" class="quiet text-left small">Suggest a new path</div>';
   popup+='<div id="fform" class=""><form id="feedback"><p><textarea id="comment" name="comment" class="small" style="padding:3px"></textarea></p>';
-  popup+='<input type="hidden" name="link" value="' + window.location.href + '">';
+  popup+='<input type="hidden" name="link" value="https://maps.bikeottawa.ca/desire/?&lat='+lngLat.lat+'&lng='+lngLat.lng + '">';
   popup+='<p id="result"></p><input type="submit" value="Submit" /></form></div>';
 
   const pop = new mapboxgl.Popup()
