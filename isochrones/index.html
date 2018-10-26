@@ -94,8 +94,35 @@
         <a href='https://github.com/BikeOttawa/maps.bikeottawa.ca-frontend'><img src="../img/logos/github.png" style="width:32px; height:32px;"></a>
         <a href='https://twitter.com/BikeOttawa'><img src="../img/logos/twitter.png" style="width:32px; height:32px;">  </a>
       </div>
+      <div class='center '>
+        <a href='#about' class='fill-darken2 pad1 rounded-toggle short icon button bike'>About</a>
+      </div>
     </div>
+    <div id='about' class='col4 pad2 fill-darken2 pin-left offcanvas-left animate scroll-styled'>
+      <a href='#' class='fill-darken2 pad1 icon close button fr'></a>
+      <div class='clearfix'></div><br><br>
+      <div class=' prose dark'>
+        <h3>About</h3>
+        <p>This project was made possible with the grant from Councilor Jeff Leiper and the help of Bike Ottawa volunteers:</p>
+        <ul>
+          <li>Heather Shearer</li>
+          <li>Yaro Shkvorets</li>
+          <li>Rob McCrae </li>
+          <li>Alex deVries</li>
+          <li>Matthew Darwin</li>
+          <li>JP Torunski</li>
+          <li>Shawn Gettler</li>
+          <li>... and others</li>
+        </ul>
+        <p>Join us:</p>
+      </div>
+      <div class='center pad2'>
+        <a href='https://bikeottawa.ca'><img src="../img/logos/bikeottawa.png" style="width:32px; height:32px;"></a>
+        <a href='https://github.com/BikeOttawa/maps.bikeottawa.ca-frontend'><img src="../img/logos/github.png" style="width:32px; height:32px;"></a>
+        <a href='https://twitter.com/BikeOttawa'><img src="../img/logos/twitter.png" style="width:32px; height:32px;">  </a>
+      </div>
   </div>
+  <div class="loading" title="loading..." id="loader"></div>
   <script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v2.2.0/mapbox-gl-geocoder.min.js'></script>
   <link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v2.2.0/mapbox-gl-geocoder.css' type='text/css' />
 
@@ -119,7 +146,8 @@
         zoom: 13,
         minZoom: 10,
         maxZoom: 17,
-        maxBounds: [[-76.385193,44.963826],[-75.011902,45.614998]]
+        maxBounds: [[-76.385193,44.963826],[-75.011902,45.614998]],
+        attributionControl: false
     });
 
     map.addControl(new mapboxgl.ScaleControl({
@@ -127,8 +155,8 @@
         unit: 'metric'
     }), 'bottom-left');
 
-
     map.addControl(new mapboxgl.NavigationControl(),'bottom-right');
+    map.addControl(new mapboxgl.AttributionControl({compact: true }), 'bottom-right');
 
     const geocoder = new MapboxGeocoder({
         accessToken: mapboxgl.accessToken,
@@ -209,6 +237,21 @@
         map.off('mousemove', onMove);
     }
 
+    function addDateToAttribution(){
+      const request = new XMLHttpRequest()
+      request.open('GET','https://api.mapbox.com/tilesets/v1/bikeottawa?access_token=sk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdyYTJmN2EwMmtoMzJwc3JxM2hoZ3ozIn0.YB1JNmncsPvktmgGU_zK8A')
+      request.onload = function () {
+        if (request.status >= 200 && request.status < 400) {
+          var data = JSON.parse(request.responseText);
+          if(data && data instanceof Array){
+            const date = new Date(data.find(x => x.id === 'bikeottawa.7gev94ax').modified)
+            document.querySelector('.mapboxgl-ctrl-attrib').innerHTML = '<a href="https://bikeottawa.ca">© BikeOttawa</a> <a href="https://www.mapbox.com/about/maps/" target="_blank">© Mapbox</a> <a href="http://www.openstreetmap.org/about/" target="_blank">© OpenStreetMap</a>'+' ['+date.toLocaleString()+']';
+          }
+        }
+      }
+      request.send()
+    }
+
     var isochroneLayers = [
           {time:15, color:'#C8D9EA', opacity:1},
           {time:12, color:'#96B8E6', opacity:1},
@@ -224,7 +267,13 @@
           {id:"legend-lts4", name:'LTS-4 - High stress', color:'#DD5454', opacity:0.9, tileset:'mapbox://bikeottawa.0ne8pnv3', layer:'0ne8pnv3'}
         ];
 
+    map.on('load', function(e) {
+        addDateToAttribution()
+        document.getElementById("loader").style.visibility = "hidden";
+      });
+
     map.on('style.load', function () {
+
       map.addSource('grid', {
           "type" : "geojson",
           "data": gridSource
@@ -455,7 +504,7 @@
         var params = {
           lng: pLng,
           lat: pLat,
-          radius: 3,
+          radius: 3.5,
           deintersect: 'true',
           concavity: 2,
           lengthThreshold: 0,

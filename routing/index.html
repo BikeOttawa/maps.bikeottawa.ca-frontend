@@ -48,6 +48,7 @@
     </div>
   </div>
 </div>
+<div class="loading" title="loading..." id="loader"></div>
 
 <script>
 var ltsLayers = [
@@ -94,26 +95,45 @@ map.addControl(new mapboxgl.GeolocateControl({
 map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
 
 map.addControl(new mapboxgl.ScaleControl(), 'bottom-left');
+map.addControl(new mapboxgl.AttributionControl({compact: true }), 'bottom-right');
 
 map.addControl(new MapboxDirections({
     accessToken: mapboxgl.accessToken,
     profile: 'lts4',
-    //api: 'http://localhost:5000/route/v1',
-    //api: 'http://ec2-34-214-224-151.us-west-2.compute.amazonaws.com/route/v1',
     api: 'https://maps.bikeottawa.ca/route/v1',
     alternatives: true,
-    unit: 'metric'
+    unit: 'metric',
+    attributionControl: false
 }), 'top-left');
 
 function toggleLayer (checkbox) {
     map.setLayoutProperty(checkbox.currentTarget.id, 'visibility', checkbox.currentTarget.checked?'visible':'none');
   }
 
+function addDateToAttribution(){
+  const request = new XMLHttpRequest()
+  request.open('GET','https://api.mapbox.com/tilesets/v1/bikeottawa?access_token=sk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdyYTJmN2EwMmtoMzJwc3JxM2hoZ3ozIn0.YB1JNmncsPvktmgGU_zK8A')
+  request.onload = function () {
+    if (request.status >= 200 && request.status < 400) {
+      var data = JSON.parse(request.responseText);
+      if(data && data instanceof Array){
+        const date = new Date(data.find(x => x.id === 'bikeottawa.7gev94ax').modified)
+        document.querySelector('.mapboxgl-ctrl-attrib').innerHTML = '<a href="https://bikeottawa.ca">© BikeOttawa</a> <a href="https://www.mapbox.com/about/maps/" target="_blank">© Mapbox</a> <a href="http://www.openstreetmap.org/about/" target="_blank">© OpenStreetMap</a>'+' ['+date.toLocaleString()+']';
+      }
+    }
+  }
+  request.send()
+}
+
 document.getElementById('legend-lts1').onclick = toggleLayer
 document.getElementById('legend-lts2').onclick = toggleLayer
 document.getElementById('legend-lts3').onclick = toggleLayer
 document.getElementById('legend-lts4').onclick = toggleLayer
 
+map.on('load', function(e) {
+    addDateToAttribution()
+    document.getElementById("loader").style.visibility = "hidden";
+  });
 
 map.on('style.load', function () {
 

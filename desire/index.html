@@ -5,7 +5,6 @@
     <title>Ottawa cycling stress map</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.0/mapbox-gl.js'></script>
-    <script  data-cfasync="false" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.0/mapbox-gl.css' rel='stylesheet' />
     <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
     <style>
@@ -183,8 +182,7 @@ function addDateToAttribution(){
       var data = JSON.parse(request.responseText);
       if(data && data instanceof Array){
         const date = new Date(data.find(x => x.id === 'bikeottawa.4hnbbuhd').modified)
-        $('.mapboxgl-ctrl-attrib').html('<a href="https://bikeottawa.ca">© BikeOttawa</a> <a href="https://www.mapbox.com/about/maps/" target="_blank">© Mapbox</a> <a href="http://www.openstreetmap.org/about/" target="_blank">© OpenStreetMap</a>')
-        $('.mapboxgl-ctrl-attrib').append(' ['+date.toLocaleString()+']')
+        document.querySelector('.mapboxgl-ctrl-attrib').innerHTML = '<a href="https://bikeottawa.ca">© BikeOttawa</a> <a href="https://www.mapbox.com/about/maps/" target="_blank">© Mapbox</a> <a href="http://www.openstreetmap.org/about/" target="_blank">© OpenStreetMap</a>'+' ['+date.toLocaleString()+']';
       }
     }
   }
