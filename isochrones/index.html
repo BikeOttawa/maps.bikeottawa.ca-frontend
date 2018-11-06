@@ -164,7 +164,7 @@
       const params = { format: "json", q: query, limit: 5, viewbox:'-76.36384,45.51697,-74.92326,45.03379', bounded: 1};
     	const urlParams = new URLSearchParams(Object.entries(params));
 
-      return fetch("http://nominatim.openstreetmap.org/search?" + urlParams).then(function(response) {
+      return fetch("//nominatim.openstreetmap.org/search?" + urlParams).then(function(response) {
     		if(response.ok) {
     			return response.json();
     		} else {
