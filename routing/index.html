@@ -16,7 +16,7 @@
 </head>
 <body>
 
-<script src = 'mapbox-gl-directions.js'></script>
+<script src = 'mapbox-gl-directions.min.js'></script>
 <!--<script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v3.1.1/mapbox-gl-directions.js'></script>-->
 <link rel='stylesheet' href='mapbox-gl-directions.css' type='text/css' />
 <div id='app' class='col12 contain clip'>
@@ -103,7 +103,8 @@ map.addControl(new MapboxDirections({
     api: 'https://maps.bikeottawa.ca/route/v1',
     alternatives: true,
     unit: 'metric',
-    attributionControl: false
+    attributionControl: false,
+    geocoder: {limit:10}
 }), 'top-left');
 
 function toggleLayer (checkbox) {
