@@ -4,9 +4,11 @@
     <meta charset='utf-8' />
     <title>Ottawa Cycling Isochrones</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
-    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.0/mapbox-gl.js'></script>
-    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.0/mapbox-gl.css' rel='stylesheet' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
     <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
+    <script src='../js/mapbox-gl-geocoder.min.js'></script>
+    <link rel='stylesheet' href='../css/mapbox-gl-geocoder.css' type='text/css' />
     <style>
         #app { position:absolute; top:0; right:0; bottom:0; left:0; }
         #map { position:absolute; top:0; right:0; bottom:0; left:0; }
@@ -123,9 +125,6 @@
       </div>
   </div>
   <div class="loading" title="loading..." id="loader"></div>
-  <script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v2.2.0/mapbox-gl-geocoder.min.js'></script>
-  <link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v2.2.0/mapbox-gl-geocoder.css' type='text/css' />
-
   <script>
     var args = location.search.replace(/^\?/,'').split('&').reduce(function(o, param) {
       var keyvalue=param.split('=');
@@ -158,11 +157,41 @@
     map.addControl(new mapboxgl.NavigationControl(),'bottom-right');
     map.addControl(new mapboxgl.AttributionControl({compact: true }), 'bottom-right');
 
+
+
+    const nominatimGeocoder = (query) => {
+
+      const params = { format: "json", q: query, limit: 5, viewbox:'-76.36384,45.51697,-74.92326,45.03379', bounded: 1};
+    	const urlParams = new URLSearchParams(Object.entries(params));
+
+      return fetch("//nominatim.openstreetmap.org/search?" + urlParams).then(function(response) {
+    		if(response.ok) {
+    			return response.json();
+    		} else {
+    			return [];
+    		}
+    	}).then(function(json) {
+    		return json.map(function(place) {
+    			return {
+            center: [place.lon, place.lat],
+            geometry: {
+                type: "Point",
+                coordinates: [place.lon, place.lat]
+            },
+            place_name: place.display_name,
+            properties: {},
+            type: 'Feature'
+    			};
+    		});
+    	});
+    };
+
     const geocoder = new MapboxGeocoder({
         accessToken: mapboxgl.accessToken,
         bbox: [-76.385193,44.963826,-75.011902,45.614998],
         zoom: 13,
-        limit: 10
+        limit: 10,
+        asyncGeocoder: nominatimGeocoder
     })
 
     map.addControl(geocoder)
@@ -344,7 +373,7 @@
         }
       });
 
-      map.loadImage("/img/bike-icon.png", function(error, image) {
+      map.loadImage("../img/bike-icon.png", function(error, image) {
         if (error) throw error;
         map.addImage("custom-marker", image);
 

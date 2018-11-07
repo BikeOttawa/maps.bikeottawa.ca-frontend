@@ -5284,8 +5284,8 @@ var Suggestions = function(el, data, options) {
 
   this.options = extend({
     minLength: 2,
-    limit: 5,
-    filter: true
+    limit: 10,
+    filter: false
   }, options);
 
   this.el = el;
@@ -6242,46 +6242,76 @@ Geocoder.prototype = {
     return el;
   },
 
+  _nominatimGeocoder: function _nominatimGeocoder(query) {
+
+    const params = { format: "json", q: query, limit: 5, viewbox:'-76.36384,45.51697,-74.92326,45.03379', bounded: 1};
+    const urlParams = new URLSearchParams(Object.entries(params));
+
+    return fetch("//nominatim.openstreetmap.org/search?" + urlParams).then(function(response) {
+      if(response.ok) {
+        return response.json();
+      } else {
+        return [];
+      }
+    }).then(function(json) {
+      return json.map(function(place) {
+        return {
+          center: [place.lon, place.lat],
+          geometry: {
+              type: "Point",
+              coordinates: [place.lon, place.lat]
+          },
+          place_name: place.display_name,
+          properties: {},
+          type: 'Feature'
+        };
+      });
+    });
+  },
+
+  _mapboxGeocoder: function _mapboxGeocoder(query) {
+
+    const accessToken = this.options.accessToken ? this.options.accessToken : mapboxgl.accessToken;
+    const params = { access_token: accessToken, bbox:'-76.385193,44.963826,-75.011902,45.614998', limit:5};
+    const urlParams = new URLSearchParams(Object.entries(params));
+
+    return fetch(API + encodeURIComponent(query.trim()) + '.json?' + urlParams).then(function(response) {
+      if(response.ok) {
+        return response.json();
+      } else {
+        return [];
+      }
+    }).then(function(json) {
+      return json.features;
+    });
+  },
+
   _geocode: function _geocode(q, callback) {
     this._loadingEl.classList.add('active');
     this.fire('loading');
 
-    var options = [];
-    if (this.options.proximity) options.push('proximity=' + this.options.proximity.join());
-    if (this.options.bbox) options.push('bbox=' + this.options.bbox.join());
-    if (this.options.country) options.push('country=' + this.options.country);
-    if (this.options.types) options.push('types=' + this.options.types);
+    var customRequest = this._nominatimGeocoder(q);
+    var mapboxRequest = this._mapboxGeocoder(q);
 
-    var accessToken = this.options.accessToken ? this.options.accessToken : mapboxgl.accessToken;
-    options.push('access_token=' + accessToken);
-
-    this.request.abort();
-    this.request.open('GET', API + encodeURIComponent(q.trim()) + '.json?' + options.join('&'), true);
-    this.request.onload = function () {
+    Promise.all([mapboxRequest, customRequest]).then(function(values) {
       this._loadingEl.classList.remove('active');
-      if (this.request.status >= 200 && this.request.status < 400) {
-        var data = JSON.parse(this.request.responseText);
-        if (data.features.length) {
-          this._clearEl.classList.add('active');
-        } else {
-          this._clearEl.classList.remove('active');
-          this._typeahead.selected = null;
-        }
 
-        this.fire('results', { results: data.features });
-        this._typeahead.update(data.features);
-        return callback(data.features);
+      var res = {};
+      res.features = values[0].concat(values[1]);
+
+
+      if (res.features.length) {
+        this._clearEl.classList.add('active');
+        this.fire('results', { results: res.features });
+        this._typeahead.update(res.features);
+        return callback(res.features);
       } else {
-        this.fire('error', { error: JSON.parse(this.request.responseText).message });
+        this._clearEl.classList.remove('active');
+        this._typeahead.selected = null;
       }
-    }.bind(this);
 
-    this.request.onerror = function () {
-      this._loadingEl.classList.remove('active');
-      this.fire('error', { error: JSON.parse(this.request.responseText).message });
-    }.bind(this);
+    }.bind(this));
 
-    this.request.send();
   },
 
   _queryFromInput: function _queryFromInput(q) {
