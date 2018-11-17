@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>Ottawa Snowplowing Map</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
+    <script  data-cfasync="false" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
+    <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
+    <style>
+        body { margin:0; padding:0; }
+        #app { position:absolute; top:0; right:0; bottom:0; left:0; }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+        .enlarge-onhover {
+             width: 160px;
+             height: 100px;
+             transition-duration: 0.5s; /* delays for 1 second */
+             -webkit-transition-duration: 0.5s; /* for Safari & Chrome */
+        }
+        .enlarge-onhover:hover {
+             width: 640px;
+             height: 400px;
+        }
+        #menu {
+           position: absolute;
+           background: #fff;
+           padding: 10px;
+           font-family: 'Open Sans', sans-serif;
+        }
+    </style>
+</head>
+<body>
+<div id='app' class='col12 contain clip'>
+<div id='map'></div>
+<div id='menu'>
+  <input id='dark' type='radio' name='rtoggle' value='dark' checked='checked'>
+  <label for='dark'>dark</label>
+  <input id='light' type='radio' name='rtoggle' value='light' >
+  <label for='light'>light</label>
+  <input id='bright' type='radio' name='rtoggle' value='bright'>
+  <label for='bright'>bright</label>
+  <input id='satellite' type='radio' name='rtoggle' value='satellite'>
+  <label for='satellite'>satellite</label>
+</div>
+<div class='col4 pad1 scroll-styled pin-topright '>
+  <div id='legendbtn' class='fill-darken2 pad1 icon book button hidden fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
+  <div id='legend' class='fill-darken1 round'>
+    <div id='closebtn' class='fill-darken2 pad1 icon close button fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
+    <div class='clearfix'></div>
+    <div class='pad1 dark'>
+      <h3>Winter Maintenance</h3><br>
+      <form>
+      <fieldset class='checkbox-pill clearfix '>
+        <input type='checkbox' id='plowed' checked='checked'>
+        <label for='plowed' id='plowed-label' class='button icon check quiet col12' style='text-align:left;'>Plowed</label>
+        <input type='checkbox' id='notplowed' checked='checked'>
+        <label for='notplowed' id='notplowed-label' class='button icon check quiet col12' style='text-align:left;'>Not Plowed</label>
+        <input type='checkbox' id='unknown' checked='checked'>
+        <label for='unknown' id='unknown-label' class='button icon check quiet col12' style='text-align:left;'>Unknown</label>
+      </fieldset>
+      </form>
+      <div class='pad1 small'>
+        <p>This map shows which pathways in the city of Ottawa are plowed in the winter and which are not.</p>
+        <p>The map is maintained by Bike Ottawa volunteers. <p>
+        <p>If you see any mistakes or familiar with the status of a pathway in your neighbourhood, feel free to submit feedback by clicking on the path and writing a quick note.</p>
+      </div>
+      <div class='center pad2'>
+      	<a href='https://bikeottawa.ca'><img src="../img/logos/bikeottawa.png" style="width:32px; height:32px;"></a>
+        <a href='https://github.com/BikeOttawa/maps.bikeottawa.ca-frontend'><img src="../img/logos/github.png" style="width:32px; height:32px;"></a>
+        <a href='https://twitter.com/BikeOttawa'><img src="../img/logos/twitter.png" style="width:32px; height:32px;"></a>
+      </div>
+      <div class='center '>
+        <a class='fill-darken2 pad1 rounded-toggle short icon button bike' onclick="$('#about').toggle()">About</a>
+      </div>
+      <div id='about' class='center small hidden'>
+          Made possible with the grant from Councilor Jeff Leiper and the help of Bike Ottawa volunteers: Heather Shearer, Yaro Shkvorets, Rob McCrae, Alex deVries, Matthew Darwin, JP Torunski, Shawn Gettler and others
+      </div>
+      <div class='fr pad1 small'>Last update: <span id='dateUpdated'>[updating...]</span></div>
+      <div class='clearfix'></div>
+    </div>
+  </div>
+</div>
+<div class="loading" title="loading..." id="loader"></div>
+</div>
+
+<script>
+var layers = [
+    {id:"plowed", name:'Plowed', color:'#0099CC', opacity:0.9, filter:['==', 'winter_service', 'yes']},
+    {id:"notplowed", name:'Not Plowed', color:'#DD5454', opacity:0.9, filter:['==', 'winter_service', 'no']},
+    {id:"unknown", name:'Unknown', color:'#F0C808', opacity:0.9, filter:['!in', 'winter_service', 'yes', 'no']}
+];
+
+
+  mapboxgl.accessToken = 'pk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdqaWxrN3gwZXQ4MnFxbjAwZXRpbG8zIn0.XhAdk2ASwdipubccCWTfoQ';
+  var map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/dark-v9',
+    center: [-75.697927,45.417431],
+    zoom: 13,
+    minZoom: 10,
+    maxZoom: 17,
+    maxBounds: [[-76.385193,44.963826],[-75.011902,45.614998]],
+    attributionControl: false
+});
+
+var layerList = document.getElementById('menu');
+var inputs = layerList.getElementsByTagName('input');
+
+function switchLayer(layer) {
+    var layerId = layer.target.id;
+    map.setStyle('mapbox://styles/mapbox/' + layerId + '-v9');
+}
+
+for (var i = 0; i < inputs.length; i++) {
+    inputs[i].onclick = switchLayer;
+}
+
+
+function init() {
+
+  map.addLayer({
+    "id": 'pathways',
+    "type": "line",
+    "source": {
+        type: 'vector',
+        url: 'mapbox://bikeottawa.03jqtlpj',
+    },
+    "source-layer": '03jqtlpj',
+    "layout": {
+        "line-join": "round",
+        "line-cap": "round"
+    },
+    "paint": {
+        "line-color": ['match',
+              ['get', 'winter_service'],
+              'yes', layers[0].color,
+              'no', layers[1].color,
+              /* other */ layers[2].color],
+        "line-width": 2,
+        "line-opacity": 0.9
+      }
+    });
+  for(let layer of layers){
+    document.getElementById(layer.id+'-label').innerHTML = '<span style="display: inline-block;width:50px; height:8px;background-color: '+layer.color+'"></span>&nbsp;&nbsp;'+layer.name;
+  }
+
+  map.addSource('highlight', { type: 'geojson' , data: null});
+  map.addLayer({
+     "id": "highlight",
+     "type": "line",
+     "source": 'highlight',
+     "paint": {
+         "line-color": "#df42f4",
+         "line-width": 5,
+         "line-opacity": 0.5
+     }
+ });
+}
+
+map.addControl(new mapboxgl.NavigationControl(),'bottom-right');
+map.addControl(new mapboxgl.ScaleControl(), 'bottom-left');
+map.addControl(new mapboxgl.AttributionControl({compact: true }), 'bottom-right');
+
+function toggleFilter(checkbox) {
+  let filter = ["any"];
+  if(document.getElementById('plowed').checked){
+    filter.push(layers[0].filter);
+  }
+  if(document.getElementById('notplowed').checked){
+    filter.push(layers[1].filter);
+  }
+  if(document.getElementById('unknown').checked){
+    filter.push(layers[2].filter);
+  }
+  map.setFilter('pathways', filter);
+}
+
+document.getElementById('plowed').onclick = toggleFilter
+document.getElementById('notplowed').onclick = toggleFilter
+document.getElementById('unknown').onclick = toggleFilter
+
+
+map.on('style.load', function () {
+    init()
+});
+
+map.on('click', function(e) {
+
+    var features = map.queryRenderedFeatures(e.point, {
+                layers: ['pathways']
+            });
+    if (!features.length) {
+        return;
+    }
+    var feature = features[0];
+    displayOsmElementInfo(feature.properties.id, e.lngLat);
+    window.history.replaceState(null, null, window.location.pathname+'?&lat='+e.lngLat.lat+'&lng='+e.lngLat.lng+'&id='+feature.properties.id);
+      //TODO: highlight using filters
+    map.getSource('highlight').setData(feature);
+
+});
+
+map.on('mousemove', function(e) {
+    var features = map.queryRenderedFeatures(e.point, {
+                layers: ['pathways']
+            });
+    map.getCanvas().style.cursor = (features.length) ? 'pointer' : '';
+});
+map.on('load', function(e) {
+    addUpdatedDate()
+    document.getElementById("loader").style.visibility = "hidden";
+    //url = new URLSearchParams(window.location.href)
+    url = (function(a) {    //workaround for edge that doesn't support URLSearchParams
+        if (a == "") return {};
+        var b = {};
+        for (var i = 0; i < a.length; ++i)
+        {
+            var p=a[i].split('=', 2);
+            if (p.length == 1)
+                b[p[0]] = "";
+            else
+                b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+        }
+        return b;
+    })(window.location.search.substr(1).split('&'));
+    const lat = url['lat']
+    const lng = url['lng']
+    if(lat && lng){
+      map.flyTo({center: [lng, lat]})
+      map.once('moveend', function(){
+          map.fire("click", {point : map.project([lng, lat]), lngLat: {lng:lng, lat:lat}});
+      });
+
+    }
+
+})
+
+function addUpdatedDate(){
+  const request = new XMLHttpRequest()
+  request.open('GET','https://api.mapbox.com/tilesets/v1/bikeottawa?access_token=sk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdyYTJmN2EwMmtoMzJwc3JxM2hoZ3ozIn0.YB1JNmncsPvktmgGU_zK8A')
+  request.onload = function () {
+    if (request.status >= 200 && request.status < 400) {
+      var data = JSON.parse(request.responseText);
+      if(data && data instanceof Array){
+        const date = new Date(data.find(x => x.id === 'bikeottawa.03jqtlpj').modified)
+        document.getElementById('dateUpdated').innerHTML = date.toLocaleString();
+      }
+    }
+  }
+  request.send()
+}
+
+
+function displayOsmElementInfo(element, lngLat) {
+  if(typeof element == 'undefined') return;
+  const xhr = new XMLHttpRequest()
+  xhr.open('GET','https://api.openstreetmap.org/api/0.6/'+element)
+  xhr.onload = function () {
+    let popup = '<h4><a href="https://www.openstreetmap.org/' + element + '" target="_blank">' + element + '</a></h4><hr><ul>'
+    if (xhr.status === 200) {
+      const xmlDOM = new DOMParser().parseFromString(xhr.responseText, 'text/xml');
+      const tags = xmlDOM.getElementsByTagName("tag");
+      const ltsWay = {id:element, tags:{}}
+      for(let i=0; i<tags.length; i++)
+      {
+        if(tags[i].attributes["k"].value == 'source') continue;   //skip non-important tags
+        if(tags[i].attributes["k"].value == 'name:fr') continue;
+        if(tags[i].attributes["k"].value == 'operator') continue;
+        popup += '<li>'+tags[i].attributes["k"].value+": <b>"+tags[i].attributes["v"].value+'</b></li>\n';
+        ltsWay.tags[tags[i].attributes["k"].value] = tags[i].attributes["v"].value
+      }
+      showMapillaryImage(lngLat)
+      popup+='<li><div id="showMapillary"></div></li>'
+      popup+='</ul><hr><div id="clickme" class="quiet text-right small">Write a note</div>';
+      popup+='<div id="fform" class="hidden"><form id="feedback"><p><textarea id="comment" name="comment" class="small" style="padding:3px"></textarea></p>';
+      popup+='<input type="hidden" name="link" value="' + window.location.href + '">';
+      popup+='<input type="hidden" name="osm_link" value="https://www.openstreetmap.org/' + element + '">';
+      popup+='<p id="result"></p><input type="submit" value="Submit" /></form></div>';
+    } else {
+      popup += 'Failed to request details from osm.org';
+    }
+    var pop = new mapboxgl.Popup()
+    .setLngLat(lngLat)
+    .setHTML(popup)
+    .addTo(map)
+    $( "#clickme" ).click(function() {
+      $(this).toggle('slow');
+      $( "#fform" ).toggle('slow');
+    });
+    var request;
+  	$("#feedback").submit(function(event){
+  		if (request) {
+  			request.abort();
+  		}
+  		var $form = $(this);
+  		var $inputs = $form.find("input, select, button, textarea");
+  		var serializedData = $form.serialize();
+	    $inputs.prop("disabled", true);
+  		$('#result').text('Sending ...');
+  		request = $.ajax({
+  			url: "https://script.google.com/macros/s/AKfycbya64PfAcZ36ia3dJpleAxokuPRFPa9X-3j9nR1M2mZgBdRx94y/exec",
+  			type: "post",
+  			data: serializedData
+  		});
+  		request.done(function (response, textStatus, jqXHR){
+  			$('#result').html('Thanks! We\'ll look into it</a>');
+  		}).fail(function (jqXHR, textStatus, errorThrown){
+  			$('#result').html('An error occured. Try again later.');
+        $inputs.prop("disabled", false);
+  		}).always(function () {
+
+  		});
+  		event.preventDefault();
+  	});
+  }
+  xhr.send()
+}
+
+
+
+function showMapillaryImage(lngLat) {
+  const xhr = new XMLHttpRequest()
+  xhr.open('GET','https://a.mapillary.com/v3/images/?radius=15&per_page=1&client_id=TG1sUUxGQlBiYWx2V05NM0pQNUVMQTo2NTU3NTBiNTk1NzM1Y2U2&closeto='+lngLat.lng+','+lngLat.lat)
+  xhr.onload = function () {
+    if (xhr.status === 200) {
+      const result = JSON.parse(xhr.responseText)
+      if(!result.features || result.features.length==0){
+        return
+      }
+      document.getElementById('showMapillary').innerHTML = '<a href="https://www.mapillary.com/app/?focus=photo&pKey='+result.features[0].properties.key+'"><img class="enlarge-onhover" src="https://d1cuyjsrcm0gby.cloudfront.net/'+result.features[0].properties.key+'/thumb-640.jpg"></a>'
+    }
+  }
+  xhr.send()
+}
+</script>
+<!--https://docs.google.com/spreadsheets/d/1Rx1SjhWXwkMsHFAioP9XE42Or9S7Ob7JYPLUzSMe-T8/edit?usp=sharing -->
+</body>
+</html>
