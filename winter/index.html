@@ -289,15 +289,37 @@ function displayOsmElementInfo(element, lngLat) {
     });
     var request;
   	$("#feedback").submit(function(event){
-  		if (request) {
-  			request.abort();
-  		}
 
-  		var $form = $(this);
+      var $form = $(this);
   		var $inputs = $form.find("input, select, button, textarea");
   		var serializedData = $form.serialize();
 	    $inputs.prop("disabled", true);
   		$('#result').text('Sending ...');
+  		
+      /*
+            const tags = {};
+            $( "li" ).each(function( index ) {
+              const tag = $( this ).text().split(': ')
+              if(tag.length!=2) return;
+              tags[tag[0]]=tag[1];
+            });
+
+            submitOsmChangeset(element, tags)
+            .then(() => {
+              $('#result').html('Your changeset submitted!</a>');
+
+            })
+            .catch(() => {
+              $('#result').html('Failed to submit changeset</a>');
+            })
+            event.preventDefault();
+            return;
+      */
+
+  		if (request) {
+  			request.abort();
+  		}
+
   		request = $.ajax({
   			url: "https://script.google.com/macros/s/AKfycbya64PfAcZ36ia3dJpleAxokuPRFPa9X-3j9nR1M2mZgBdRx94y/exec",
   			type: "post",
