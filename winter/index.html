@@ -82,6 +82,7 @@
 <div class="loading" title="loading..." id="loader"></div>
 </div>
 
+<script src='bundle.js'></script>
 <script>
 var layers = [
     {id:"plowed", name:'Plowed', color:'#0099CC', opacity:0.9, filter:['==', 'winter_service', 'yes']},
@@ -251,6 +252,8 @@ function addUpdatedDate(){
 
 
 function displayOsmElementInfo(element, lngLat) {
+  const ImportantTags = ['name', 'highway', 'winter_service', 'width', 'surface', 'smoothness'];
+
   if(typeof element == 'undefined') return;
   const xhr = new XMLHttpRequest()
   xhr.open('GET','https://api.openstreetmap.org/api/0.6/'+element)
@@ -262,10 +265,8 @@ function displayOsmElementInfo(element, lngLat) {
       const ltsWay = {id:element, tags:{}}
       for(let i=0; i<tags.length; i++)
       {
-        if(tags[i].attributes["k"].value == 'source') continue;   //skip non-important tags
-        if(tags[i].attributes["k"].value == 'name:fr') continue;
-        if(tags[i].attributes["k"].value == 'operator') continue;
-        popup += '<li>'+tags[i].attributes["k"].value+": <b>"+tags[i].attributes["v"].value+'</b></li>\n';
+        if(!ImportantTags.includes(tags[i].attributes["k"].value)) continue;
+        popup += '<li>'+tags[i].attributes["k"].value+": <strong>"+tags[i].attributes["v"].value+'</strong></li>\n';
         ltsWay.tags[tags[i].attributes["k"].value] = tags[i].attributes["v"].value
       }
       showMapillaryImage(lngLat)
@@ -291,6 +292,7 @@ function displayOsmElementInfo(element, lngLat) {
   		if (request) {
   			request.abort();
   		}
+
   		var $form = $(this);
   		var $inputs = $form.find("input, select, button, textarea");
   		var serializedData = $form.serialize();
