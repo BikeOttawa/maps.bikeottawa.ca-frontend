@@ -252,7 +252,7 @@ function addUpdatedDate(){
 
 
 function displayOsmElementInfo(element, lngLat) {
-  const ImportantTags = ['name', 'highway', 'winter_service', 'width', 'surface', 'smoothness'];
+  const ImportantTags = ['name', 'highway', 'winter_service', 'width', 'surface', 'smoothness', 'fixme'];
 
   if(typeof element == 'undefined') return;
   const xhr = new XMLHttpRequest()
@@ -263,14 +263,40 @@ function displayOsmElementInfo(element, lngLat) {
       const xmlDOM = new DOMParser().parseFromString(xhr.responseText, 'text/xml');
       const tags = xmlDOM.getElementsByTagName("tag");
       const ltsWay = {id:element, tags:{}}
+      popup+='<li><div id="showMapillary"></div></li>'
       for(let i=0; i<tags.length; i++)
       {
         if(!ImportantTags.includes(tags[i].attributes["k"].value)) continue;
-        popup += '<li>'+tags[i].attributes["k"].value+": <strong>"+tags[i].attributes["v"].value+'</strong></li>\n';
+        popup += '<li>'+tags[i].attributes["k"].value+': ';
+        if(tags[i].attributes["k"].value == 'width'){
+          popup += '<select name="width">';
+          [0.5,1,1.5,2,3,4,5,''].forEach(w => popup+=`<option value="${w}" ${tags[i].attributes["v"].value==w?"selected":""}>${w}</option>`)
+          popup += '</select>\n';
+        }
+        else if(tags[i].attributes["k"].value == 'surface'){
+          popup += '<select name="surface">';
+          ['asphalt','concrete','ground','fine_gravel','gravel','paving_stones','wood','grass',''].forEach(w => popup+=`<option value="${w}" ${tags[i].attributes["v"].value==w?"selected":""}>${w}</option>`)
+          popup += '</select>\n';
+        }
+        else if(tags[i].attributes["k"].value == 'smoothness'){
+          popup += '<select name="smoothness">';
+          ['excellent','good','intermediate','bad','horrible','impassable'].forEach(w => popup+=`<option value="${w}" ${tags[i].attributes["v"].value==w?"selected":""}>${w}</option>`)
+          popup += '</select>\n';
+        }
+        else if(tags[i].attributes["k"].value == 'winter_service'){
+          popup += '<select name="winter_service">';
+          ['yes','no',''].forEach(w => popup+=`<option value="${w}" ${tags[i].attributes["v"].value==w?"selected":""}>${w}</option>`)
+          popup += '</select>\n';
+        }
+        else if(tags[i].attributes["k"].value == 'fixme'){
+          popup += '<input type="text" width="125" name="fixme" value="' + tags[i].attributes["v"].value + '">\n'
+        }
+        else{
+          popup += '<strong>'+tags[i].attributes["v"].value+'</strong></li>\n';
+        }
         ltsWay.tags[tags[i].attributes["k"].value] = tags[i].attributes["v"].value
       }
       showMapillaryImage(lngLat)
-      popup+='<li><div id="showMapillary"></div></li>'
       popup+='</ul><hr><div id="clickme" class="quiet text-right small">Write a note</div>';
       popup+='<div id="fform" class="hidden"><form id="feedback"><p><textarea id="comment" name="comment" class="small" style="padding:3px"></textarea></p>';
       popup+='<input type="hidden" name="link" value="' + window.location.href + '">';
@@ -295,7 +321,7 @@ function displayOsmElementInfo(element, lngLat) {
   		var serializedData = $form.serialize();
 	    $inputs.prop("disabled", true);
   		$('#result').text('Sending ...');
-  		
+
       /*
             const tags = {};
             $( "li" ).each(function( index ) {
