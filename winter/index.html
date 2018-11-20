@@ -13,8 +13,8 @@
         #app { position:absolute; top:0; right:0; bottom:0; left:0; }
         #map { position:absolute; top:0; bottom:0; width:100%; }
         .enlarge-onhover {
-             width: 160px;
-             height: 100px;
+             width: 200px;
+             height: 125px;
              transition-duration: 0.5s; /* delays for 1 second */
              -webkit-transition-duration: 0.5s; /* for Safari & Chrome */
         }
@@ -258,47 +258,45 @@ function displayOsmElementInfo(element, lngLat) {
   const xhr = new XMLHttpRequest()
   xhr.open('GET','https://api.openstreetmap.org/api/0.6/'+element)
   xhr.onload = function () {
-    let popup = '<h4><a href="https://www.openstreetmap.org/' + element + '" target="_blank">' + element + '</a></h4><hr><ul>'
+    let popup = '<h4><a href="https://www.openstreetmap.org/' + element + '" target="_blank">' + element + '</a></h4><hr>'
     if (xhr.status === 200) {
       const xmlDOM = new DOMParser().parseFromString(xhr.responseText, 'text/xml');
-      const tags = xmlDOM.getElementsByTagName("tag");
-      const ltsWay = {id:element, tags:{}}
-      popup+='<li><div id="showMapillary"></div></li>'
-      for(let i=0; i<tags.length; i++)
-      {
-        if(!ImportantTags.includes(tags[i].attributes["k"].value)) continue;
-        popup += '<li>'+tags[i].attributes["k"].value+': ';
-        if(tags[i].attributes["k"].value == 'width'){
+      const tags = Array.from(xmlDOM.getElementsByTagName("tag"));
+      popup+='<div id="fform"><form id="feedback"><ul><li><div id="showMapillary"></div></li>'
+
+      for(let key of ImportantTags){
+        const t = tags.find(ele => {return ele.attributes['k'].value==key});
+        const tag = t ? t.attributes["v"].value : '';
+        popup += `<li>${key}: `;
+        if(key == 'width'){
           popup += '<select name="width">';
-          [0.5,1,1.5,2,3,4,5,''].forEach(w => popup+=`<option value="${w}" ${tags[i].attributes["v"].value==w?"selected":""}>${w}</option>`)
+          ['',0.5,1,1.5,2,3,4,5].forEach(w => popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`)
           popup += '</select>\n';
         }
-        else if(tags[i].attributes["k"].value == 'surface'){
+        else if(key == 'surface'){
           popup += '<select name="surface">';
-          ['asphalt','concrete','ground','fine_gravel','gravel','paving_stones','wood','grass',''].forEach(w => popup+=`<option value="${w}" ${tags[i].attributes["v"].value==w?"selected":""}>${w}</option>`)
+          ['','asphalt','concrete','ground','fine_gravel','gravel','paving_stones','wood','grass',''].forEach(w => popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`)
           popup += '</select>\n';
         }
-        else if(tags[i].attributes["k"].value == 'smoothness'){
+        else if(key == 'smoothness'){
           popup += '<select name="smoothness">';
-          ['excellent','good','intermediate','bad','horrible','impassable'].forEach(w => popup+=`<option value="${w}" ${tags[i].attributes["v"].value==w?"selected":""}>${w}</option>`)
+          ['','excellent','good','intermediate','bad','horrible','impassable'].forEach(w => popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`)
           popup += '</select>\n';
         }
-        else if(tags[i].attributes["k"].value == 'winter_service'){
+        else if(key == 'winter_service'){
           popup += '<select name="winter_service">';
-          ['yes','no',''].forEach(w => popup+=`<option value="${w}" ${tags[i].attributes["v"].value==w?"selected":""}>${w}</option>`)
+          ['','yes','no'].forEach(w => popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`)
           popup += '</select>\n';
         }
-        else if(tags[i].attributes["k"].value == 'fixme'){
-          popup += '<input type="text" width="125" name="fixme" value="' + tags[i].attributes["v"].value + '">\n'
+        else if(key == 'fixme'){
+          popup += '<input type="text" class="small" style="height:initial;padding:initial" id="fixme" value="' + tag + '">\n'
         }
         else{
-          popup += '<strong>'+tags[i].attributes["v"].value+'</strong></li>\n';
+          popup += '<strong>'+tag+'</strong></li>\n';
         }
-        ltsWay.tags[tags[i].attributes["k"].value] = tags[i].attributes["v"].value
       }
       showMapillaryImage(lngLat)
-      popup+='</ul><hr><div id="clickme" class="quiet text-right small">Write a note</div>';
-      popup+='<div id="fform" class="hidden"><form id="feedback"><p><textarea id="comment" name="comment" class="small" style="padding:3px"></textarea></p>';
+      popup+='</ul>';
       popup+='<input type="hidden" name="link" value="' + window.location.href + '">';
       popup+='<input type="hidden" name="osm_link" value="https://www.openstreetmap.org/' + element + '">';
       popup+='<p id="result"></p><input type="submit" value="Submit" /></form></div>';
@@ -309,12 +307,7 @@ function displayOsmElementInfo(element, lngLat) {
     .setLngLat(lngLat)
     .setHTML(popup)
     .addTo(map)
-    $( "#clickme" ).click(function() {
-      $(this).toggle('slow');
-      $( "#fform" ).toggle('slow');
-    });
-    var request;
-  	$("#feedback").submit(function(event){
+    $("#feedback").submit(function(event){
 
       var $form = $(this);
   		var $inputs = $form.find("input, select, button, textarea");
@@ -322,44 +315,22 @@ function displayOsmElementInfo(element, lngLat) {
 	    $inputs.prop("disabled", true);
   		$('#result').text('Sending ...');
 
-      /*
-            const tags = {};
-            $( "li" ).each(function( index ) {
-              const tag = $( this ).text().split(': ')
-              if(tag.length!=2) return;
-              tags[tag[0]]=tag[1];
-            });
 
-            submitOsmChangeset(element, tags)
-            .then(() => {
-              $('#result').html('Your changeset submitted!</a>');
+      const tags = {};
+      $('select').each(function(index) {
+        tags[$(this)[0].name]=$(this)[0].value;
+      });
+      tags['fixme']=$('#fixme')[0].value;
 
-            })
-            .catch(() => {
-              $('#result').html('Failed to submit changeset</a>');
-            })
-            event.preventDefault();
-            return;
-      */
+      submitOsmChangeset(element, tags)
+      .then(() => {
+        $('#result').html('Your changes submitted!');
+      })
+      .catch(() => {
+        $('#result').html('<font color="red">Failed to submit changes</font>');
+      })
+      event.preventDefault();
 
-  		if (request) {
-  			request.abort();
-  		}
-
-  		request = $.ajax({
-  			url: "https://script.google.com/macros/s/AKfycbya64PfAcZ36ia3dJpleAxokuPRFPa9X-3j9nR1M2mZgBdRx94y/exec",
-  			type: "post",
-  			data: serializedData
-  		});
-  		request.done(function (response, textStatus, jqXHR){
-  			$('#result').html('Thanks! We\'ll look into it</a>');
-  		}).fail(function (jqXHR, textStatus, errorThrown){
-  			$('#result').html('An error occured. Try again later.');
-        $inputs.prop("disabled", false);
-  		}).always(function () {
-
-  		});
-  		event.preventDefault();
   	});
   }
   xhr.send()

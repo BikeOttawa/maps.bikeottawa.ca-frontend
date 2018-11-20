@@ -10,18 +10,26 @@ const osm = new OsmRequest({
 });
 
 
-let changesetId = 0;
+let changesetId = 1;
 
 global.submitOsmChangeset = async function (osmElement, tags) {
     let element = await osm.fetchElement(osmElement);
     for (const key of Object.keys(tags)) {
-      element = osm.setProperty(element, key, tags[key]);
+      if(tags[key].trim()!='')
+        element = osm.setProperty(element, key, tags[key].trim());
     }
-    //element = osm.removeProperty(element, 'key2');
-    //element = osm.setTimestampToNow(element);
 
-    const changesetId = await osm.createChangeset('BikeOttawaMaps', 'Changed pathway details - https://maps.bikeottawa.ca');
-    //const changesetId = await osm.isChangesetStillOpen(changesetId);
+    let isOpen = false;
+    try {
+			await osm.isChangesetStillOpen(changesetId);
+		}
+		catch(e) {
+			changesetId = 1;
+		}
+
+    if(changesetId == 1)
+      changesetId = await osm.createChangeset('BikeOttawaMaps', 'Changed pathway details - https://maps.bikeottawa.ca');
+
     const newElementVersion = await osm.sendElement(element, changesetId);
 
     //element = osm.setVersion(element, newElementVersion);
