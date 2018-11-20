@@ -28,7 +28,7 @@ global.submitOsmChangeset = async function (osmElement, tags) {
 		}
 
     if(changesetId == 1)
-      changesetId = await osm.createChangeset('BikeOttawaMaps', 'Changed pathway details - https://maps.bikeottawa.ca');
+      changesetId = await osm.createChangeset('BikeOttawaMaps', 'Pathway details based on mapillary and local knowledge - https://maps.bikeottawa.ca');
 
     const newElementVersion = await osm.sendElement(element, changesetId);
 
