@@ -10,6 +10,7 @@
     <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
     <style>
         body { margin:0; padding:0; }
+        li { margin: 4px 0; }
         #app { position:absolute; top:0; right:0; bottom:0; left:0; }
         #map { position:absolute; top:0; bottom:0; width:100%; }
         .enlarge-onhover {
@@ -32,7 +33,6 @@
             position: relative;
             display: inline-block;
         }
-
         .tooltip .tooltiptext {
             visibility: hidden;
             width: 120px;
@@ -49,7 +49,6 @@
             opacity: 0;
             transition: opacity 0.8s;
         }
-
         .tooltip .tooltiptext::after {
             content: "";
             position: absolute;
@@ -60,7 +59,6 @@
             border-style: solid;
             border-color: #555 transparent transparent transparent;
         }
-
         .tooltip:hover .tooltiptext {
             visibility: visible;
             opacity: 1;
@@ -304,6 +302,7 @@ function displayOsmElementInfo(element, lngLat) {
       for(let key of ImportantTags){
         const t = tags.find(ele => {return ele.attributes['k'].value==key});
         const tag = t ? t.attributes["v"].value : '';
+        if(key=='name' && tag=='') continue;
         popup += `<li><div class="tooltip">${key}:&nbsp;&nbsp;`;
         if(key == 'width'){
           popup += '<span class="tooltiptext">Width in meters</span></div><select class="fill-lighten3" name="width">';
