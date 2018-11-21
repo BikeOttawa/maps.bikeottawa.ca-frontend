@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>Ottawa Pathway Map</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
+    <script  data-cfasync="false" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
+    <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
+    <link href='../css/maps.css' rel='stylesheet' />
+    <style>
+        body { margin:0; padding:0; }
+        li { margin: 4px 0; }
+        #app { position:absolute; top:0; right:0; bottom:0; left:0; }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+    </style>
+</head>
+<body>
+<div id='app' class='col12 contain clip'>
+<div id='map'></div>
+<div id='menu'>
+  <input id='dark' type='radio' name='rtoggle' value='dark' checked='checked'>
+  <label for='dark'>dark</label>
+  <input id='light' type='radio' name='rtoggle' value='light' >
+  <label for='light'>light</label>
+  <input id='bright' type='radio' name='rtoggle' value='bright'>
+  <label for='bright'>bright</label>
+  <input id='satellite' type='radio' name='rtoggle' value='satellite'>
+  <label for='satellite'>satellite</label>
+</div>
+<div class='col4 pad1 scroll-styled pin-topright '>
+  <div id='legendbtn' class='fill-darken2 pad1 icon book button hidden fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
+  <div id='legend' class='fill-darken1 round'>
+    <div id='closebtn' class='fill-darken2 pad1 icon close button fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
+    <div class='clearfix'></div>
+    <div class='pad1 dark'>
+      <h3>Pathways</h3><br>
+      <form>
+      <fieldset class='checkbox-pill clearfix '>
+        <input type='checkbox' id='narrow' checked='checked'>
+        <label for='narrow' id='narrow-label' class='button icon check quiet col12' style='text-align:left;'></label>
+        <input type='checkbox' id='wide' checked='checked'>
+        <label for='wide' id='wide-label' class='button icon check quiet col12' style='text-align:left;'></label>
+        <input type='checkbox' id='unknown' checked='checked'>
+        <label for='unknown' id='unknown-label' class='button icon check quiet col12' style='text-align:left;'></label>
+      </fieldset>
+      </form>
+      <div class='pad1 small'>
+        <p>This map shows pathways in the city of Ottawa.</p>
+        <p>The map is maintained by Bike Ottawa volunteers like you. <p>
+        <p>If you see any mistakes or are familiar with the status of a pathway, click on the path and change its properties. It's that easy!</p>
+      </div>
+      <div class='center pad2'>
+      	<a href='https://bikeottawa.ca'><img src="../img/logos/bikeottawa.png" style="width:32px; height:32px;"></a>
+        <a href='https://github.com/BikeOttawa/maps.bikeottawa.ca-frontend'><img src="../img/logos/github.png" style="width:32px; height:32px;"></a>
+        <a href='https://twitter.com/BikeOttawa'><img src="../img/logos/twitter.png" style="width:32px; height:32px;"></a>
+      </div>
+      <a class='fr fill-darken3 pad1 rounded-toggle short icon button bike' onclick="$('#about').toggle()"></a>
+      <div class='fr pad1 small'>Last update: <span id='dateUpdated'>[...]</span></div>
+      <div class='clearfix'></div>
+      <div id='about' class='center small hidden'>
+          Made possible with City of Ottawa Open Data, funding from Councilor Jeff Leiper, and the help of Open Street Map Canada and Bike Ottawa volunteers. Main contributors: Heather Shearer, Yaro Shkvorets, Rob McCrae, Alex deVries, Matthew Darwin, JP Torunski, Shawn Gettler and others
+      </div>
+    </div>
+  </div>
+</div>
+<div class="loading" title="loading..." id="loader"></div>
+</div>
+
+<script src='../js/maps.js'></script>
+<script src='../js/osm-bundle.js'></script>
+<script>
+const layers = [
+    {id:"narrow", name:'Narrow: &#60;2m', color:'#0099CC', opacity:0.9, filter:['<',['to-number',['get', 'width']], 2]},
+    {id:"wide", name:'Wide: &#8805;2m', color:'#DD5454', opacity:0.9, filter:['>=',['to-number',['get', 'width']], 2]},
+    {id:"unknown", name:'Unknown', color:'#F0C808', opacity:0.9, filter:['==',['to-number',['get', 'width'], 0], 0]}
+];
+
+mapboxgl.accessToken = 'pk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdqaWxrN3gwZXQ4MnFxbjAwZXRpbG8zIn0.XhAdk2ASwdipubccCWTfoQ';
+const map = new mapboxgl.Map({
+  container: 'map',
+  style: 'mapbox://styles/mapbox/dark-v9',
+  center: [-75.697927,45.417431],
+  zoom: 13,
+  minZoom: 10,
+  maxZoom: 17,
+  maxBounds: [[-76.385193,44.963826],[-75.011902,45.614998]],
+});
+
+map.addControl(new mapboxgl.NavigationControl(),'bottom-right');
+map.addControl(new mapboxgl.ScaleControl(), 'bottom-left');
+map.addControl(new mapboxgl.AttributionControl({compact: true }), 'bottom-right');
+
+addStyleSwitcher();
+
+document.getElementById('narrow').onclick = toggleFilter
+document.getElementById('wide').onclick = toggleFilter
+document.getElementById('unknown').onclick = toggleFilter
+
+//helpers & handlers below
+
+function addStyleSwitcher(){
+  const layerList = document.getElementById('menu');
+  const inputs = layerList.getElementsByTagName('input');
+
+  for (let i = 0; i < inputs.length; i++) {
+      inputs[i].onclick = switchLayer;
+  }
+}
+
+function switchLayer(layer) {
+    const layerId = layer.target.id;
+    map.setStyle('mapbox://styles/mapbox/' + layerId + '-v9');
+}
+
+function init() {
+  map.addLayer({
+    "id": 'pathways',
+    "type": "line",
+    "source": {
+        type: 'vector',
+        url: 'mapbox://bikeottawa.03jqtlpj',
+    },
+    "source-layer": '03jqtlpj',
+    "layout": {
+        "line-join": "round",
+        "line-cap": "round"
+    },
+    "paint": {
+        "line-color": ['case',
+              layers[2].filter, layers[2].color,
+              layers[0].filter, layers[0].color,
+              layers[1].filter, layers[1].color,
+              /* other */ layers[2].color],
+        "line-width": 2,
+        "line-opacity": 0.9
+      }
+    });
+  for(let layer of layers){
+    document.getElementById(layer.id+'-label').innerHTML = '<span style="display: inline-block;width:50px; height:8px;background-color: '+layer.color+'"></span>&nbsp;&nbsp;'+layer.name;
+  }
+
+  map.addSource('highlight', { type: 'geojson' , data: null});
+  map.addLayer({
+     "id": "highlight",
+     "type": "line",
+     "source": 'highlight',
+     "paint": {
+         "line-color": "#df42f4",
+         "line-width": 5,
+         "line-opacity": 0.5
+     }
+ });
+}
+
+map.on('style.load', function () {
+    init()
+});
+
+function toggleFilter(checkbox) {
+  const filter = ["any"];
+  if(document.getElementById('narrow').checked){
+    filter.push(layers[0].filter);
+  }
+  if(document.getElementById('wide').checked){
+    filter.push(layers[1].filter);
+  }
+  if(document.getElementById('unknown').checked){
+    filter.push(layers[2].filter);
+  }
+  map.setFilter('pathways', filter);
+}
+
+
+map.on('click', function(e) {
+
+  const features = map.queryRenderedFeatures(e.point, {
+              layers: ['pathways']
+          });
+  if (!features.length) {
+      return;
+  }
+  const feature = features[0];
+  displayOsmElementInfo(feature.properties.id, e.lngLat);
+  window.history.replaceState(null, null, window.location.pathname+'?&lat='+e.lngLat.lat+'&lng='+e.lngLat.lng+'&id='+feature.properties.id);
+  map.getSource('highlight').setData(feature);
+});
+
+map.on('mousemove', function(e) {
+    const features = map.queryRenderedFeatures(e.point, {
+                layers: ['pathways']
+            });
+    map.getCanvas().style.cursor = (features.length) ? 'pointer' : '';
+});
+
+map.on('load', function(e) {
+    addUpdatedDate('bikeottawa.03jqtlpj')
+    document.getElementById("loader").style.visibility = "hidden";
+    url = parseUrl(window.location.search.substr(1).split('&'));
+    const lat = url['lat']
+    const lng = url['lng']
+    if(lat && lng){
+      map.flyTo({center: [lng, lat]})
+      map.once('moveend', function(){
+          map.fire("click", {point : map.project([lng, lat]), lngLat: {lng:lng, lat:lat}});
+      });
+    }
+});
+
+</script>
+</body>
+</html>
