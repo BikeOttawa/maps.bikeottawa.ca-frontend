@@ -28,6 +28,43 @@
            padding: 10px;
            font-family: 'Open Sans', sans-serif;
         }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 120px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 0;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -60px;
+            opacity: 0;
+            transition: opacity 0.8s;
+        }
+
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #555 transparent transparent transparent;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -267,39 +304,39 @@ function displayOsmElementInfo(element, lngLat) {
       for(let key of ImportantTags){
         const t = tags.find(ele => {return ele.attributes['k'].value==key});
         const tag = t ? t.attributes["v"].value : '';
-        popup += `<li>${key}: `;
+        popup += `<li><div class="tooltip">${key}:&nbsp;&nbsp;`;
         if(key == 'width'){
-          popup += '<select name="width">';
-          ['',0.5,1,1.5,2,3,4,5].forEach(w => popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`)
-          popup += '</select>\n';
+          popup += '<span class="tooltiptext">Width in meters</span></div><select class="fill-lighten3" name="width">';
+          ['',0.5,1,1.5,2,2.5,3,4,5,10].forEach(w => popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`)
+          popup += '</select> m\n';
         }
         else if(key == 'surface'){
-          popup += '<select name="surface">';
+          popup += '<span class="tooltiptext">Pathway surface</span></div><select class="fill-lighten3" name="surface">';
           ['','asphalt','concrete','ground','fine_gravel','gravel','paving_stones','wood','grass',''].forEach(w => popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`)
           popup += '</select>\n';
         }
         else if(key == 'smoothness'){
-          popup += '<select name="smoothness">';
+          popup += '<span class="tooltiptext">How smooth is the surface</span></div><select class="fill-lighten3" name="smoothness">';
           ['','excellent','good','intermediate','bad','horrible','impassable'].forEach(w => popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`)
           popup += '</select>\n';
         }
         else if(key == 'winter_service'){
-          popup += '<select name="winter_service">';
+          popup += '<span class="tooltiptext">Is pathway plowed in winter?</span></div><select class="fill-lighten3" name="winter_service">';
           ['','yes','no'].forEach(w => popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`)
           popup += '</select>\n';
         }
         else if(key == 'fixme'){
-          popup += '<input type="text" class="small" style="height:initial;padding:initial" id="fixme" value="' + tag + '">\n'
+          popup += '<span class="tooltiptext">Describe in a few words if there is anything wrong with this path</span></div><input type="text" class="fill-lighten3 small"  style="height:initial;padding:initial" id="fixme" value="' + tag + '">\n'
         }
         else{
-          popup += '<strong>'+tag+'</strong></li>\n';
+          popup += '</div><strong>'+tag+'</strong></li>\n';
         }
       }
       showMapillaryImage(lngLat)
       popup+='</ul>';
       popup+='<input type="hidden" name="link" value="' + window.location.href + '">';
       popup+='<input type="hidden" name="osm_link" value="https://www.openstreetmap.org/' + element + '">';
-      popup+='<p id="result"></p><input type="submit" value="Submit" /></form></div>';
+      popup+='<p id="result"></p><div class="center"><input class="button short fill-darken3" type="submit" value="Submit" /></div></form></div>';
     } else {
       popup += 'Failed to request details from osm.org';
     }
