@@ -72,8 +72,8 @@
 <script src='../js/osm-bundle.js'></script>
 <script>
 const layers = [
-    {id:"narrow", name:'Narrow: &#60;2m', color:'#4BA3C3', opacity:0.9, filter:['all',['<',['to-number',['get', 'width']], 2],['>',['to-number',['get', 'width']], 0]]},
-    {id:"wide", name:'Wide: &#8805;2m', color:'#175676', opacity:0.9, filter:['>=',['to-number',['get', 'width']], 2]},
+    {id:"narrow", name:'Narrow: &#60;2m', color:'#a6bddb', opacity:0.9, filter:['all',['<',['to-number',['get', 'width']], 2],['>',['to-number',['get', 'width']], 0]]},
+    {id:"wide", name:'Wide: &#8805;2m', color:'#023858', opacity:0.9, filter:['>=',['to-number',['get', 'width']], 2]},
     {id:"unknown", name:'Unknown', color:'#F0C808', opacity:0.9, filter:['==',['to-number',['get', 'width']], 0]/*["==", ["get", "width"], null]*/}
 ];
 
@@ -128,11 +128,14 @@ function init() {
         "line-cap": "round"
     },
     "paint": {
-        "line-color": ['case',
-              layers[0].filter, layers[0].color,
-              layers[1].filter, layers[1].color,
-              layers[2].filter, layers[2].color,
-                /* other */ '#FFFFFF'], //non-literal?
+        "line-color": [
+                      "interpolate",
+                      ["linear"],
+                      ['to-number',['get', 'width']],
+                      0, layers[2].color,
+                      0.5, layers[0].color,
+                      4, layers[1].color
+                    ],
         "line-width": ['+',['to-number',['get', 'width']], 1.5],    //line width = width+1.5 pixels
         "line-opacity": 0.9
       }
