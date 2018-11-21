@@ -38,10 +38,10 @@
       <h3>Pathways</h3><br>
       <form>
       <fieldset class='checkbox-pill clearfix '>
-        <input type='checkbox' id='narrow' checked='checked'>
-        <label for='narrow' id='narrow-label' class='button icon check quiet col12' style='text-align:left;'></label>
         <input type='checkbox' id='wide' checked='checked'>
         <label for='wide' id='wide-label' class='button icon check quiet col12' style='text-align:left;'></label>
+        <input type='checkbox' id='narrow' checked='checked'>
+        <label for='narrow' id='narrow-label' class='button icon check quiet col12' style='text-align:left;'></label>
         <input type='checkbox' id='unknown' checked='checked'>
         <label for='unknown' id='unknown-label' class='button icon check quiet col12' style='text-align:left;'></label>
       </fieldset>
@@ -72,9 +72,9 @@
 <script src='../js/osm-bundle.js'></script>
 <script>
 const layers = [
-    {id:"narrow", name:'Narrow: &#60;2m', color:'#0099CC', opacity:0.9, filter:['<',['to-number',['get', 'width']], 2]},
-    {id:"wide", name:'Wide: &#8805;2m', color:'#DD5454', opacity:0.9, filter:['>=',['to-number',['get', 'width']], 2]},
-    {id:"unknown", name:'Unknown', color:'#F0C808', opacity:0.9, filter:['==',['to-number',['get', 'width'], 0], 0]}
+    {id:"narrow", name:'Narrow: &#60;2m', color:'#4BA3C3', opacity:0.9, filter:['all',['<',['to-number',['get', 'width']], 2],['>',['to-number',['get', 'width']], 0]]},
+    {id:"wide", name:'Wide: &#8805;2m', color:'#175676', opacity:0.9, filter:['>=',['to-number',['get', 'width']], 2]},
+    {id:"unknown", name:'Unknown', color:'#F0C808', opacity:0.9, filter:['==',['to-number',['get', 'width']], 0]/*["==", ["get", "width"], null]*/}
 ];
 
 mapboxgl.accessToken = 'pk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdqaWxrN3gwZXQ4MnFxbjAwZXRpbG8zIn0.XhAdk2ASwdipubccCWTfoQ';
@@ -129,11 +129,11 @@ function init() {
     },
     "paint": {
         "line-color": ['case',
-              layers[2].filter, layers[2].color,
               layers[0].filter, layers[0].color,
               layers[1].filter, layers[1].color,
-              /* other */ layers[2].color],
-        "line-width": 2,
+              layers[2].filter, layers[2].color,
+                /* other */ '#FFFFFF'], //non-literal?
+        "line-width": ['+',['to-number',['get', 'width']], 1.5],    //line width = width+1.5 pixels
         "line-opacity": 0.9
       }
     });
