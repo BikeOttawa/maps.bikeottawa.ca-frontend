@@ -8,61 +8,12 @@
     <script  data-cfasync="false" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
     <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
+    <link href='../css/maps.css' rel='stylesheet' />
     <style>
         body { margin:0; padding:0; }
         li { margin: 4px 0; }
         #app { position:absolute; top:0; right:0; bottom:0; left:0; }
         #map { position:absolute; top:0; bottom:0; width:100%; }
-        .enlarge-onhover {
-             width: 200px;
-             height: 125px;
-             transition-duration: 0.5s; /* delays for 1 second */
-             -webkit-transition-duration: 0.5s; /* for Safari & Chrome */
-        }
-        .enlarge-onhover:hover {
-             width: 640px;
-             height: 400px;
-        }
-        #menu {
-           position: absolute;
-           background: #fff;
-           padding: 10px;
-           font-family: 'Open Sans', sans-serif;
-        }
-        .tooltip {
-            position: relative;
-            display: inline-block;
-        }
-        .tooltip .tooltiptext {
-            visibility: hidden;
-            width: 120px;
-            background-color: #555;
-            color: #fff;
-            text-align: center;
-            border-radius: 6px;
-            padding: 5px 0;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            margin-left: -60px;
-            opacity: 0;
-            transition: opacity 0.8s;
-        }
-        .tooltip .tooltiptext::after {
-            content: "";
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            margin-left: -5px;
-            border-width: 5px;
-            border-style: solid;
-            border-color: #555 transparent transparent transparent;
-        }
-        .tooltip:hover .tooltiptext {
-            visibility: visible;
-            opacity: 1;
-        }
     </style>
 </head>
 <body>
@@ -117,42 +68,53 @@
 <div class="loading" title="loading..." id="loader"></div>
 </div>
 
-<script src='bundle.js'></script>
+<script src='../js/maps.js'></script>
+<script src='../js/osm-bundle.js'></script>
 <script>
-var layers = [
+const layers = [
     {id:"plowed", name:'Plowed', color:'#0099CC', opacity:0.9, filter:['==', 'winter_service', 'yes']},
     {id:"notplowed", name:'Not Plowed', color:'#DD5454', opacity:0.9, filter:['==', 'winter_service', 'no']},
     {id:"unknown", name:'Unknown', color:'#F0C808', opacity:0.9, filter:['!in', 'winter_service', 'yes', 'no']}
 ];
 
-
-  mapboxgl.accessToken = 'pk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdqaWxrN3gwZXQ4MnFxbjAwZXRpbG8zIn0.XhAdk2ASwdipubccCWTfoQ';
-  var map = new mapboxgl.Map({
-    container: 'map',
-    style: 'mapbox://styles/mapbox/dark-v9',
-    center: [-75.697927,45.417431],
-    zoom: 13,
-    minZoom: 10,
-    maxZoom: 17,
-    maxBounds: [[-76.385193,44.963826],[-75.011902,45.614998]],
-    attributionControl: false
+mapboxgl.accessToken = 'pk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdqaWxrN3gwZXQ4MnFxbjAwZXRpbG8zIn0.XhAdk2ASwdipubccCWTfoQ';
+const map = new mapboxgl.Map({
+  container: 'map',
+  style: 'mapbox://styles/mapbox/dark-v9',
+  center: [-75.697927,45.417431],
+  zoom: 13,
+  minZoom: 10,
+  maxZoom: 17,
+  maxBounds: [[-76.385193,44.963826],[-75.011902,45.614998]],
 });
 
-var layerList = document.getElementById('menu');
-var inputs = layerList.getElementsByTagName('input');
+map.addControl(new mapboxgl.NavigationControl(),'bottom-right');
+map.addControl(new mapboxgl.ScaleControl(), 'bottom-left');
+map.addControl(new mapboxgl.AttributionControl({compact: true }), 'bottom-right');
+
+addStyleSwitcher();
+
+document.getElementById('plowed').onclick = toggleFilter
+document.getElementById('notplowed').onclick = toggleFilter
+document.getElementById('unknown').onclick = toggleFilter
+
+//helpers & handlers below
+
+function addStyleSwitcher(){
+  const layerList = document.getElementById('menu');
+  const inputs = layerList.getElementsByTagName('input');
+
+  for (let i = 0; i < inputs.length; i++) {
+      inputs[i].onclick = switchLayer;
+  }
+}
 
 function switchLayer(layer) {
-    var layerId = layer.target.id;
+    const layerId = layer.target.id;
     map.setStyle('mapbox://styles/mapbox/' + layerId + '-v9');
 }
 
-for (var i = 0; i < inputs.length; i++) {
-    inputs[i].onclick = switchLayer;
-}
-
-
 function init() {
-
   map.addLayer({
     "id": 'pathways',
     "type": "line",
@@ -192,12 +154,12 @@ function init() {
  });
 }
 
-map.addControl(new mapboxgl.NavigationControl(),'bottom-right');
-map.addControl(new mapboxgl.ScaleControl(), 'bottom-left');
-map.addControl(new mapboxgl.AttributionControl({compact: true }), 'bottom-right');
+map.on('style.load', function () {
+    init()
+});
 
 function toggleFilter(checkbox) {
-  let filter = ["any"];
+  const filter = ["any"];
   if(document.getElementById('plowed').checked){
     filter.push(layers[0].filter);
   }
@@ -210,54 +172,32 @@ function toggleFilter(checkbox) {
   map.setFilter('pathways', filter);
 }
 
-document.getElementById('plowed').onclick = toggleFilter
-document.getElementById('notplowed').onclick = toggleFilter
-document.getElementById('unknown').onclick = toggleFilter
-
-
-map.on('style.load', function () {
-    init()
-});
 
 map.on('click', function(e) {
 
-    var features = map.queryRenderedFeatures(e.point, {
-                layers: ['pathways']
-            });
-    if (!features.length) {
-        return;
-    }
-    var feature = features[0];
-    displayOsmElementInfo(feature.properties.id, e.lngLat);
-    window.history.replaceState(null, null, window.location.pathname+'?&lat='+e.lngLat.lat+'&lng='+e.lngLat.lng+'&id='+feature.properties.id);
-      //TODO: highlight using filters
-    map.getSource('highlight').setData(feature);
-
+  const features = map.queryRenderedFeatures(e.point, {
+              layers: ['pathways']
+          });
+  if (!features.length) {
+      return;
+  }
+  const feature = features[0];
+  displayOsmElementInfo(feature.properties.id, e.lngLat);
+  window.history.replaceState(null, null, window.location.pathname+'?&lat='+e.lngLat.lat+'&lng='+e.lngLat.lng+'&id='+feature.properties.id);
+  map.getSource('highlight').setData(feature);
 });
 
 map.on('mousemove', function(e) {
-    var features = map.queryRenderedFeatures(e.point, {
+    const features = map.queryRenderedFeatures(e.point, {
                 layers: ['pathways']
             });
     map.getCanvas().style.cursor = (features.length) ? 'pointer' : '';
 });
+
 map.on('load', function(e) {
-    addUpdatedDate()
+    addUpdatedDate('bikeottawa.03jqtlpj')
     document.getElementById("loader").style.visibility = "hidden";
-    //url = new URLSearchParams(window.location.href)
-    url = (function(a) {    //workaround for edge that doesn't support URLSearchParams
-        if (a == "") return {};
-        var b = {};
-        for (var i = 0; i < a.length; ++i)
-        {
-            var p=a[i].split('=', 2);
-            if (p.length == 1)
-                b[p[0]] = "";
-            else
-                b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
-        }
-        return b;
-    })(window.location.search.substr(1).split('&'));
+    url = parseUrl(window.location.search.substr(1).split('&'));
     const lat = url['lat']
     const lng = url['lng']
     if(lat && lng){
@@ -265,130 +205,9 @@ map.on('load', function(e) {
       map.once('moveend', function(){
           map.fire("click", {point : map.project([lng, lat]), lngLat: {lng:lng, lat:lat}});
       });
-
     }
+});
 
-})
-
-function addUpdatedDate(){
-  const request = new XMLHttpRequest()
-  request.open('GET','https://api.mapbox.com/tilesets/v1/bikeottawa?access_token=sk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdyYTJmN2EwMmtoMzJwc3JxM2hoZ3ozIn0.YB1JNmncsPvktmgGU_zK8A')
-  request.onload = function () {
-    if (request.status >= 200 && request.status < 400) {
-      var data = JSON.parse(request.responseText);
-      if(data && data instanceof Array){
-        const date = new Date(data.find(x => x.id === 'bikeottawa.03jqtlpj').modified)
-        document.getElementById('dateUpdated').innerHTML = date.toLocaleString();
-      }
-    }
-  }
-  request.send()
-}
-
-
-function displayOsmElementInfo(element, lngLat) {
-  const ImportantTags = ['name', 'highway', 'winter_service', 'width', 'surface', 'smoothness', 'fixme'];
-
-  if(typeof element == 'undefined') return;
-  const xhr = new XMLHttpRequest()
-  xhr.open('GET','https://api.openstreetmap.org/api/0.6/'+element)
-  xhr.onload = function () {
-    let popup = '<h4><a href="https://www.openstreetmap.org/' + element + '" target="_blank">' + element + '</a></h4><hr>'
-    if (xhr.status === 200) {
-      const xmlDOM = new DOMParser().parseFromString(xhr.responseText, 'text/xml');
-      const tags = Array.from(xmlDOM.getElementsByTagName("tag"));
-      popup+='<div id="fform"><form id="feedback"><ul><li><div id="showMapillary"></div></li>'
-
-      for(let key of ImportantTags){
-        const t = tags.find(ele => {return ele.attributes['k'].value==key});
-        const tag = t ? t.attributes["v"].value : '';
-        if(key=='name' && tag=='') continue;
-        popup += `<li><div class="tooltip">${key}:&nbsp;&nbsp;`;
-        if(key == 'width'){
-          popup += '<span class="tooltiptext">Width in meters</span></div><select class="fill-lighten3" name="width">';
-          ['',0.5,1,1.5,2,2.5,3,4,5,10].forEach(w => popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`)
-          popup += '</select> m\n';
-        }
-        else if(key == 'surface'){
-          popup += '<span class="tooltiptext">Pathway surface</span></div><select class="fill-lighten3" name="surface">';
-          ['','asphalt','concrete','ground','fine_gravel','gravel','paving_stones','wood','grass',''].forEach(w => popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`)
-          popup += '</select>\n';
-        }
-        else if(key == 'smoothness'){
-          popup += '<span class="tooltiptext">How smooth is the surface</span></div><select class="fill-lighten3" name="smoothness">';
-          ['','excellent','good','intermediate','bad','horrible','impassable'].forEach(w => popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`)
-          popup += '</select>\n';
-        }
-        else if(key == 'winter_service'){
-          popup += '<span class="tooltiptext">Is pathway plowed in winter?</span></div><select class="fill-lighten3" name="winter_service">';
-          ['','yes','no'].forEach(w => popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`)
-          popup += '</select>\n';
-        }
-        else if(key == 'fixme'){
-          popup += '<span class="tooltiptext">Describe in a few words if there is anything wrong with this path</span></div><input type="text" class="fill-lighten3 small"  style="height:initial;padding:initial" id="fixme" value="' + tag + '">\n'
-        }
-        else{
-          popup += '</div><strong>'+tag+'</strong></li>\n';
-        }
-      }
-      showMapillaryImage(lngLat)
-      popup+='</ul>';
-      popup+='<input type="hidden" name="link" value="' + window.location.href + '">';
-      popup+='<input type="hidden" name="osm_link" value="https://www.openstreetmap.org/' + element + '">';
-      popup+='<p id="result"></p><div class="center"><input class="button short fill-darken3" type="submit" value="Submit" /></div></form></div>';
-    } else {
-      popup += 'Failed to request details from osm.org';
-    }
-    var pop = new mapboxgl.Popup()
-    .setLngLat(lngLat)
-    .setHTML(popup)
-    .addTo(map)
-    $("#feedback").submit(function(event){
-
-      var $form = $(this);
-  		var $inputs = $form.find("input, select, button, textarea");
-  		var serializedData = $form.serialize();
-	    $inputs.prop("disabled", true);
-  		$('#result').text('Sending ...');
-
-
-      const tags = {};
-      $('select').each(function(index) {
-        tags[$(this)[0].name]=$(this)[0].value;
-      });
-      tags['fixme']=$('#fixme')[0].value;
-
-      submitOsmChangeset(element, tags)
-      .then(() => {
-        $('#result').html('Your changes submitted!');
-      })
-      .catch(() => {
-        $('#result').html('<font color="red">Failed to submit changes</font>');
-      })
-      event.preventDefault();
-
-  	});
-  }
-  xhr.send()
-}
-
-
-
-function showMapillaryImage(lngLat) {
-  const xhr = new XMLHttpRequest()
-  xhr.open('GET','https://a.mapillary.com/v3/images/?radius=15&per_page=1&client_id=TG1sUUxGQlBiYWx2V05NM0pQNUVMQTo2NTU3NTBiNTk1NzM1Y2U2&closeto='+lngLat.lng+','+lngLat.lat)
-  xhr.onload = function () {
-    if (xhr.status === 200) {
-      const result = JSON.parse(xhr.responseText)
-      if(!result.features || result.features.length==0){
-        return
-      }
-      document.getElementById('showMapillary').innerHTML = '<a href="https://www.mapillary.com/app/?focus=photo&pKey='+result.features[0].properties.key+'"><img class="enlarge-onhover" src="https://d1cuyjsrcm0gby.cloudfront.net/'+result.features[0].properties.key+'/thumb-640.jpg"></a>'
-    }
-  }
-  xhr.send()
-}
 </script>
-<!--https://docs.google.com/spreadsheets/d/1Rx1SjhWXwkMsHFAioP9XE42Or9S7Ob7JYPLUzSMe-T8/edit?usp=sharing -->
 </body>
 </html>
