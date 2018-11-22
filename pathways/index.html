@@ -9,6 +9,7 @@
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
     <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
     <link href='../css/maps.css' rel='stylesheet' />
+    <link href="../css/nouislider.min.css" rel="stylesheet">
     <style>
         body { margin:0; padding:0; }
         li { margin: 4px 0; }
@@ -37,11 +38,13 @@
     <div class='pad1 dark'>
       <h3>Pathways</h3><br>
       <form>
+      <div class="col12 small">
+        <div id='min_width' class="col2 fl">0</div>
+        <div class="col6 "><div id="slider"></div></div>
+        <div id='max_width' class="col3 fr">10</div>
+      </div>
+      <br><br>
       <fieldset class='checkbox-pill clearfix '>
-        <input type='checkbox' id='wide' checked='checked'>
-        <label for='wide' id='wide-label' class='button icon check quiet col12' style='text-align:left;'></label>
-        <input type='checkbox' id='narrow' checked='checked'>
-        <label for='narrow' id='narrow-label' class='button icon check quiet col12' style='text-align:left;'></label>
         <input type='checkbox' id='unknown' checked='checked'>
         <label for='unknown' id='unknown-label' class='button icon check quiet col12' style='text-align:left;'></label>
       </fieldset>
@@ -70,11 +73,12 @@
 
 <script src='../js/maps.js'></script>
 <script src='../js/osm-bundle.js'></script>
+<script src="../js/nouislider.min.js"></script>
 <script>
 const layers = [
     {id:"narrow", name:'Narrow: &#60;2m', color:'#a6bddb', opacity:0.9, filter:['all',['<',['to-number',['get', 'width']], 2],['>',['to-number',['get', 'width']], 0]]},
     {id:"wide", name:'Wide: &#8805;2m', color:'#023858', opacity:0.9, filter:['>=',['to-number',['get', 'width']], 2]},
-    {id:"unknown", name:'Unknown', color:'#F0C808', opacity:0.9, filter:['==',['to-number',['get', 'width']], 0]/*["==", ["get", "width"], null]*/}
+    {id:"unknown", name:'Unknown width', color:'#F0C808', opacity:0.9, filter:['==',['to-number',['get', 'width']], 0]/*["==", ["get", "width"], null]*/}
 ];
 
 mapboxgl.accessToken = 'pk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdqaWxrN3gwZXQ4MnFxbjAwZXRpbG8zIn0.XhAdk2ASwdipubccCWTfoQ';
@@ -94,11 +98,33 @@ map.addControl(new mapboxgl.AttributionControl({compact: true }), 'bottom-right'
 
 addStyleSwitcher();
 
-document.getElementById('narrow').onclick = toggleFilter
-document.getElementById('wide').onclick = toggleFilter
-document.getElementById('unknown').onclick = toggleFilter
+document.getElementById('unknown').onclick = toggleUnknown
+
 
 //helpers & handlers below
+
+const slider = document.getElementById('slider')
+noUiSlider.create(slider, {
+    start: [0.5, 5],
+    connect: true,
+    step: 0.5,
+    range: {
+        'min': 0.5,
+        'max': 5
+    }
+});
+const snapValues = [
+    document.getElementById('min_width'),
+    document.getElementById('max_width')
+];
+
+function sliderUpdate(values){
+  map.getSource('highlight').setData(null);
+  const filter = map.getFilter('pathways');
+  filter[2][1][2] = parseFloat(values[0]);
+  filter[2][2][2] = parseFloat(values[1])==5 ? 100 : parseFloat(values[1]);
+  map.setFilter('pathways', filter);
+}
 
 function addStyleSwitcher(){
   const layerList = document.getElementById('menu');
@@ -138,11 +164,17 @@ function init() {
                     ],
         "line-width": ['+',['to-number',['get', 'width']], 1.5],    //line width = width+1.5 pixels
         "line-opacity": 0.9
-      }
+      },
+      'filter': [ 'any',
+                  ['==',['to-number',['get', 'width']], 0],
+                  ['all',
+                    ['>=', ['to-number',['get', 'width']], 0.5],
+                    ['<=', ['to-number',['get', 'width']], 100]
+                  ]
+                ]
     });
-  for(let layer of layers){
-    document.getElementById(layer.id+'-label').innerHTML = '<span style="display: inline-block;width:50px; height:8px;background-color: '+layer.color+'"></span>&nbsp;&nbsp;'+layer.name;
-  }
+
+  document.getElementById('unknown-label').innerHTML = '<span style="display: inline-block;width:50px; height:8px;background-color: '+layers[2].color+'"></span>&nbsp;&nbsp;'+layers[2].name;
 
   map.addSource('highlight', { type: 'geojson' , data: null});
   map.addLayer({
@@ -161,16 +193,13 @@ map.on('style.load', function () {
     init()
 });
 
-function toggleFilter(checkbox) {
-  const filter = ["any"];
-  if(document.getElementById('narrow').checked){
-    filter.push(layers[0].filter);
-  }
-  if(document.getElementById('wide').checked){
-    filter.push(layers[1].filter);
-  }
+function toggleUnknown(checkbox) {
+  const filter = map.getFilter('pathways');
   if(document.getElementById('unknown').checked){
-    filter.push(layers[2].filter);
+    filter[1][0]='==';
+  }
+  else {
+    filter[1][0]='<';
   }
   map.setFilter('pathways', filter);
 }
@@ -209,6 +238,14 @@ map.on('load', function(e) {
           map.fire("click", {point : map.project([lng, lat]), lngLat: {lng:lng, lat:lat}});
       });
     }
+
+
+    slider.noUiSlider.on('update', function (values, handle) {
+        const val=parseFloat(values[handle]);
+        snapValues[handle].innerHTML = val.toFixed(1) + (val==5?'+ m':' m');
+        sliderUpdate(values);
+    });
+
 });
 
 </script>
