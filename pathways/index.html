@@ -155,12 +155,12 @@ function init() {
     },
     "paint": {
         "line-color": [
-                      "interpolate",
+                      "interpolate-hcl",
                       ["linear"],
                       ['to-number',['get', 'width']],
                       0, layers[2].color,
                       0.5, layers[0].color,
-                      4, layers[1].color
+                      3, layers[1].color
                     ],
         "line-width": ['+',['to-number',['get', 'width']], 1.5],    //line width = width+1.5 pixels
         "line-opacity": 0.9

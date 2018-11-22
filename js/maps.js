@@ -54,7 +54,7 @@ function displayOsmElementInfo(element, lngLat) {
         }
         else if(key == 'surface'){
           popup += '<span class="tooltiptext">Pathway surface</span></div><select class="fill-lighten3" name="surface">';
-          ['','asphalt','concrete','ground','fine_gravel','gravel','paving_stones','wood','grass',''].forEach(w => popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`)
+          ['','asphalt','concrete','ground','fine_gravel','gravel','paving_stones','wood','grass'].forEach(w => popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`)
           popup += '</select>\n';
         }
         else if(key == 'smoothness'){
@@ -103,7 +103,7 @@ function displayOsmElementInfo(element, lngLat) {
 
       submitOsmChangeset(element, tags)
       .then(() => {
-        $('#result').html('Your changes submitted!');
+        $('#result').html('Your changes submitted to OpenStreetMap!');
       })
       .catch(() => {
         $('#result').html('<font color="red">Failed to submit changes</font>');
