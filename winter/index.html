@@ -44,6 +44,9 @@
         <label for='notplowed' id='notplowed-label' class='button icon check quiet col12' style='text-align:left;'>Not Plowed</label>
         <input type='checkbox' id='unknown' checked='checked'>
         <label for='unknown' id='unknown-label' class='button icon check quiet col12' style='text-align:left;'>Unknown</label>
+        <br><br>
+        <input type='checkbox' id='plowtracks'>
+        <label for='plowtracks' id='plowtracks-label' class='button icon check quiet col12' style='text-align:left;'><span style="display: inline-block;width:50px; height:8px;background-color: #ff00bf"></span>&nbsp;&nbsp;City Plow Tracks</label>
       </fieldset>
       </form>
       <div class='pad1 small'>
@@ -97,6 +100,7 @@ addStyleSwitcher();
 document.getElementById('plowed').onclick = toggleFilter
 document.getElementById('notplowed').onclick = toggleFilter
 document.getElementById('unknown').onclick = toggleFilter
+document.getElementById('plowtracks').onclick = togglePlowTracks
 
 //helpers & handlers below
 
@@ -137,21 +141,41 @@ function init() {
         "line-opacity": 0.9
       }
     });
-  for(let layer of layers){
-    document.getElementById(layer.id+'-label').innerHTML = '<span style="display: inline-block;width:50px; height:8px;background-color: '+layer.color+'"></span>&nbsp;&nbsp;'+layer.name;
-  }
+    map.addLayer({
+      "id": 'plowtracks',
+      "type": "line",
+      "source": {
+          type: 'vector',
+          url: 'mapbox://bikeottawa.5rnbt9k5',
+      },
+      "source-layer": 'city_plow_tracks-avcjvu',
+      "layout": {
+          "line-join": "round",
+          "line-cap": "round",
+          "visibility": document.getElementById('plowtracks').checked ? "visible" : "none",
+      },
+      "paint": {
+          "line-color": '#ff00bf',
+          "line-width": 1,
+          "line-opacity": 0.3
+        }
+      });
 
-  map.addSource('highlight', { type: 'geojson' , data: null});
-  map.addLayer({
-     "id": "highlight",
-     "type": "line",
-     "source": 'highlight',
-     "paint": {
-         "line-color": "#df42f4",
-         "line-width": 5,
-         "line-opacity": 0.5
-     }
- });
+    for(let layer of layers){
+      document.getElementById(layer.id+'-label').innerHTML = '<span style="display: inline-block;width:50px; height:8px;background-color: '+layer.color+'"></span>&nbsp;&nbsp;'+layer.name;
+    }
+
+    map.addSource('highlight', { type: 'geojson' , data: null});
+    map.addLayer({
+       "id": "highlight",
+       "type": "line",
+       "source": 'highlight',
+       "paint": {
+           "line-color": "#df42f4",
+           "line-width": 5,
+           "line-opacity": 0.5
+       }
+   });
 }
 
 map.on('style.load', function () {
@@ -170,6 +194,15 @@ function toggleFilter(checkbox) {
     filter.push(layers[2].filter);
   }
   map.setFilter('pathways', filter);
+}
+
+function togglePlowTracks(checkbox) {
+  if(document.getElementById('plowtracks').checked){
+    map.setLayoutProperty('plowtracks', 'visibility', 'visible');
+  }
+  else{
+    map.setLayoutProperty('plowtracks', 'visibility', 'none');
+  }
 }
 
 
