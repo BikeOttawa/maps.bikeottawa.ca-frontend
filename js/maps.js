@@ -103,7 +103,7 @@ function displayOsmElementInfo(element, lngLat) {
 
       submitOsmChangeset(element, tags)
       .then(() => {
-        $('#result').html('Your changes submitted to OpenStreetMap!');
+        $('#result').html('Your changes submitted!');
       })
       .catch(() => {
         $('#result').html('<font color="red">Failed to submit changes</font>');
