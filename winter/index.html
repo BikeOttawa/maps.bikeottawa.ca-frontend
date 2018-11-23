@@ -8,6 +8,7 @@
     <script  data-cfasync="false" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
     <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
+    <link rel='stylesheet' href='../css/mapbox-gl-geocoder.css' type='text/css' />
     <link href='../css/maps.css' rel='stylesheet' />
     <style>
         body { margin:0; padding:0; }
@@ -73,6 +74,7 @@
 
 <script src='../js/maps.js'></script>
 <script src='../js/osm-bundle.js'></script>
+<script src='../js/mapbox-gl-geocoder.min.js'></script>
 <script>
 const layers = [
     {id:"plowed", name:'Plowed', color:'#0099CC', opacity:0.9, filter:['==', 'winter_service', 'yes']},
@@ -92,8 +94,15 @@ const map = new mapboxgl.Map({
 });
 
 map.addControl(new mapboxgl.NavigationControl(),'bottom-right');
-map.addControl(new mapboxgl.ScaleControl(), 'bottom-left');
 map.addControl(new mapboxgl.AttributionControl({compact: true }), 'bottom-right');
+const geocoder = new MapboxGeocoder({
+    accessToken: mapboxgl.accessToken,
+    bbox: [-76.385193,44.963826,-75.011902,45.614998],
+    zoom: 13,
+    limit: 10,
+    asyncGeocoder: nominatimGeocoder
+})
+map.addControl(geocoder, 'bottom-left')
 
 addStyleSwitcher();
 
