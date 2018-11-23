@@ -64,9 +64,9 @@
       </fieldset>
       </form>
       <div class='center pad2'>
-      	<a href='https://bikeottawa.ca'><img src="../img/logos/bikeottawa.png" style="width:32px; height:32px;"></a>
-        <a href='https://github.com/BikeOttawa/maps.bikeottawa.ca-frontend'><img src="../img/logos/github.png" style="width:32px; height:32px;"></a>
-        <a href='https://twitter.com/BikeOttawa'><img src="../img/logos/twitter.png" style="width:32px; height:32px;"></a>
+      	<a href='https://bikeottawa.ca' target="_blank"><img src="../img/logos/bikeottawa.png" style="width:32px; height:32px;"></a>
+        <a href='https://github.com/BikeOttawa/maps.bikeottawa.ca-frontend' target="_blank"><img src="../img/logos/github.png" style="width:32px; height:32px;"></a>
+        <a href='https://twitter.com/BikeOttawa' target="_blank"><img src="../img/logos/twitter.png" style="width:32px; height:32px;"></a>
       </div>
       <a class='fr fill-darken2 pad1 rounded-toggle short icon button bike' onclick="$('#about').toggle()"></a>
       <div class='fr pad1 small'>Last update: <span id='dateUpdated'>[...]</span></div>
@@ -320,7 +320,7 @@ function showMapillaryImage(lngLat) {
       if(!result.features || result.features.length==0){
         return
       }
-      document.getElementById('showMapillary').innerHTML = '<a href="https://www.mapillary.com/app/?focus=photo&pKey='+result.features[0].properties.key+'"><img class="enlarge-onhover" src="https://d1cuyjsrcm0gby.cloudfront.net/'+result.features[0].properties.key+'/thumb-640.jpg"></a>'
+      document.getElementById('showMapillary').innerHTML = '<a href="https://www.mapillary.com/app/?focus=photo&pKey='+result.features[0].properties.key+'" target="_blank"><img class="enlarge-onhover" src="https://d1cuyjsrcm0gby.cloudfront.net/'+result.features[0].properties.key+'/thumb-640.jpg"></a>'
     }
   }
   xhr.send()
