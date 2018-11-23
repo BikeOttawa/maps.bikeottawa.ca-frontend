@@ -33,6 +33,7 @@ function displayOsmElementInfo(element, lngLat) {
   const ImportantTags = [ ['name','Name'],        //[actual OSM tag, display name for tag in popup]
                           ['highway','Type'],
                           ['winter_service','Snowplowing'],
+			  ['winter_service:quality','Useability'],
                           ['width', 'Width'],
                           ['surface', 'Surface'],
                           ['smoothness', 'Smoothness'],
@@ -64,13 +65,18 @@ function displayOsmElementInfo(element, lngLat) {
           popup += '</select>\n';
         }
         else if(key[0] == 'smoothness'){
-          popup += '<span class="tooltiptext">How smooth is the surface</span></div><select class="fill-lighten3" name="smoothness">';
+          popup += '<span class="tooltiptext">How smooth is the surface in summer</span></div><select class="fill-lighten3" name="smoothness">';
           ['','excellent','good','intermediate','bad','horrible','impassable'].forEach(w => popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`)
           popup += '</select>\n';
         }
         else if(key[0] == 'winter_service'){
           popup += '<span class="tooltiptext">Is pathway plowed in winter?</span></div><select class="fill-lighten3" name="winter_service">';
           ['','yes','no'].forEach(w => popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`)
+          popup += '</select>\n';
+	}
+        else if(key[0] == 'winter_service:quality'){
+          popup += '<span class="tooltiptext">How well is the path typically plowed?</span></div><select class="fill-lighten3" name="winter_service">';
+          ['','excellent','good','intermediate','bad','horrible','impassable'].forEach(w => popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`)
           popup += '</select>\n';
         }
         else if(key[0] == 'fixme'){
