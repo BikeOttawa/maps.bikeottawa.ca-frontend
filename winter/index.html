@@ -146,7 +146,13 @@ function init() {
               'yes', layers[0].color,
               'no', layers[1].color,
               /* other */ layers[2].color],
-        "line-width": 2,
+        "line-width": [
+                      'interpolate',
+                      ['exponential', 1.5],
+                      ['zoom'],
+                      10, 1,
+                      17, 10
+                    ],
         "line-opacity": 0.9
       }
     });
