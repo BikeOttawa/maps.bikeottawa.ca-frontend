@@ -162,7 +162,14 @@ function init() {
                       0.5, layers[0].color,
                       3, layers[1].color
                     ],
-        "line-width": ['+',['to-number',['get', 'width']], 1.5],    //line width = width+1.5 pixels
+        //"line-width": ['+',['to-number',['get', 'width']], 1.5],    //line width = width+1.5 pixels
+        "line-width": [
+                      'interpolate',
+                      ['exponential', 2],
+                      ['zoom'],
+                      10, 2,/*['+', ['/',['to-number',['get', 'width']],2], 1],*/
+                      17, ['*', ['+',['to-number',['get', 'width']],1], 3]
+                    ],
         "line-opacity": 0.9
       },
       'filter': [ 'any',
