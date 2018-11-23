@@ -30,7 +30,13 @@ function parseUrl(url)  //workaround for edge that doesn't support URLSearchPara
 }
 
 function displayOsmElementInfo(element, lngLat) {
-  const ImportantTags = ['name', 'highway', 'winter_service', 'width', 'surface', 'smoothness', 'fixme'];
+  const ImportantTags = [ ['name','Name'],        //[actual OSM tag, display name for tag in popup]
+                          ['highway','Type'],
+                          ['winter_service','Snowplowing'],
+                          ['width', 'Width'],
+                          ['surface', 'Surface'],
+                          ['smoothness', 'Smoothness'],
+                          ['fixme', 'Other info']];
 
   if(typeof element == 'undefined') return;
   const xhr = new XMLHttpRequest()
@@ -43,31 +49,31 @@ function displayOsmElementInfo(element, lngLat) {
       popup+='<div id="fform"><form id="feedback"><ul><li><div id="showMapillary"></div></li>'
 
       for(let key of ImportantTags){
-        const t = tags.find(ele => {return ele.attributes['k'].value==key});
+        const t = tags.find(ele => {return ele.attributes['k'].value==key[0]});
         const tag = t ? t.attributes["v"].value : '';
-        if(key=='name' && tag=='') continue;
-        popup += `<li><div class="tooltip">${key}:&nbsp;&nbsp;`;
-        if(key == 'width'){
+        if(key[0]=='name' && tag=='') continue;
+        popup += `<li><div class="tooltip">${key[1]}:&nbsp;&nbsp;`;
+        if(key[0] == 'width'){
           popup += '<span class="tooltiptext">Width in meters</span></div><select class="fill-lighten3" name="width" >';
           ['',0.5,1,1.5,2,2.5,3,4,5,10].forEach(w => popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`)
           popup += '</select> m\n';
         }
-        else if(key == 'surface'){
+        else if(key[0] == 'surface'){
           popup += '<span class="tooltiptext">Pathway surface</span></div><select class="fill-lighten3" name="surface">';
           ['','asphalt','concrete','ground','fine_gravel','gravel','paving_stones','wood','grass'].forEach(w => popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`)
           popup += '</select>\n';
         }
-        else if(key == 'smoothness'){
+        else if(key[0] == 'smoothness'){
           popup += '<span class="tooltiptext">How smooth is the surface</span></div><select class="fill-lighten3" name="smoothness">';
           ['','excellent','good','intermediate','bad','horrible','impassable'].forEach(w => popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`)
           popup += '</select>\n';
         }
-        else if(key == 'winter_service'){
+        else if(key[0] == 'winter_service'){
           popup += '<span class="tooltiptext">Is pathway plowed in winter?</span></div><select class="fill-lighten3" name="winter_service">';
           ['','yes','no'].forEach(w => popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`)
           popup += '</select>\n';
         }
-        else if(key == 'fixme'){
+        else if(key[0] == 'fixme'){
           popup += '<span class="tooltiptext">Describe in a few words if there is anything wrong with this path</span></div><input type="text" class="fill-lighten3 small"  style="height:initial;padding:initial" id="fixme" value="' + tag + '">\n'
         }
         else{
