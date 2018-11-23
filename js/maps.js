@@ -131,3 +131,31 @@ function showMapillaryImage(lngLat) {
   }
   xhr.send()
 }
+
+
+function nominatimGeocoder(query){
+
+  const params = { format: "json", q: query, limit: 5, viewbox:'-76.36384,45.51697,-74.92326,45.03379', bounded: 1};
+  const urlParams = new URLSearchParams(Object.entries(params));
+
+  return fetch("//nominatim.openstreetmap.org/search?" + urlParams).then(function(response) {
+    if(response.ok) {
+      return response.json();
+    } else {
+      return [];
+    }
+  }).then(function(json) {
+    return json.map(function(place) {
+      return {
+        center: [place.lon, place.lat],
+        geometry: {
+            type: "Point",
+            coordinates: [place.lon, place.lat]
+        },
+        place_name: place.display_name,
+        properties: {},
+        type: 'Feature'
+      };
+    });
+  });
+};
