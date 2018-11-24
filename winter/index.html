@@ -230,7 +230,7 @@ map.on('click', function(e) {
       return;
   }
   const feature = features[0];
-  displayOsmElementInfo(feature.properties.id, e.lngLat);
+  displayOsmElementInfo(feature.properties.id, e.lngLat,['name','highway','surface','winter_service','winter_service:quality','fixme']);
   window.history.replaceState(null, null, window.location.pathname+'?&lat='+e.lngLat.lat+'&lng='+e.lngLat.lng+'&id='+feature.properties.id);
   map.getSource('highlight').setData(feature);
 });
