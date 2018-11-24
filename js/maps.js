@@ -30,7 +30,7 @@ function parseUrl(url)  //workaround for edge that doesn't support URLSearchPara
 }
 
 function displayOsmElementInfo(element, lngLat, showTags=[]) {
-  const ImportantTags = [ ['name','Name',''],        //[actual OSM tag, display name for tag in popup, tooltip]
+  const TagsDefinitions = [ ['name','Name',''],        //[actual OSM tag, display name for tag in popup, tooltip]
                           ['highway','Type',''],
                           ['winter_service', 'Snowplowing', 'Is pathway plowed in winter?'],
                           ['winter_service:quality', 'Plow quality', 'Optional: how well is the path typically plowed?'],
@@ -50,44 +50,45 @@ function displayOsmElementInfo(element, lngLat, showTags=[]) {
       const tags = Array.from(xmlDOM.getElementsByTagName("tag"));
       popup+='<div id="fform"><form id="feedback"><ul><li><div id="showMapillary"></div></li>'
 
-      for(let key of ImportantTags){
+      for(let key of TagsDefinitions){
         const t = tags.find(ele => {return ele.attributes['k'].value==key[0]});
         const tag = t ? t.attributes["v"].value : '';
         if(key[0]=='name' && tag=='') continue;
         if(showTags.length>0 && !showTags.includes(key[0])) continue;
 
-        popup += `<li><div class="tooltip">${key[1]}:&nbsp;&nbsp;`;
+        popup += `<div id="${key[0]}-div"><li><div class="tooltip">${key[1]}:&nbsp;&nbsp;`;
         if(key[0] == 'width'){
           popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" name="width" >`;
           ['',0.5,1,1.5,2,2.5,3,4,5,10].forEach(w => popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`)
-          popup += '</select> m\n';
+          popup += '</select> m';
         }
         else if(key[0] == 'surface'){
           popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" name="surface">`;
           ['','asphalt','concrete','ground','fine_gravel','gravel','paving_stones','wood','grass'].forEach(w => popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`)
-          popup += '</select>\n';
+          popup += '</select>';
         }
         else if(key[0] == 'smoothness'){
           popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" name="smoothness">`;
           ['','excellent','good','intermediate','bad','horrible','impassable'].forEach(w => popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`)
-          popup += '</select>\n';
+          popup += '</select>';
         }
         else if(key[0] == 'winter_service'){
           popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="winter_service" name="winter_service">`;
           ['','yes','no'].forEach(w => popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`)
-          popup += '</select>\n';
+          popup += '</select>';
         }
         else if(key[0] == 'winter_service:quality'){
           popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="plow_quality" name="plow_quality">`;
           ['','good','intermediate','bad'].forEach(w => popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`)
-          popup += '</select>\n';
+          popup += '</select>';
         }
         else if(key[0] == 'fixme'){
-          popup += `<span class="tooltiptext">${key[2]}</span></div><input type="text" class="fill-lighten3 small"  style="height:initial;padding:initial" id="fixme" value="${tag}">\n`
+          popup += `<span class="tooltiptext">${key[2]}</span></div><input type="text" class="fill-lighten3 small"  style="height:initial;padding:initial" id="fixme" value="${tag}">`
         }
         else{
-          popup += '</div><strong>'+tag+'</strong></li>\n';
+          popup += '</div><strong>'+tag+'</strong>';
         }
+        popup += '</li></div>\n';
       }
       showMapillaryImage(lngLat)
       popup+='</ul>';
@@ -103,9 +104,9 @@ function displayOsmElementInfo(element, lngLat, showTags=[]) {
     .addTo(map)
     if(showTags.includes('winter_service:quality') && showTags.includes('winter_service')){
       document.querySelector("#winter_service").onchange = function (e) {
-        document.querySelector("#plow_quality").disabled = (this.value != 'yes');
+        document.getElementById("winter_service:quality-div").style.display = (this.value == 'yes')?'block':'none';
       }
-      document.querySelector("#plow_quality").disabled = (this.value != 'yes');
+      document.getElementById("winter_service:quality-div").style.display = (this.value == 'yes')?'block':'none';
     }
     $("#feedback").submit(function(event){
 
