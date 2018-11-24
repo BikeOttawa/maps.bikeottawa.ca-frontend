@@ -32,7 +32,7 @@
 </div>
 <div class='col4 pad1 scroll-styled pin-topright '>
   <div id='legendbtn' class='fill-darken2 pad1 icon book button hidden fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
-  <div id='legend' class='fill-darken1 round'>
+  <div id='legend' class='fill-darken2 round'>
     <div id='closebtn' class='fill-darken2 pad1 icon close button fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
     <div class='clearfix'></div>
     <div class='pad1 dark'>
@@ -47,7 +47,7 @@
         <label for='unknown' id='unknown-label' class='button icon check quiet col12' style='text-align:left;'>Unknown</label>
         <br><br>
         <input type='checkbox' id='plowtracks'>
-        <label for='plowtracks' id='plowtracks-label' class='button icon check quiet col12' style='text-align:left;'><span style="display: inline-block;width:50px; height:8px;background-color: #ff00bf"></span>&nbsp;&nbsp;City Plow Tracks</label>
+        <label for='plowtracks' id='plowtracks-label' class='button icon check quiet col12' style='text-align:left;'><span style="display: inline-block;width:50px; height:8px;background-color: #ff00bf"></span>&nbsp;&nbsp;City Plow Routes</label>
       </fieldset>
       </form>
       <div class='pad1 small'>
@@ -230,7 +230,7 @@ map.on('click', function(e) {
       return;
   }
   const feature = features[0];
-  displayOsmElementInfo(feature.properties.id, e.lngLat);
+  displayOsmElementInfo(feature.properties.id, e.lngLat,['name','highway','surface','winter_service','winter_service:quality','fixme']);
   window.history.replaceState(null, null, window.location.pathname+'?&lat='+e.lngLat.lat+'&lng='+e.lngLat.lng+'&id='+feature.properties.id);
   map.getSource('highlight').setData(feature);
 });
