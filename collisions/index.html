@@ -56,6 +56,8 @@
       <label for='year2015' >2015</label>
       <input type='radio' name='year' id='year2016' value='year2016'>
       <label for='year2016' >2016</label>
+      <input type='radio' name='year' id='year2017' value='year2017'>
+      <label for='year2017' >2017</label>
     </div>
     <h5>Collisions involving</h5>
     <div class='rounded-toggle inline'>
@@ -99,6 +101,7 @@ const years = [
     {id:"year2014", url: 'data/collisionsbylocation2014.geojson', year:2014},
     {id:"year2015", url: 'data/collisionsbylocation2015.geojson', year:2015},
     {id:"year2016", url: 'data/collisionsbylocation2016.geojson', year:2016},
+    {id:"year2017", url: 'data/h2017collisionsfinal.geojson', year:2017},
   ];
 
 let activeLayer = 0
@@ -262,6 +265,7 @@ function setMinColFilter(min)
 document.getElementById('year2014').onclick = toggleLayer
 document.getElementById('year2015').onclick = toggleLayer
 document.getElementById('year2016').onclick = toggleLayer
+document.getElementById('year2017').onclick = toggleLayer
 document.getElementById('yearAll').onclick = toggleLayer
 
 document.getElementById('col_peds').onclick = toggleFilters
