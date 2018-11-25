@@ -112,7 +112,8 @@ const map = new mapboxgl.Map({
     //pitch: 40,
     minZoom: 10,
     maxZoom: 17,
-    maxBounds: [[-76.385193,44.963826],[-75.011902,45.614998]]
+    maxBounds: [[-76.385193,44.963826],[-75.011902,45.614998]],
+    attributionControl: false
 });
 
 let gPopup;
@@ -120,7 +121,7 @@ map.once('style.load', function () {
 
     init()
     map.addControl(new mapboxgl.NavigationControl(),'bottom-right');
-
+    map.addControl(new mapboxgl.AttributionControl({compact: true }), 'bottom-right');
 
     map.on('mousemove', function(e) {
         var features = map.queryRenderedFeatures(e.point, {
