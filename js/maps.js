@@ -78,7 +78,7 @@ function displayOsmElementInfo(element, lngLat, showTags=[]) {
           popup += '</select>';
         }
         else if(key[0] == 'winter_service:quality'){
-          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="plow_quality" name="plow_quality">`;
+          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="winter_service:quality" name="winter_service:quality">`;
           ['','good','intermediate','bad'].forEach(w => popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`)
           popup += '</select>';
         }
@@ -104,9 +104,9 @@ function displayOsmElementInfo(element, lngLat, showTags=[]) {
     .addTo(map)
     if(showTags.includes('winter_service:quality') && showTags.includes('winter_service')){
       document.querySelector("#winter_service").onchange = function (e) {
-        document.getElementById("winter_service:quality-div").style.display = (this.value == 'yes')?'block':'none';
+        document.getElementById("winter_service:quality-div").style.display = (document.querySelector("#winter_service").value == 'yes')?'block':'none';
       }
-      document.getElementById("winter_service:quality-div").style.display = (this.value == 'yes')?'block':'none';
+      document.getElementById("winter_service:quality-div").style.display = (document.querySelector("#winter_service").value == 'yes')?'block':'none';
     }
     $("#feedback").submit(function(event){
 
