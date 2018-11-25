@@ -4,7 +4,7 @@ function addUpdatedDate(layerName){
   request.open('GET','https://api.mapbox.com/tilesets/v1/bikeottawa?access_token=sk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdyYTJmN2EwMmtoMzJwc3JxM2hoZ3ozIn0.YB1JNmncsPvktmgGU_zK8A')
   request.onload = function () {
     if (request.status >= 200 && request.status < 400) {
-      var data = JSON.parse(request.responseText);
+      const data = JSON.parse(request.responseText);
       if(data && data instanceof Array){
         const date = new Date(data.find(x => x.id === layerName).modified)
         document.getElementById('dateUpdated').innerHTML = date.toLocaleString();
@@ -104,7 +104,7 @@ function displayOsmElementInfo(element, lngLat, showTags=[]) {
     } else {
       popup += 'Failed to request details from osm.org';
     }
-    var pop = new mapboxgl.Popup()
+    const pop = new mapboxgl.Popup()
     .setLngLat(lngLat)
     .setHTML(popup)
     .addTo(map)
@@ -116,12 +116,10 @@ function displayOsmElementInfo(element, lngLat, showTags=[]) {
     }
     $("#feedback").submit(function(event){
 
-      var $form = $(this);
-  		var $inputs = $form.find("input, select, button, textarea");
-  		var serializedData = $form.serialize();
-	    $inputs.prop("disabled", true);
+      const $form = $(this);
+  		const $inputs = $form.find("input, select, button, textarea");
+  		$inputs.prop("disabled", true);
   		$('#result').text('Sending ...');
-
 
       const tags = {};
       $('select').each(function(index) {
@@ -132,6 +130,7 @@ function displayOsmElementInfo(element, lngLat, showTags=[]) {
       submitOsmChangeset(element, tags)
       .then(() => {
         $('#result').html('Your changes submitted!');
+        setTimeout(() => {pop.remove();} , 1500);
       })
       .catch(() => {
         $('#result').html('<font color="red">Failed to submit changes</font>');
