@@ -1,7 +1,9 @@
 #menu {
    position: absolute;
-   background: #fff;
-   padding: 10px;
+   background: #fafafa;
+   padding: 8px;
+   border-radius: 0px 0px 5px 0px;
+   box-shadow: 1px 1px 3px 1px grey;
    font-family: 'Open Sans', sans-serif;
 }
 
@@ -10,6 +12,7 @@
      height: 125px;
      transition-duration: 0.5s; /* delays for 1 second */
      -webkit-transition-duration: 0.5s; /* for Safari & Chrome */
+     box-shadow: 1px 1px 3px 1px grey; 
 }
 .enlarge-onhover:hover {
      width: 640px;
