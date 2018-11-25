@@ -32,11 +32,12 @@ function parseUrl(url)  //workaround for edge that doesn't support URLSearchPara
 function displayOsmElementInfo(element, lngLat, showTags=[]) {
   const TagsDefinitions = [ ['name','Name',''],        //[actual OSM tag, display name for tag in popup, tooltip]
                           ['highway','Type',''],
-                          ['winter_service', 'Snowplowing', 'Is pathway plowed in winter?'],
-                          ['winter_service:quality', 'Plow quality', 'Optional: how well is the path typically plowed?'],
+                          ['winter_service', 'Snowplowing', 'Is pathway plowed in winter'],
+                          ['winter_service:quality', 'Plow quality', 'Optional: how well is the path typically plowed'],
                           ['width', 'Width', 'Width in meters'],
                           ['surface', 'Surface', 'Pathway surface'],
                           ['smoothness', 'Smoothness', 'How smooth is the surface in summer'],
+                          ['lit', 'Lit', 'Is it lit'],
                           ['fixme', 'Other info', 'Describe in a few words if there is anything wrong with this path']
                         ];
 
@@ -80,6 +81,11 @@ function displayOsmElementInfo(element, lngLat, showTags=[]) {
         else if(key[0] == 'winter_service:quality'){
           popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="winter_service:quality" name="winter_service:quality">`;
           ['','good','intermediate','bad'].forEach(w => popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`)
+          popup += '</select>';
+        }
+        else if(key[0] == 'lit'){
+          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="lit" name="lit">`;
+          ['','yes','no'].forEach(w => popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`)
           popup += '</select>';
         }
         else if(key[0] == 'fixme'){

@@ -36,7 +36,7 @@
     <div id='closebtn' class='fill-darken2 pad1 icon close button fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
     <div class='clearfix'></div>
     <div class='pad1 dark'>
-      <h3>Pathways</h3><br>
+      <h3>Pathway width</h3><br>
       <form>
       <div class="col12 small">
         <div id='min_width' class="col2 fl">0</div>
@@ -47,8 +47,32 @@
       <fieldset class='checkbox-pill clearfix '>
         <input type='checkbox' id='unknown' checked='checked'>
         <label for='unknown' id='unknown-label' class='button icon check quiet col12' style='text-align:left;'></label>
-      </fieldset>
+      </fieldset><br>
+      <h3>Surface details</h3><br>
+      <fieldset class='surfaces checkbox-pill clearfix '>
+        <input type='checkbox' id='asphalt' checked='checked'>
+        <label for='asphalt' id='asphalt-label' class='button icon check quiet col4' style='text-align:left;'>Asphalt</label>
+        <input type='checkbox' id='concrete' checked='checked'>
+        <label for='concrete' id='concrete-label' class='button icon check quiet col4' style='text-align:left;'>Concrete</label>
+        <input type='checkbox' id='ground' checked='checked'>
+        <label for='ground' id='ground-label' class='button icon check quiet col4' style='text-align:left;'>Ground</label>
+        <input type='checkbox' id='fine_gravel' checked='checked'>
+        <label for='fine_gravel' id='fine_gravel-label' class='button icon check quiet col4' style='text-align:left;'>Fine Gravel</label>
+        <input type='checkbox' id='gravel' checked='checked'>
+        <label for='gravel' id='gravel-label' class='button icon check quiet col4' style='text-align:left;'>Gravel</label>
+        <input type='checkbox' id='paving_stones' checked='checked'>
+        <label for='paving_stones' id='paving_stones-label' class='button icon check quiet col4' style='text-align:left;'>Paving Stones</label>
+        <input type='checkbox' id='grass' checked='checked'>
+        <label for='grass' id='grass-label' class='button icon check quiet col4' style='text-align:left;'>Grass</label>
+        <input type='checkbox' id='wood' checked='checked'>
+        <label for='wood' id='wood-label' class='button icon check quiet col4' style='text-align:left;'>Wood</label>
+        <input type='checkbox' id='sand' checked='checked'>
+        <label for='sand' id='sand-label' class='button icon check quiet col4' style='text-align:left;'>Sand</label>
+        <input type='checkbox' id='unknown_surface' checked='checked'>
+        <label for='unknown_surface' id='unknown_surface-label' class='margin3 button icon check quiet col6' style='text-align:left;'>Unknown Surface</label>
+        <br><br>
       </form>
+      <div class='clearfix'></div>
       <div class='pad1 small'>
         <p>This map shows pathways in the city of Ottawa.</p>
         <p>The map is maintained by Bike Ottawa volunteers like you. <p>
@@ -90,6 +114,7 @@ const map = new mapboxgl.Map({
   minZoom: 10,
   maxZoom: 17,
   maxBounds: [[-76.385193,44.963826],[-75.011902,45.614998]],
+  attributionControl: false
 });
 
 map.addControl(new mapboxgl.NavigationControl(),'bottom-right');
@@ -99,7 +124,9 @@ map.addControl(new mapboxgl.AttributionControl({compact: true }), 'bottom-right'
 addStyleSwitcher();
 
 document.getElementById('unknown').onclick = toggleUnknown
-
+Array.from(
+  document.querySelector('.surfaces').querySelectorAll('input')
+).map(function(el) { el.onclick = toggleSurfaces });
 
 //helpers & handlers below
 
@@ -121,8 +148,8 @@ const snapValues = [
 function sliderUpdate(values){
   map.getSource('highlight').setData(null);
   const filter = map.getFilter('pathways');
-  filter[2][1][2] = parseFloat(values[0]);
-  filter[2][2][2] = parseFloat(values[1])==5 ? 100 : parseFloat(values[1]);
+  filter[1][2][1][2] = parseFloat(values[0]);
+  filter[1][2][2][2] = parseFloat(values[1])==5 ? 100 : parseFloat(values[1]);
   map.setFilter('pathways', filter);
 }
 
@@ -146,9 +173,9 @@ function init() {
     "type": "line",
     "source": {
         type: 'vector',
-        url: 'mapbox://bikeottawa.03jqtlpj',
+        url: 'mapbox://bikeottawa.6wnvt0cx',
     },
-    "source-layer": '03jqtlpj',
+    "source-layer": '6wnvt0cx',
     "layout": {
         "line-join": "round",
         "line-cap": "round"
@@ -172,13 +199,28 @@ function init() {
                     ],
         "line-opacity": 0.9
       },
-      'filter': [ 'any',
-                  ['==',['to-number',['get', 'width']], 0],
-                  ['all',
-                    ['>=', ['to-number',['get', 'width']], 0.5],
-                    ['<=', ['to-number',['get', 'width']], 100]
-                  ]
+      'filter': [ 'all',
+                  [ 'any',
+                    ['==',['to-number',['get', 'width']], 0],
+                    ['all',
+                      ['>=', ['to-number',['get', 'width']], 0.5],
+                      ['<=', ['to-number',['get', 'width']], 100],
+                    ],
+                  ],
+                  ['any',
+                    ['==', ['get', 'surface'], 'asphalt'],
+                    ['==', ['get', 'surface'], 'concrete'],
+                    ['==', ['get', 'surface'], 'ground'],
+                    ['==', ['get', 'surface'], 'fine_gravel'],
+                    ['==', ['get', 'surface'], 'gravel'],
+                    ['==', ['get', 'surface'], 'paving_stones'],
+                    ['==', ['get', 'surface'], 'grass'],
+                    ['==', ['get', 'surface'], 'wood'],
+                    ['==', ['get', 'surface'], 'sand'],
+                    ['==', ['get', 'surface'], null],
                 ]
+              ]
+
     });
 
   document.getElementById('unknown-label').innerHTML = '<span style="display: inline-block;width:50px; height:8px;background-color: '+layers[2].color+'"></span>&nbsp;&nbsp;'+layers[2].name;
@@ -203,11 +245,23 @@ map.on('style.load', function () {
 function toggleUnknown(checkbox) {
   const filter = map.getFilter('pathways');
   if(document.getElementById('unknown').checked){
-    filter[1][0]='==';
+    filter[1][1][0]='==';
   }
   else {
-    filter[1][0]='<';
+    filter[1][1][0]='<';
   }
+  map.setFilter('pathways', filter);
+}
+
+function toggleSurfaces(checkbox) {
+  const filter = map.getFilter('pathways');
+  const surfacesOn = Array.from(
+    document.querySelector('.surfaces').querySelectorAll('input:checked')
+  ).map(function(el) { return el.id });
+  filter[2]=['any'];
+  surfacesOn.forEach(s => {
+    filter[2].push(['==', ['get', 'surface'], (s=='unknown_surface')?null:s]);
+  });
   map.setFilter('pathways', filter);
 }
 
@@ -221,7 +275,7 @@ map.on('click', function(e) {
       return;
   }
   const feature = features[0];
-  displayOsmElementInfo(feature.properties.id, e.lngLat,['name','highway','surface','width','smoothness','fixme']);
+  displayOsmElementInfo(feature.properties.id, e.lngLat,['name','highway','surface','width','smoothness','lit','winter_service','fixme']);
   window.history.replaceState(null, null, window.location.pathname+'?&lat='+e.lngLat.lat+'&lng='+e.lngLat.lng+'&id='+feature.properties.id);
   map.getSource('highlight').setData(feature);
 });
