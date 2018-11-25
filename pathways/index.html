@@ -43,12 +43,11 @@
         <div class="col6 "><div id="slider"></div></div>
         <div id='max_width' class="col3 fr">10</div>
       </div>
-      <br><br>
-      <fieldset class='checkbox-pill clearfix '>
-        <input type='checkbox' id='unknown' checked='checked'>
-        <label for='unknown' id='unknown-label' class='button icon check quiet col12' style='text-align:left;'></label>
-      </fieldset><br>
-      <h3>Surface details</h3><br>
+      <fieldset class='checkbox-pill clearfix pad2'>
+        <input type='checkbox' id='unknown_width' checked='checked'>
+        <label for='unknown_width' id='unknown_width-label' class='button icon check quiet col12' style='text-align:left;'><span style='display: inline-block;width:50px;height:8px;background-color:#F0C808'></span>&nbsp;&nbsp;Unknown width</label>
+      </fieldset>
+      <h3>Pathway surface</h3><br>
       <fieldset class='surfaces checkbox-pill clearfix '>
         <input type='checkbox' id='asphalt' checked='checked'>
         <label for='asphalt' id='asphalt-label' class='button icon check quiet col4' style='text-align:left;'>Asphalt</label>
@@ -57,11 +56,11 @@
         <input type='checkbox' id='ground' checked='checked'>
         <label for='ground' id='ground-label' class='button icon check quiet col4' style='text-align:left;'>Ground</label>
         <input type='checkbox' id='fine_gravel' checked='checked'>
-        <label for='fine_gravel' id='fine_gravel-label' class='button icon check quiet col4' style='text-align:left;'>Fine Gravel</label>
+        <label for='fine_gravel' id='fine_gravel-label' class='button icon check quiet col4' style='text-align:left;'>Fine gravel</label>
         <input type='checkbox' id='gravel' checked='checked'>
         <label for='gravel' id='gravel-label' class='button icon check quiet col4' style='text-align:left;'>Gravel</label>
         <input type='checkbox' id='paving_stones' checked='checked'>
-        <label for='paving_stones' id='paving_stones-label' class='button icon check quiet col4' style='text-align:left;'>Paving Stones</label>
+        <label for='paving_stones' id='paving_stones-label' class='button icon check quiet col4' style='text-align:left;'>Paving stones</label>
         <input type='checkbox' id='grass' checked='checked'>
         <label for='grass' id='grass-label' class='button icon check quiet col4' style='text-align:left;'>Grass</label>
         <input type='checkbox' id='wood' checked='checked'>
@@ -69,12 +68,16 @@
         <input type='checkbox' id='sand' checked='checked'>
         <label for='sand' id='sand-label' class='button icon check quiet col4' style='text-align:left;'>Sand</label>
         <input type='checkbox' id='unknown_surface' checked='checked'>
-        <label for='unknown_surface' id='unknown_surface-label' class='margin3 button icon check quiet col6' style='text-align:left;'>Unknown Surface</label>
-        <br><br>
+        <label for='unknown_surface' id='unknown_surface-label' class='margin3 button icon check quiet col6' style='text-align:left;'>Unknown surface</label>
+      </fieldset>
+      <fieldset class='checkbox-pill clearfix pad2'>
+        <input type='checkbox' id='mapillary_tracks' checked='checked'>
+        <label for='mapillary_tracks' id='mapillary_tracks-label' class='button icon check quiet col12' style='text-align:left;'><span style='display: inline-block;width:50px;height:8px;background-color:#ff00bf'></span>&nbsp;&nbsp;Mapillary tracks</label>
+      </fieldset>
       </form>
       <div class='clearfix'></div>
       <div class='pad1 small'>
-        <p>This map shows pathways in the city of Ottawa.</p>
+        <p>This is the ultimate map of pathways in Ottawa.</p>
         <p>The map is maintained by Bike Ottawa volunteers like you. <p>
         <p>If you see any mistakes or are familiar with the status of a pathway, click on the path and change its properties. It's that easy!</p>
       </div>
@@ -123,7 +126,9 @@ map.addControl(new mapboxgl.AttributionControl({compact: true }), 'bottom-right'
 
 addStyleSwitcher();
 
-document.getElementById('unknown').onclick = toggleUnknown
+document.getElementById('unknown_width').onclick = toggleUnknown;
+document.getElementById('mapillary_tracks').onclick = toggleMapillary;
+
 Array.from(
   document.querySelector('.surfaces').querySelectorAll('input')
 ).map(function(el) { el.onclick = toggleSurfaces });
@@ -223,7 +228,6 @@ function init() {
 
     });
 
-  document.getElementById('unknown-label').innerHTML = '<span style="display: inline-block;width:50px; height:8px;background-color: '+layers[2].color+'"></span>&nbsp;&nbsp;'+layers[2].name;
 
   map.addSource('highlight', { type: 'geojson' , data: null});
   map.addLayer({
@@ -236,6 +240,31 @@ function init() {
          "line-opacity": 0.5
      }
  });
+
+ map.addLayer({
+        "id": "mapillary",
+        "type": "line",
+        "source": {
+            "type": "vector",
+            "tiles": ["https://d25uarhxywzl1j.cloudfront.net/v0.1/{z}/{x}/{y}.mvt"],
+            "minzoom": 6,
+            "maxzoom": 14
+        },
+        "source-layer": "mapillary-sequences",
+        "layout": {
+            "line-cap": "round",
+            "line-join": "round"
+        },
+        "paint": {
+            "line-opacity": ["interpolate", ["exponential", 2], ["zoom"],
+                            14, 0,
+                            17, 0.5
+                          ],
+            "line-color": "#ff00bf", //"rgb(53, 175, 109)",
+            "line-width": 1
+        }
+    }, 'waterway-label');
+
 }
 
 map.on('style.load', function () {
@@ -244,14 +273,14 @@ map.on('style.load', function () {
 
 function toggleUnknown(checkbox) {
   const filter = map.getFilter('pathways');
-  if(document.getElementById('unknown').checked){
-    filter[1][1][0]='==';
-  }
-  else {
-    filter[1][1][0]='<';
-  }
+  filter[1][1][0]=(document.getElementById('unknown_width').checked)?'==':'<';
   map.setFilter('pathways', filter);
 }
+
+function toggleMapillary(checkbox) {
+  map.setLayoutProperty('mapillary', 'visibility', checkbox.currentTarget.checked?'visible':'none');
+}
+
 
 function toggleSurfaces(checkbox) {
   const filter = map.getFilter('pathways');
