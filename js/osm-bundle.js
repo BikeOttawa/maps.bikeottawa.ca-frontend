@@ -12,30 +12,41 @@ const osm = new OsmRequest({
 });
 
 
-var changesetId = 1;
+var oldChangesetId = 1;
 
-global.submitOsmChangeset = async function (osmElement, tags) {
-    let element = await osm.fetchElement(osmElement);
-    for (const key of Object.keys(tags)) {
-      if(tags[key].trim()!='')
-        element = osm.setProperty(element, key, tags[key].trim());
-    }
+global.submitOsmChangeset = function (osmElement, tags) {
+  return new Promise(function(resolve, reject) {
 
-    let isOpen = false;
-    try {
-			await osm.isChangesetStillOpen(changesetId);
-		}
-		catch(e) {
-			changesetId = 1;
-		}
-
-    if(changesetId == 1)
-      changesetId = await osm.createChangeset('BikeOttawaMaps', 'Pathway details based on mapillary and local knowledge - https://maps.bikeottawa.ca');
-
-    const newElementVersion = await osm.sendElement(element, changesetId);
+    osm.fetchElement(osmElement)
+    .then(function(element) {
+      for (var key of Object.keys(tags)) {
+        if(tags[key].trim()!='')
+          element = osm.setProperty(element, key, tags[key].trim());
+      }
+      return element;
+    })
+    .catch(function(e) {
+      reject(e);
+    })
+    .then(function(element){
+      return osm.isChangesetStillOpen(oldChangesetId)
+      .catch(function(e) {
+        return osm.createChangeset('BikeOttawaMaps', 'Pathway details based on mapillary and local knowledge - https://maps.bikeottawa.ca')
+      })
+      .then(function(newChangesetId){
+        osm.sendElement(element, newChangesetId)
+        .then(function(newElem){
+          oldChangesetId  = newChangesetId;
+          resolve();
+        })
+        .catch(function(e) {
+          reject(e);
+        })
+      })
+    })
 
     //element = osm.setVersion(element, newElementVersion);
-
+  })
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
