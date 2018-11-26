@@ -6,7 +6,7 @@ function addUpdatedDate(layerName){
     if (request.status >= 200 && request.status < 400) {
       const data = JSON.parse(request.responseText);
       if(data && data instanceof Array){
-        const date = new Date(data.find(x => x.id === layerName).modified)
+        const date = new Date(data.find(function(x){return x.id === layerName}).modified)
         document.getElementById('dateUpdated').innerHTML = date.toLocaleString();
       }
     }
@@ -18,9 +18,9 @@ function parseUrl(url)  //workaround for edge that doesn't support URLSearchPara
 {
     if (url == "") return {};
     const ret = {};
-    for (let i = 0; i < url.length; ++i)
+    for (var part of url)
     {
-        const par=url[i].split('=', 2);
+        const par=part.split('=', 2);
         if (par.length == 1)
             ret[par[0]] = "";
         else
@@ -29,7 +29,7 @@ function parseUrl(url)  //workaround for edge that doesn't support URLSearchPara
     return ret;
 }
 
-function displayOsmElementInfo(element, lngLat, showTags=[]) {
+function displayOsmElementInfo(element, lngLat, showTags) {
   const TagsDefinitions = [ ['name','Name',''],        //[actual OSM tag, display name for tag in popup, tooltip]
                           ['highway','Type',''],
                           ['winter_service', 'Snowplowing', 'Is pathway plowed in winter'],
@@ -45,14 +45,14 @@ function displayOsmElementInfo(element, lngLat, showTags=[]) {
   const xhr = new XMLHttpRequest()
   xhr.open('GET','https://api.openstreetmap.org/api/0.6/'+element)
   xhr.onload = function () {
-    let popup = '<h4><a href="https://www.openstreetmap.org/' + element + '" target="_blank">' + element + '</a></h4><hr>'
+    var popup = '<h4><a href="https://www.openstreetmap.org/' + element + '" target="_blank">' + element + '</a></h4><hr>'
     if (xhr.status === 200) {
       const xmlDOM = new DOMParser().parseFromString(xhr.responseText, 'text/xml');
       const tags = Array.from(xmlDOM.getElementsByTagName("tag"));
       popup+='<div id="fform"><form id="feedback"><ul><li><div id="showMapillary"></div></li>'
 
-      for(let key of TagsDefinitions){
-        const t = tags.find(ele => {return ele.attributes['k'].value==key[0]});
+      for(var key of TagsDefinitions){
+        const t = tags.find(function(ele){return ele.attributes['k'].value==key[0]});
         const tag = t ? t.attributes["v"].value : '';
         if(key[0]=='name' && tag=='') continue;
         if(showTags.length>0 && !showTags.includes(key[0])) continue;
@@ -60,32 +60,32 @@ function displayOsmElementInfo(element, lngLat, showTags=[]) {
         popup += `<div id="${key[0]}-div"><li><div class="tooltip">${key[1]}:&nbsp;&nbsp;`;
         if(key[0] == 'width'){
           popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" name="width" >`;
-          ['',0.5,1,1.5,2,2.5,3,4,5,10].forEach(w => popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`)
+          ['',0.5,1,1.5,2,2.5,3,4,5,10].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`});
           popup += '</select> m';
         }
         else if(key[0] == 'surface'){
           popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" name="surface">`;
-          ['','asphalt','concrete','ground','fine_gravel','gravel','paving_stones','wood','grass'].forEach(w => popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`)
+          ['','asphalt','concrete','ground','fine_gravel','gravel','paving_stones','grass','wood','sand'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
           popup += '</select>';
         }
         else if(key[0] == 'smoothness'){
           popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" name="smoothness">`;
-          ['','excellent','good','intermediate','bad','horrible','impassable'].forEach(w => popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`)
+          ['','excellent','good','intermediate','bad','horrible','impassable'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
           popup += '</select>';
         }
         else if(key[0] == 'winter_service'){
           popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="winter_service" name="winter_service">`;
-          ['','yes','no'].forEach(w => popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`)
+          ['','yes','no'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
           popup += '</select>';
         }
         else if(key[0] == 'winter_service:quality'){
           popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="winter_service:quality" name="winter_service:quality">`;
-          ['','good','intermediate','bad'].forEach(w => popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`)
+          ['','good','intermediate','bad'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
           popup += '</select>';
         }
         else if(key[0] == 'lit'){
           popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="lit" name="lit">`;
-          ['','yes','no'].forEach(w => popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`)
+          ['','yes','no'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
           popup += '</select>';
         }
         else if(key[0] == 'fixme'){
@@ -128,11 +128,11 @@ function displayOsmElementInfo(element, lngLat, showTags=[]) {
       tags['fixme']=$('#fixme')[0].value;
 
       submitOsmChangeset(element, tags)
-      .then(() => {
+      .then(function(){
         $('#result').html('Your changes submitted!');
-        setTimeout(() => {pop.remove();} , 1500);
+        setTimeout(function(){pop.remove();} , 1500);
       })
-      .catch(() => {
+      .catch(function(){
         $('#result').html('<font color="red">Failed to submit changes</font>');
       })
       event.preventDefault();

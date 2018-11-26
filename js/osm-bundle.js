@@ -12,7 +12,7 @@ const osm = new OsmRequest({
 });
 
 
-let changesetId = 1;
+var changesetId = 1;
 
 global.submitOsmChangeset = async function (osmElement, tags) {
     let element = await osm.fetchElement(osmElement);

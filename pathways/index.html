@@ -71,7 +71,7 @@
         <label for='unknown_surface' id='unknown_surface-label' class='margin3 button icon check quiet col6' style='text-align:left;'>Unknown surface</label>
       </fieldset>
       <fieldset class='checkbox-pill clearfix pad2'>
-        <input type='checkbox' id='mapillary_tracks' checked='checked'>
+        <input type='checkbox' id='mapillary_tracks'>
         <label for='mapillary_tracks' id='mapillary_tracks-label' class='button icon check quiet col12' style='text-align:left;'><span style='display: inline-block;width:50px;height:8px;background-color:#ff00bf'></span>&nbsp;&nbsp;Mapillary tracks</label>
       </fieldset>
       </form>
@@ -109,7 +109,7 @@ const layers = [
 ];
 
 mapboxgl.accessToken = 'pk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdqaWxrN3gwZXQ4MnFxbjAwZXRpbG8zIn0.XhAdk2ASwdipubccCWTfoQ';
-const map = new mapboxgl.Map({
+var map = new mapboxgl.Map({
   container: 'map',
   style: 'mapbox://styles/mapbox/dark-v9',
   center: [-75.697927,45.417431],
@@ -162,7 +162,7 @@ function addStyleSwitcher(){
   const layerList = document.getElementById('menu');
   const inputs = layerList.getElementsByTagName('input');
 
-  for (let i = 0; i < inputs.length; i++) {
+  for (var i = 0; i < inputs.length; i++) {
       inputs[i].onclick = switchLayer;
   }
 }
@@ -247,13 +247,14 @@ function init() {
         "source": {
             "type": "vector",
             "tiles": ["https://d25uarhxywzl1j.cloudfront.net/v0.1/{z}/{x}/{y}.mvt"],
-            "minzoom": 6,
+            "minzoom": 13,
             "maxzoom": 14
         },
         "source-layer": "mapillary-sequences",
         "layout": {
             "line-cap": "round",
-            "line-join": "round"
+            "line-join": "round",
+            "visibility": "none"
         },
         "paint": {
             "line-opacity": ["interpolate", ["exponential", 2], ["zoom"],
@@ -288,7 +289,7 @@ function toggleSurfaces(checkbox) {
     document.querySelector('.surfaces').querySelectorAll('input:checked')
   ).map(function(el) { return el.id });
   filter[2]=['any'];
-  surfacesOn.forEach(s => {
+  surfacesOn.forEach(function(s){
     filter[2].push(['==', ['get', 'surface'], (s=='unknown_surface')?null:s]);
   });
   map.setFilter('pathways', filter);

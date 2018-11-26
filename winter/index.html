@@ -83,7 +83,7 @@ const layers = [
 ];
 
 mapboxgl.accessToken = 'pk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdqaWxrN3gwZXQ4MnFxbjAwZXRpbG8zIn0.XhAdk2ASwdipubccCWTfoQ';
-const map = new mapboxgl.Map({
+var map = new mapboxgl.Map({
   container: 'map',
   style: 'mapbox://styles/mapbox/dark-v9',
   center: [-75.697927,45.417431],
@@ -94,7 +94,7 @@ const map = new mapboxgl.Map({
   attributionControl: false
 });
 
-map.addControl(new mapboxgl.NavigationControl(),'bottom-right');
+//map.addControl(new mapboxgl.NavigationControl(),'bottom-right');
 map.addControl(new mapboxgl.AttributionControl({compact: true }), 'bottom-right');
 const geocoder = new MapboxGeocoder({
     accessToken: mapboxgl.accessToken,
@@ -115,10 +115,10 @@ document.getElementById('plowtracks').onclick = togglePlowTracks
 //helpers & handlers below
 
 function addStyleSwitcher(){
-  const layerList = document.getElementById('menu');
-  const inputs = layerList.getElementsByTagName('input');
+  var layerList = document.getElementById('menu');
+  var inputs = layerList.getElementsByTagName('input');
 
-  for (let i = 0; i < inputs.length; i++) {
+  for (var i=0; i<inputs.length; i++) {
       inputs[i].onclick = switchLayer;
   }
 }
@@ -177,7 +177,7 @@ function init() {
         }
       });
 
-    for(let layer of layers){
+    for(var layer of layers){
       document.getElementById(layer.id+'-label').innerHTML = '<span style="display: inline-block;width:50px; height:8px;background-color: '+layer.color+'"></span>&nbsp;&nbsp;'+layer.name;
     }
 
