@@ -23,18 +23,34 @@
              width: 640px;
              height: 400px;
         }
+        #menu {
+           position: absolute;
+           background: #fff;
+           padding: 10px;
+           font-family: 'Open Sans', sans-serif;
+        }
     </style>
 </head>
 <body>
 <div id='app' class='col12 contain clip'>
 <div id='map'></div>
-<div class='col4 pad1  scroll-styled pin-topright dark '>
-  <div id='legendbtn' class='fill-darken2 pad1 icon menu button fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
-  <div id='legend' class='fill-darken2 hidden round'>
+<div id='menu'>
+  <input id='light' type='radio' name='rtoggle' value='light' checked='checked'>
+  <label for='light'>light</label>
+  <input id='dark' type='radio' name='rtoggle' value='dark' >
+  <label for='dark'>dark</label>
+  <input id='bright' type='radio' name='rtoggle' value='bright'>
+  <label for='bright'>bright</label>
+  <input id='satellite' type='radio' name='rtoggle' value='satellite'>
+  <label for='satellite'>satellite</label>
+</div>
+<div class='col4 pad1 scroll-styled pin-topright '>
+  <div id='legendbtn' class='fill-darken2 pad1 icon book button hidden fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
+  <div id='legend' class='fill-darken1 round'>
     <div id='closebtn' class='fill-darken2 pad1 icon close button fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
     <div class='clearfix'></div>
     <div class='pad1'>
-      <h5>Levels of Stress</h5>
+      <h3 class='dark'>Cyclng Level of Stress</h3><br>
       <form>
       <fieldset class='checkbox-pill clearfix '>
         <input type='checkbox' id='lts1' checked='checked'>
@@ -48,17 +64,23 @@
       </fieldset>
       </form>
       <div class='center pad2'>
-      	<a href='https://bikeottawa.ca'><img src="../img/logos/bikeottawa.png" style="width:32px; height:32px;"></a>
-        <a href='https://github.com/BikeOttawa/maps.bikeottawa.ca-frontend'><img src="../img/logos/github.png" style="width:32px; height:32px;"></a>
-        <a href='https://twitter.com/BikeOttawa'><img src="../img/logos/twitter.png" style="width:32px; height:32px;"></a>
+      	<a href='https://bikeottawa.ca' target="_blank"><img src="../img/logos/bikeottawa.png" style="width:32px; height:32px;"></a>
+        <a href='https://github.com/BikeOttawa/maps.bikeottawa.ca-frontend' target="_blank"><img src="../img/logos/github.png" style="width:32px; height:32px;"></a>
+        <a href='https://twitter.com/BikeOttawa' target="_blank"><img src="../img/logos/twitter.png" style="width:32px; height:32px;"></a>
+      </div>
+      <a class='fr fill-darken2 pad1 rounded-toggle short icon button bike' onclick="$('#about').toggle()"></a>
+      <div class='fr pad1 small dark'>Last update: <span id='dateUpdated'>[...]</span></div>
+      <div class='clearfix'></div>
+      <div id='about' class='center small hidden dark'>
+          Made possible with City of Ottawa Open Data, funding from Councilor Jeff Leiper, and the help of OpenStreetMap Canada and Bike Ottawa volunteers. Main contributors: Heather Shearer, Yaro Shkvorets, Rob McCrae, Alex deVries, Matthew Darwin, JP Torunski, Shawn Gettler and others
       </div>
     </div>
   </div>
 </div>
 <div class="loading" title="loading..." id="loader"></div>
-
 </div>
 
+<script src='../js/maps.js'></script>
 <script>
 var ltsLayers = [
     {id:"lts1", name:'LTS 1 - Suitable for children', color:'#0099cc', opacity:0.9, tileset:'mapbox://bikeottawa.7gev94ax', layer:'7gev94ax'},
@@ -80,6 +102,27 @@ var ltsLayers = [
     attributionControl: false
 });
 
+map.addControl(new mapboxgl.NavigationControl(),'bottom-right');
+map.addControl(new mapboxgl.ScaleControl(), 'bottom-left');
+map.addControl(new mapboxgl.AttributionControl({compact: true }), 'bottom-right');
+
+addStyleSwitcher();
+
+function addStyleSwitcher(){
+  const layerList = document.getElementById('menu');
+  const inputs = layerList.getElementsByTagName('input');
+
+  for (let i = 0; i < inputs.length; i++) {
+      inputs[i].onclick = switchLayer;
+  }
+}
+
+function switchLayer(layer) {
+    const layerId = layer.target.id;
+    map.setStyle('mapbox://styles/mapbox/' + layerId + '-v9');
+}
+
+
 function init() {
 
   ltsLayers.forEach(function (layer, i) {
@@ -97,7 +140,13 @@ function init() {
       },
       "paint": {
           "line-color": layer.color,
-          "line-width": 2,
+          "line-width": [
+                        'interpolate',
+                        ['exponential', 1.5],
+                        ['zoom'],
+                        10, 1,
+                        17, 8
+                      ],
           "line-opacity": layer.opacity
       }
     });
@@ -127,12 +176,9 @@ document.getElementById('lts2').onclick = toggleLayer
 document.getElementById('lts3').onclick = toggleLayer
 document.getElementById('lts4').onclick = toggleLayer
 
-map.once('style.load', function () {
+map.on('style.load', function () {
 
     init()
-    map.addControl(new mapboxgl.NavigationControl(),'bottom-right');
-    map.addControl(new mapboxgl.ScaleControl(), 'bottom-left');
-    map.addControl(new mapboxgl.AttributionControl({compact: true }), 'bottom-right');
 });
 
 map.on('click', function(e) {
@@ -158,22 +204,9 @@ map.on('mousemove', function(e) {
     map.getCanvas().style.cursor = (features.length) ? 'pointer' : '';
 });
 map.on('load', function(e) {
-    addDateToAttribution()
+    addUpdatedDate('bikeottawa.03jqtlpj');
     document.getElementById("loader").style.visibility = "hidden";
-    //url = new URLSearchParams(window.location.href)
-    url = (function(a) {    //workaround for edge that doesn't support URLSearchParams
-        if (a == "") return {};
-        var b = {};
-        for (var i = 0; i < a.length; ++i)
-        {
-            var p=a[i].split('=', 2);
-            if (p.length == 1)
-                b[p[0]] = "";
-            else
-                b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
-        }
-        return b;
-    })(window.location.search.substr(1).split('&'));
+    url = parseUrl(window.location.search.substr(1).split('&'));
     const lat = url['lat']
     const lng = url['lng']
     if(lat && lng){
@@ -185,21 +218,6 @@ map.on('load', function(e) {
     }
 
 })
-
-function addDateToAttribution(){
-  const request = new XMLHttpRequest()
-  request.open('GET','https://api.mapbox.com/tilesets/v1/bikeottawa?access_token=sk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdyYTJmN2EwMmtoMzJwc3JxM2hoZ3ozIn0.YB1JNmncsPvktmgGU_zK8A')
-  request.onload = function () {
-    if (request.status >= 200 && request.status < 400) {
-      var data = JSON.parse(request.responseText);
-      if(data && data instanceof Array){
-        const date = new Date(data.find(x => x.id === 'bikeottawa.7gev94ax').modified)
-        document.querySelector('.mapboxgl-ctrl-attrib').innerHTML = '<a href="https://bikeottawa.ca">© BikeOttawa</a> <a href="https://www.mapbox.com/about/maps/" target="_blank">© Mapbox</a> <a href="http://www.openstreetmap.org/about/" target="_blank">© OpenStreetMap</a>'+' ['+date.toLocaleString()+']';
-      }
-    }
-  }
-  request.send()
-}
 
 function displayOsmElementInfo(element, lngLat) {
   if(typeof element == 'undefined') return;
@@ -216,7 +234,7 @@ function displayOsmElementInfo(element, lngLat) {
         if(tags[i].attributes["k"].value == 'source') continue;   //skip non-important tags
         if(tags[i].attributes["k"].value == 'name:fr') continue;
         if(tags[i].attributes["k"].value == 'operator') continue;
-        popup += '<li>'+tags[i].attributes["k"].value+": <b>"+tags[i].attributes["v"].value+'</b></li>\n';
+        popup += '<li>'+tags[i].attributes["k"].value+": <strong>"+tags[i].attributes["v"].value+'</strong></li>\n';
         ltsWay.tags[tags[i].attributes["k"].value] = tags[i].attributes["v"].value
       }
       showMapillaryImage(lngLat)
@@ -225,7 +243,7 @@ function displayOsmElementInfo(element, lngLat) {
       popup+='<div id="ltsWhy" class="hidden"><li>'+ltsEval.message.join('</li><li>')+'</li></div>\n'
       popup+='<li><div id="showMapillary"></div></li>'
       popup+='<li><div id="showGoogle"><a href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint='+lngLat.lat+','+lngLat.lng
-      popup+='"><img class="enlarge-onhover" src="https://maps.googleapis.com/maps/api/streetview?size=640x400&fov=120&pitch=-30&key=AIzaSyDXbZYWFjz5Nr8N1c0OoTA_YFYCyV0V6Fs&location='+lngLat.lat+','+lngLat.lng+'"></a></div></li>'
+      popup+='" target="_blank"><img class="enlarge-onhover" src="https://maps.googleapis.com/maps/api/streetview?size=640x400&fov=120&pitch=-30&key=AIzaSyDXbZYWFjz5Nr8N1c0OoTA_YFYCyV0V6Fs&location='+lngLat.lat+','+lngLat.lng+'"></a></div></li>'
       popup+='</ul><hr><div id="clickme" class="quiet text-right small">Suggest an edit</div>';
       popup+='<div id="fform" class="hidden"><form id="feedback"><p><textarea id="comment" name="comment" class="small" style="padding:3px"></textarea></p>';
       popup+='<input type="hidden" name="link" value="' + window.location.href + '">';
@@ -274,22 +292,6 @@ function displayOsmElementInfo(element, lngLat) {
   xhr.send()
 }
 
-
-
-function showMapillaryImage(lngLat) {
-  const xhr = new XMLHttpRequest()
-  xhr.open('GET','https://a.mapillary.com/v3/images/?radius=15&per_page=1&client_id=TG1sUUxGQlBiYWx2V05NM0pQNUVMQTo2NTU3NTBiNTk1NzM1Y2U2&closeto='+lngLat.lng+','+lngLat.lat)
-  xhr.onload = function () {
-    if (xhr.status === 200) {
-      const result = JSON.parse(xhr.responseText)
-      if(!result.features || result.features.length==0){
-        return
-      }
-      document.getElementById('showMapillary').innerHTML = '<a href="https://www.mapillary.com/app/?focus=photo&pKey='+result.features[0].properties.key+'"><img class="enlarge-onhover" src="https://d1cuyjsrcm0gby.cloudfront.net/'+result.features[0].properties.key+'/thumb-640.jpg"></a>'
-    }
-  }
-  xhr.send()
-}
 </script>
 <!--https://docs.google.com/spreadsheets/d/1Rx1SjhWXwkMsHFAioP9XE42Or9S7Ob7JYPLUzSMe-T8/edit?usp=sharing -->
 </body>

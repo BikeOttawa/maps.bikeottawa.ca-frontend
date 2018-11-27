@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>Ottawa Pathway Map</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
+    <script  data-cfasync="false" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
+    <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
+    <link href='../css/maps.css' rel='stylesheet' />
+    <link href="../css/nouislider.min.css" rel="stylesheet">
+    <style>
+        body { margin:0; padding:0; }
+        li { margin: 4px 0; }
+        #app { position:absolute; top:0; right:0; bottom:0; left:0; }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+    </style>
+</head>
+<body>
+<div id='app' class='col12 contain clip'>
+<div id='map'></div>
+<div id='menu'>
+  <input id='dark' type='radio' name='rtoggle' value='dark' checked='checked'>
+  <label for='dark'>dark</label>
+  <input id='light' type='radio' name='rtoggle' value='light' >
+  <label for='light'>light</label>
+  <input id='bright' type='radio' name='rtoggle' value='bright'>
+  <label for='bright'>bright</label>
+  <input id='satellite' type='radio' name='rtoggle' value='satellite'>
+  <label for='satellite'>satellite</label>
+</div>
+<div class='col4 pad1 scroll-styled pin-topright '>
+  <div id='legendbtn' class='fill-darken2 pad1 icon book button hidden fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
+  <div id='legend' class='fill-darken1 round'>
+    <div id='closebtn' class='fill-darken2 pad1 icon close button fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
+    <div class='clearfix'></div>
+    <div class='pad1 dark'>
+      <h3>Pathway width</h3><br>
+      <form>
+      <div class="col12 small">
+        <div id='min_width' class="col2 fl">0</div>
+        <div class="col6 "><div id="slider"></div></div>
+        <div id='max_width' class="col3 fr">10</div>
+      </div>
+      <fieldset class='checkbox-pill clearfix pad2'>
+        <input type='checkbox' id='unknown_width' checked='checked'>
+        <label for='unknown_width' id='unknown_width-label' class='button icon check quiet col12' style='text-align:left;'><span style='display: inline-block;width:50px;height:8px;background-color:#F0C808'></span>&nbsp;&nbsp;Unknown width</label>
+      </fieldset>
+      <h3>Pathway surface</h3><br>
+      <fieldset class='surfaces checkbox-pill clearfix '>
+        <input type='checkbox' id='asphalt' checked='checked'>
+        <label for='asphalt' id='asphalt-label' class='button icon check quiet col4' style='text-align:left;'>Asphalt</label>
+        <input type='checkbox' id='concrete' checked='checked'>
+        <label for='concrete' id='concrete-label' class='button icon check quiet col4' style='text-align:left;'>Concrete</label>
+        <input type='checkbox' id='ground' checked='checked'>
+        <label for='ground' id='ground-label' class='button icon check quiet col4' style='text-align:left;'>Ground</label>
+        <input type='checkbox' id='fine_gravel' checked='checked'>
+        <label for='fine_gravel' id='fine_gravel-label' class='button icon check quiet col4' style='text-align:left;'>Fine gravel</label>
+        <input type='checkbox' id='gravel' checked='checked'>
+        <label for='gravel' id='gravel-label' class='button icon check quiet col4' style='text-align:left;'>Gravel</label>
+        <input type='checkbox' id='paving_stones' checked='checked'>
+        <label for='paving_stones' id='paving_stones-label' class='button icon check quiet col4' style='text-align:left;'>Paving stones</label>
+        <input type='checkbox' id='grass' checked='checked'>
+        <label for='grass' id='grass-label' class='button icon check quiet col4' style='text-align:left;'>Grass</label>
+        <input type='checkbox' id='wood' checked='checked'>
+        <label for='wood' id='wood-label' class='button icon check quiet col4' style='text-align:left;'>Wood</label>
+        <input type='checkbox' id='sand' checked='checked'>
+        <label for='sand' id='sand-label' class='button icon check quiet col4' style='text-align:left;'>Sand</label>
+        <input type='checkbox' id='unknown_surface' checked='checked'>
+        <label for='unknown_surface' id='unknown_surface-label' class='margin3 button icon check quiet col6' style='text-align:left;'>Unknown surface</label>
+      </fieldset>
+      <fieldset class='checkbox-pill clearfix pad2'>
+        <input type='checkbox' id='mapillary_tracks'>
+        <label for='mapillary_tracks' id='mapillary_tracks-label' class='button icon check quiet col12' style='text-align:left;'><span style='display: inline-block;width:50px;height:8px;background-color:#ff00bf'></span>&nbsp;&nbsp;Mapillary tracks</label>
+      </fieldset>
+      </form>
+      <div class='clearfix'></div>
+      <div class='pad1 small'>
+        <p>This is the ultimate map of pathways in Ottawa.</p>
+        <p>The map is maintained by Bike Ottawa volunteers like you. <p>
+        <p>If you see any mistakes or are familiar with the status of a pathway, click on the path and change its properties. It's that easy!</p>
+      </div>
+      <div class='center pad2'>
+      	<a href='https://bikeottawa.ca' target="_blank"><img src="../img/logos/bikeottawa.png" style="width:32px; height:32px;"></a>
+        <a href='https://github.com/BikeOttawa/maps.bikeottawa.ca-frontend' target="_blank"><img src="../img/logos/github.png" style="width:32px; height:32px;"></a>
+        <a href='https://twitter.com/BikeOttawa' target="_blank"><img src="../img/logos/twitter.png" style="width:32px; height:32px;"></a>
+      </div>
+      <a class='fr fill-darken3 pad1 rounded-toggle short icon button bike' onclick="$('#about').toggle()"></a>
+      <div class='fr pad1 small'>Last update: <span id='dateUpdated'>[...]</span></div>
+      <div class='clearfix'></div>
+      <div id='about' class='center small hidden'>
+          Made possible with City of Ottawa Open Data, funding from Councilor Jeff Leiper, and the help of Open Street Map Canada and Bike Ottawa volunteers. Main contributors: Heather Shearer, Yaro Shkvorets, Rob McCrae, Alex deVries, Matthew Darwin, JP Torunski, Shawn Gettler and others
+      </div>
+    </div>
+  </div>
+</div>
+<div class="loading" title="loading..." id="loader"></div>
+</div>
+
+<script src='../js/maps.js'></script>
+<script src='../js/osm-bundle.js'></script>
+<script src="../js/nouislider.min.js"></script>
+<script>
+const layers = [
+    {id:"narrow", name:'Narrow: &#60;2m', color:'#a6bddb', opacity:0.9, filter:['all',['<',['to-number',['get', 'width']], 2],['>',['to-number',['get', 'width']], 0]]},
+    {id:"wide", name:'Wide: &#8805;2m', color:'#023858', opacity:0.9, filter:['>=',['to-number',['get', 'width']], 2]},
+    {id:"unknown", name:'Unknown width', color:'#F0C808', opacity:0.9, filter:['==',['to-number',['get', 'width']], 0]/*["==", ["get", "width"], null]*/}
+];
+
+mapboxgl.accessToken = 'pk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdqaWxrN3gwZXQ4MnFxbjAwZXRpbG8zIn0.XhAdk2ASwdipubccCWTfoQ';
+var map = new mapboxgl.Map({
+  container: 'map',
+  style: 'mapbox://styles/mapbox/dark-v9',
+  center: [-75.697927,45.417431],
+  zoom: 13,
+  minZoom: 10,
+  maxZoom: 17,
+  maxBounds: [[-76.385193,44.963826],[-75.011902,45.614998]],
+  attributionControl: false
+});
+
+map.addControl(new mapboxgl.NavigationControl(),'bottom-right');
+map.addControl(new mapboxgl.ScaleControl(), 'bottom-left');
+map.addControl(new mapboxgl.AttributionControl({compact: true }), 'bottom-right');
+
+addStyleSwitcher();
+
+document.getElementById('unknown_width').onclick = toggleUnknown;
+document.getElementById('mapillary_tracks').onclick = toggleMapillary;
+
+Array.from(
+  document.querySelector('.surfaces').querySelectorAll('input')
+).map(function(el) { el.onclick = toggleSurfaces });
+
+//helpers & handlers below
+
+const slider = document.getElementById('slider')
+noUiSlider.create(slider, {
+    start: [0.5, 5],
+    connect: true,
+    step: 0.5,
+    range: {
+        'min': 0.5,
+        'max': 5
+    }
+});
+const snapValues = [
+    document.getElementById('min_width'),
+    document.getElementById('max_width')
+];
+
+function sliderUpdate(values){
+  map.getSource('highlight').setData(null);
+  const filter = map.getFilter('pathways');
+  filter[1][2][1][2] = parseFloat(values[0]);
+  filter[1][2][2][2] = parseFloat(values[1])==5 ? 100 : parseFloat(values[1]);
+  map.setFilter('pathways', filter);
+}
+
+function addStyleSwitcher(){
+  const layerList = document.getElementById('menu');
+  const inputs = layerList.getElementsByTagName('input');
+
+  for (var i = 0; i < inputs.length; i++) {
+      inputs[i].onclick = switchLayer;
+  }
+}
+
+function switchLayer(layer) {
+    const layerId = layer.target.id;
+    map.setStyle('mapbox://styles/mapbox/' + layerId + '-v9');
+}
+
+function init() {
+  map.addLayer({
+    "id": 'pathways',
+    "type": "line",
+    "source": {
+        type: 'vector',
+        url: 'mapbox://bikeottawa.6wnvt0cx',
+    },
+    "source-layer": '6wnvt0cx',
+    "layout": {
+        "line-join": "round",
+        "line-cap": "round"
+    },
+    "paint": {
+        "line-color": [
+                      "interpolate-hcl",
+                      ["linear"],
+                      ['to-number',['get', 'width']],
+                      0, layers[2].color,
+                      0.5, layers[0].color,
+                      3, layers[1].color
+                    ],
+        //"line-width": ['+',['to-number',['get', 'width']], 1.5],    //line width = width+1.5 pixels
+        "line-width": [
+                      'interpolate',
+                      ['exponential', 2],
+                      ['zoom'],
+                      10, 2,/*['+', ['/',['to-number',['get', 'width']],2], 1],*/
+                      17, ['*', ['+',['to-number',['get', 'width']],1], 3]
+                    ],
+        "line-opacity": 0.9
+      },
+      'filter': [ 'all',
+                  [ 'any',
+                    ['==',['to-number',['get', 'width']], 0],
+                    ['all',
+                      ['>=', ['to-number',['get', 'width']], 0.5],
+                      ['<=', ['to-number',['get', 'width']], 100],
+                    ],
+                  ],
+                  ['any',
+                    ['==', ['get', 'surface'], 'asphalt'],
+                    ['==', ['get', 'surface'], 'concrete'],
+                    ['==', ['get', 'surface'], 'ground'],
+                    ['==', ['get', 'surface'], 'fine_gravel'],
+                    ['==', ['get', 'surface'], 'gravel'],
+                    ['==', ['get', 'surface'], 'paving_stones'],
+                    ['==', ['get', 'surface'], 'grass'],
+                    ['==', ['get', 'surface'], 'wood'],
+                    ['==', ['get', 'surface'], 'sand'],
+                    ['==', ['get', 'surface'], null],
+                ]
+              ]
+
+    });
+
+
+  map.addSource('highlight', { type: 'geojson' , data: null});
+  map.addLayer({
+     "id": "highlight",
+     "type": "line",
+     "source": 'highlight',
+     "paint": {
+         "line-color": "#df42f4",
+         "line-width": 5,
+         "line-opacity": 0.5
+     }
+ });
+
+ map.addLayer({
+        "id": "mapillary",
+        "type": "line",
+        "source": {
+            "type": "vector",
+            "tiles": ["https://d25uarhxywzl1j.cloudfront.net/v0.1/{z}/{x}/{y}.mvt"],
+            "minzoom": 13,
+            "maxzoom": 14
+        },
+        "source-layer": "mapillary-sequences",
+        "layout": {
+            "line-cap": "round",
+            "line-join": "round",
+            "visibility": "none"
+        },
+        "paint": {
+            "line-opacity": ["interpolate", ["exponential", 2], ["zoom"],
+                            14, 0,
+                            17, 0.5
+                          ],
+            "line-color": "#ff00bf", //"rgb(53, 175, 109)",
+            "line-width": 1
+        }
+    }, 'waterway-label');
+
+}
+
+map.on('style.load', function () {
+    init()
+});
+
+function toggleUnknown(checkbox) {
+  const filter = map.getFilter('pathways');
+  filter[1][1][0]=(document.getElementById('unknown_width').checked)?'==':'<';
+  map.setFilter('pathways', filter);
+}
+
+function toggleMapillary(checkbox) {
+  map.setLayoutProperty('mapillary', 'visibility', checkbox.currentTarget.checked?'visible':'none');
+}
+
+
+function toggleSurfaces(checkbox) {
+  const filter = map.getFilter('pathways');
+  const surfacesOn = Array.from(
+    document.querySelector('.surfaces').querySelectorAll('input:checked')
+  ).map(function(el) { return el.id });
+  filter[2]=['any'];
+  surfacesOn.forEach(function(s){
+    filter[2].push(['==', ['get', 'surface'], (s=='unknown_surface')?null:s]);
+  });
+  map.setFilter('pathways', filter);
+}
+
+
+map.on('click', function(e) {
+
+  const features = map.queryRenderedFeatures(e.point, {
+              layers: ['pathways']
+          });
+  if (!features.length) {
+      return;
+  }
+  const feature = features[0];
+  displayOsmElementInfo(feature.properties.id, e.lngLat,['name','highway','surface','width','smoothness','lit','winter_service','fixme']);
+  window.history.replaceState(null, null, window.location.pathname+'?&lat='+e.lngLat.lat+'&lng='+e.lngLat.lng+'&id='+feature.properties.id);
+  map.getSource('highlight').setData(feature);
+});
+
+map.on('mousemove', function(e) {
+    const features = map.queryRenderedFeatures(e.point, {
+                layers: ['pathways']
+            });
+    map.getCanvas().style.cursor = (features.length) ? 'pointer' : '';
+});
+
+map.on('load', function(e) {
+    addUpdatedDate('bikeottawa.03jqtlpj')
+    document.getElementById("loader").style.visibility = "hidden";
+    url = parseUrl(window.location.search.substr(1).split('&'));
+    const lat = url['lat']
+    const lng = url['lng']
+    if(lat && lng){
+      map.flyTo({center: [lng, lat]})
+      map.once('moveend', function(){
+          map.fire("click", {point : map.project([lng, lat]), lngLat: {lng:lng, lat:lat}});
+      });
+    }
+
+
+    slider.noUiSlider.on('update', function (values, handle) {
+        const val=parseFloat(values[handle]);
+        snapValues[handle].innerHTML = val.toFixed(1) + (val==5?'+ m':' m');
+        sliderUpdate(values);
+    });
+
+});
+
+</script>
+</body>
+</html>

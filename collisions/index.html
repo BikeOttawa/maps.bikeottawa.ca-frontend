@@ -3,8 +3,8 @@
 <head>
     <meta charset='utf-8' />
     <title>Ottawa Collision Map</title>
-    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.0/mapbox-gl.js'></script>
-    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.0/mapbox-gl.css' rel='stylesheet' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
     <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
     <style>
         body { margin:0; padding:0; }
@@ -75,9 +75,9 @@
       <div id='max_cols'>7</div>
     </div>
     <div class='center pad2'>
-    	<a href='https://bikeottawa.ca'><img src="../img/logos/bikeottawa.png" style="width:32px; height:32px;"></a>
-      <a href='https://github.com/BikeOttawa/maps.bikeottawa.ca-frontend'><img src="../img/logos/github.png" style="width:32px; height:32px;"></a>
-      <a href='https://twitter.com/BikeOttawa'><img src="../img/logos/twitter.png" style="width:32px; height:32px;"></a>
+    	<a href='https://bikeottawa.ca' target="_blank"><img src="../img/logos/bikeottawa.png" style="width:32px; height:32px;"></a>
+      <a href='https://github.com/BikeOttawa/maps.bikeottawa.ca-frontend' target="_blank"><img src="../img/logos/github.png" style="width:32px; height:32px;"></a>
+      <a href='https://twitter.com/BikeOttawa' target="_blank"><img src="../img/logos/twitter.png" style="width:32px; height:32px;"></a>
     </div>
 </div>
 <div class="loader loader--style1" title="0" id="loader">
@@ -112,7 +112,8 @@ const map = new mapboxgl.Map({
     //pitch: 40,
     minZoom: 10,
     maxZoom: 17,
-    maxBounds: [[-76.385193,44.963826],[-75.011902,45.614998]]
+    maxBounds: [[-76.385193,44.963826],[-75.011902,45.614998]],
+    attributionControl: false
 });
 
 let gPopup;
@@ -120,7 +121,7 @@ map.once('style.load', function () {
 
     init()
     map.addControl(new mapboxgl.NavigationControl(),'bottom-right');
-
+    map.addControl(new mapboxgl.AttributionControl({compact: true }), 'bottom-right');
 
     map.on('mousemove', function(e) {
         var features = map.queryRenderedFeatures(e.point, {
