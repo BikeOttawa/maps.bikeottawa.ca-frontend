@@ -94,7 +94,7 @@ var map = new mapboxgl.Map({
   attributionControl: false
 });
 
-//map.addControl(new mapboxgl.NavigationControl(),'bottom-right');
+map.addControl(new mapboxgl.NavigationControl(),'bottom-right');
 map.addControl(new mapboxgl.AttributionControl({compact: true }), 'bottom-right');
 const geocoder = new MapboxGeocoder({
     accessToken: mapboxgl.accessToken,
