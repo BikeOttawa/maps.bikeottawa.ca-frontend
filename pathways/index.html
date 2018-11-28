@@ -20,7 +20,7 @@
 <body>
 <div id='app' class='col12 contain clip'>
 <div id='map'></div>
-<div id='menu'>
+<div id='menu' class='hide-mobile'>
   <input id='dark' type='radio' name='rtoggle' value='dark' checked='checked'>
   <label for='dark'>dark</label>
   <input id='light' type='radio' name='rtoggle' value='light' >
@@ -45,44 +45,44 @@
       </div>
       <fieldset class='checkbox-pill clearfix pad1'>
         <input type='checkbox' id='unknown_width' checked='checked'>
-        <label for='unknown_width' id='unknown_width-label' class='button icon check quiet col12' style='text-align:left;'><span style='display: inline-block;width:50px;height:8px;background-color:#F0C808'></span>&nbsp;&nbsp;Unknown width</label>
+        <label for='unknown_width' id='unknown_width-label' class='short button icon check quiet col12' style='text-align:left;'><span style='display: inline-block;width:50px;height:8px;background-color:#F0C808'></span>&nbsp;&nbsp;Unknown width</label>
       </fieldset>
       <h3>Pathway surface</h3><br>
-      <fieldset class='surfaces checkbox-pill clearfix '>
+      <fieldset class='mobile-cols surfaces checkbox-pill clearfix '>
         <input type='checkbox' id='asphalt' checked='checked'>
-        <label for='asphalt' id='asphalt-label' class='button icon check quiet col4' style='text-align:left;'>Asphalt</label>
+        <label for='asphalt' id='asphalt-label' class='unround short button icon check quiet col4' style='text-align:left;'>Asphalt</label>
         <input type='checkbox' id='concrete' checked='checked'>
-        <label for='concrete' id='concrete-label' class='button icon check quiet col4' style='text-align:left;'>Concrete</label>
+        <label for='concrete' id='concrete-label' class='unround short button icon check quiet col4' style='text-align:left;'>Concrete</label>
         <input type='checkbox' id='ground' checked='checked'>
-        <label for='ground' id='ground-label' class='button icon check quiet col4' style='text-align:left;'>Ground</label>
+        <label for='ground' id='ground-label' class='unround short button icon check quiet col4' style='text-align:left;'>Ground</label>
         <input type='checkbox' id='fine_gravel' checked='checked'>
-        <label for='fine_gravel' id='fine_gravel-label' class='button icon check quiet col4' style='text-align:left;'>Fine gravel</label>
+        <label for='fine_gravel' id='fine_gravel-label' class='unround short button icon check quiet col4' style='text-align:left;'>Fine gravel</label>
         <input type='checkbox' id='gravel' checked='checked'>
-        <label for='gravel' id='gravel-label' class='button icon check quiet col4' style='text-align:left;'>Gravel</label>
+        <label for='gravel' id='gravel-label' class='unround short button icon check quiet col4' style='text-align:left;'>Gravel</label>
         <input type='checkbox' id='paving_stones' checked='checked'>
-        <label for='paving_stones' id='paving_stones-label' class='button icon check quiet col4' style='text-align:left;'>Paving stones</label>
+        <label for='paving_stones' id='paving_stones-label' class='unround short button icon check quiet col4' style='text-align:left;'>Paving stones</label>
         <input type='checkbox' id='grass' checked='checked'>
-        <label for='grass' id='grass-label' class='button icon check quiet col4' style='text-align:left;'>Grass</label>
+        <label for='grass' id='grass-label' class='unround short button icon check quiet col4' style='text-align:left;'>Grass</label>
         <input type='checkbox' id='wood' checked='checked'>
-        <label for='wood' id='wood-label' class='button icon check quiet col4' style='text-align:left;'>Wood</label>
+        <label for='wood' id='wood-label' class='unround short button icon check quiet col4' style='text-align:left;'>Wood</label>
         <input type='checkbox' id='sand' checked='checked'>
-        <label for='sand' id='sand-label' class='button icon check quiet col4' style='text-align:left;'>Sand</label>
+        <label for='sand' id='sand-label' class='unround short button icon check quiet col4' style='text-align:left;'>Sand</label>
         <input type='checkbox' id='unknown_surface' checked='checked'>
-        <label for='unknown_surface' id='unknown_surface-label' class='margin3 button icon check quiet col6' style='text-align:left;'>Unknown surface</label>
+        <label for='unknown_surface' id='unknown_surface-label' class='unround short margin3 button icon check quiet col6' style='text-align:left;'>Unknown surface</label>
       </fieldset>
       <h3>Helpers</h3>
       <fieldset class='checkbox-pill clearfix pad1'>
         <input type='checkbox' id='mapillary_tracks'>
-        <label for='mapillary_tracks' id='mapillary_tracks-label' class='button icon check quiet col12' style='text-align:left;'><span style='display: inline-block;width:50px;height:8px;background-color:#ff00bf'></span>&nbsp;&nbsp;Mapillary tracks</label>
+        <label for='mapillary_tracks' id='mapillary_tracks-label' class='short button icon check quiet col12' style='text-align:left;'><span style='display: inline-block;width:50px;height:8px;background-color:#ff00bf'></span>&nbsp;&nbsp;Mapillary tracks</label>
       </fieldset>
       </form>
       <div class='clearfix'></div>
-      <div class='pad1 small'>
+      <div class='hide-mobile pad1 small'>
         <p>This is the ultimate map of pathways in Ottawa.<br>
         The map is maintained by Bike Ottawa volunteers like you and our goal is to put on the map as much information about our pathway network as possible.<br>
         If you are familiar with a pathway near you, click on the path and add missing properties. It's that easy!</p>
       </div>
-      <div class='center pad1'>
+      <div class='hide-mobile center pad1'>
       	<a href='https://bikeottawa.ca' target="_blank"><img src="../img/logos/bikeottawa.png" style="width:32px; height:32px;"></a>
         <a href='https://github.com/BikeOttawa/maps.bikeottawa.ca-frontend' target="_blank"><img src="../img/logos/github.png" style="width:32px; height:32px;"></a>
         <a href='https://twitter.com/BikeOttawa' target="_blank"><img src="../img/logos/twitter.png" style="width:32px; height:32px;"></a>
