@@ -186,3 +186,15 @@ function nominatimGeocoder(query){
     });
   });
 };
+
+function getStats(Stats, prefix){
+  const ret = {'unknown': Stats.total_highways};
+  for(tag of Object.keys(Stats)){
+    if(tag.indexOf(prefix+':')==0){
+      const value = tag.replace(prefix+':','');
+      ret[value] = Stats[tag];
+      ret['unknown']-=ret[value];
+    }
+  }
+  return ret;
+}
