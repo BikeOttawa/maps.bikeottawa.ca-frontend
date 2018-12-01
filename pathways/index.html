@@ -100,13 +100,13 @@
   <div id='stats' class='fill-darken1 round hidden'>
     <div id='closebtn' class='fill-darken2 pad1 icon close button fr' onclick="$('#legendbtn').toggle();$('#statsbtn').toggle();$('#stats').toggle()"></div>
     <div class='clearfix'></div>
-    <div class='pad1 dark'>
-      <h3>Width stats</h3><br>
-      <canvas id='width_chart'></canvas>
-      <h3>Surface stats</h3><br>
-      <canvas id='surface_chart'></canvas>
-      <h3>Condition stats</h3><br>
-      <canvas id='smooth_chart'></canvas>
+    <div class='pad1 dark center'>
+      <h3>Width</h3>
+      <canvas id='width_chart'></canvas><br>
+      <h3>Surface</h3>
+      <canvas id='surface_chart'></canvas><br>
+      <h3>Smoothness</h3>
+      <canvas id='smooth_chart'></canvas><br>
     </div>
   </div>
 </div>
@@ -128,7 +128,7 @@ const Mapbox = {
     layer: '6wnvt0cx',
     layerName: 'pathways'
 };
-const ChartBackgroundColors = [
+/*const ChartBackgroundColors = [
   "#fff100",
   "#ff8c00",
   "#e81123",
@@ -139,6 +139,16 @@ const ChartBackgroundColors = [
   "#00b294",
   "#009e49",
   "#bad80a"
+];*/
+const ChartBackgroundColors = [
+  "#e6261f",
+  "#eb7532",
+  "#f7d038",
+  "#a3e048",
+  "#49da9a",
+  "#34bbe6",
+  "#4355db",
+  "#d23be7"
 ];
 
 mapboxgl.accessToken = 'pk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdqaWxrN3gwZXQ4MnFxbjAwZXRpbG8zIn0.XhAdk2ASwdipubccCWTfoQ';
@@ -350,53 +360,87 @@ map.on('mousemove', function(e) {
     map.getCanvas().style.cursor = (features.length) ? 'pointer' : '';
 });
 
+function graphClickEvent(event, array){
+    if(array[0]){
+      //  alert(array[0]._chart.config.data.labels[array[0]._index]);
+    }
+}
+
 map.on('load', function(e) {
   const features = map.querySourceFeatures(Mapbox.layerName,{sourceLayer:Mapbox.layer, filter:['!=',['get','total_highways'],null]})
   if(features.length!=0){
     Stats = features[0].properties;
     const widthStats = getStats(Stats, 'width');
+    let keys = Object.keys(widthStats).sort((a,b)=>{return widthStats[b] - widthStats[a]});
     let data = {
+      label: "Width",
       datasets: [{
-        data: Object.keys(widthStats).map(k => widthStats[k]),
+        data: keys.map(k => widthStats[k]),
         "backgroundColor": ChartBackgroundColors
       }],
-      labels: Object.keys(widthStats).map(k => k+' m'),
+      labels: keys.map(k => (k=='unknown')?k:k+' m'),
     };
     new Chart(document.getElementById('width_chart'), //{"type":"doughnut","data":{"labels":["Red","Blue","Yellow"],"datasets":[{"label":"My First Dataset","data":[300,50,100],"backgroundColor":["rgb(255, 99, 132)","rgb(54, 162, 235)","rgb(255, 205, 86)"]}]}});
     {
         type: 'pie',
         data: data,
-        options: {legend: {display: false}}
+        options: {
+          legend: {display: false},
+          mode: 'label',
+          tooltips: {
+            callbacks: {
+              label: (item,data) => ` ${data.labels[item.index]}: ${data.datasets[0].data[item.index]} km`,
+            },
+          },
+        }
     });
 
     const surfaceStats = getStats(Stats, 'surface');
+    keys = Object.keys(surfaceStats).sort((a,b)=>{return surfaceStats[b] - surfaceStats[a]});
     data = {
+      label: "Surface",
       datasets: [{
-        data: Object.keys(surfaceStats).map(k => surfaceStats[k]),
+        data: keys.map(k => surfaceStats[k]),
         "backgroundColor": ChartBackgroundColors
       }],
-      labels: Object.keys(surfaceStats),
+      labels: keys,
     };
     new Chart(document.getElementById('surface_chart'), //{"type":"doughnut","data":{"labels":["Red","Blue","Yellow"],"datasets":[{"label":"My First Dataset","data":[300,50,100],"backgroundColor":["rgb(255, 99, 132)","rgb(54, 162, 235)","rgb(255, 205, 86)"]}]}});
     {
         type: 'pie',
         data: data,
-        options: {legend: {display: false}}
+        options: {
+          legend: {display: false},
+          tooltips: {
+            callbacks: {
+              label: (item,data) => ` ${data.labels[item.index]}: ${data.datasets[0].data[item.index]} km`,
+            },
+          },
+        }
     });
 
     const smoothStats = getStats(Stats, 'smoothness');
+    keys = Object.keys(smoothStats).sort((a,b)=>{return smoothStats[b] - smoothStats[a]});
     data = {
+      label: "Smoothness",
       datasets: [{
-        data: Object.keys(smoothStats).map(k => smoothStats[k]),
+        data: keys.map(k => smoothStats[k]),
         "backgroundColor": ChartBackgroundColors
       }],
-      labels: Object.keys(smoothStats),
+      labels: keys,
     };
     new Chart(document.getElementById('smooth_chart'), //{"type":"doughnut","data":{"labels":["Red","Blue","Yellow"],"datasets":[{"label":"My First Dataset","data":[300,50,100],"backgroundColor":["rgb(255, 99, 132)","rgb(54, 162, 235)","rgb(255, 205, 86)"]}]}});
     {
         type: 'pie',
         data: data,
-        options: {legend: {display: false}}
+        options: {
+          legend: {display: false},
+          tooltips: {
+            callbacks: {
+              label: (item,data) => ` ${data.labels[item.index]}: ${data.datasets[0].data[item.index]} km`,
+            },
+          },
+        }
     });
 
   }
