@@ -6,6 +6,7 @@
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
     <script  data-cfasync="false" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js'></script>
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
     <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
     <link href='../css/maps.css' rel='stylesheet' />
@@ -31,9 +32,10 @@
   <label for='satellite'>satellite</label>
 </div>
 <div class='col4 pad1 scroll-styled pin-topright '>
-  <div id='legendbtn' class='fill-darken2 pad1 icon book button hidden fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
+  <div id='legendbtn' class='fill-darken2 pad1 icon book button hidden fr' onclick="$('#statsbtn').toggle();$('#legendbtn').toggle();$('#legend').toggle()"></div>
+  <div id='statsbtn' class='fill-darken2 pad1 icon graph button hidden fr' onclick="$('#legendbtn').toggle();$('#statsbtn').toggle();$('#stats').toggle()"></div>
   <div id='legend' class='fill-darken1 round'>
-    <div id='closebtn' class='fill-darken2 pad1 icon close button fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
+    <div id='closebtn' class='fill-darken2 pad1 icon close button fr' onclick="$('#statsbtn').toggle();$('#legendbtn').toggle();$('#legend').toggle()"></div>
     <div class='clearfix'></div>
     <div class='pad1 dark'>
       <h3>Pathway width</h3><br>
@@ -95,6 +97,18 @@
       </div>
     </div>
   </div>
+  <div id='stats' class='fill-darken1 round hidden'>
+    <div id='closebtn' class='fill-darken2 pad1 icon close button fr' onclick="$('#legendbtn').toggle();$('#statsbtn').toggle();$('#stats').toggle()"></div>
+    <div class='clearfix'></div>
+    <div class='pad1 dark center'>
+      <h3>Width</h3>
+      <canvas id='width_chart'></canvas><br>
+      <h3>Surface</h3>
+      <canvas id='surface_chart'></canvas><br>
+      <h3>Smoothness</h3>
+      <canvas id='smooth_chart'></canvas><br>
+    </div>
+  </div>
 </div>
 <div class="loading" title="loading..." id="loader"></div>
 </div>
@@ -103,10 +117,38 @@
 <script src='../js/osm-bundle.js'></script>
 <script src="../js/nouislider.min.js"></script>
 <script>
+"use_strict";
 const layers = [
     {id:"narrow", name:'Narrow: &#60;2m', color:'#a6bddb', opacity:0.9, filter:['all',['<',['to-number',['get', 'width']], 2],['>',['to-number',['get', 'width']], 0]]},
     {id:"wide", name:'Wide: &#8805;2m', color:'#023858', opacity:0.9, filter:['>=',['to-number',['get', 'width']], 2]},
     {id:"unknown", name:'Unknown width', color:'#F0C808', opacity:0.9, filter:['==',['to-number',['get', 'width']], 0]/*["==", ["get", "width"], null]*/}
+];
+const Mapbox = {
+    url: 'bikeottawa.6wnvt0cx',
+    layer: '6wnvt0cx',
+    layerName: 'pathways'
+};
+/*const ChartBackgroundColors = [
+  "#fff100",
+  "#ff8c00",
+  "#e81123",
+  "#ec008c",
+  "#68217a",
+  "#00188f",
+  "#00bcf2",
+  "#00b294",
+  "#009e49",
+  "#bad80a"
+];*/
+const ChartBackgroundColors = [
+  "#e6261f",
+  "#eb7532",
+  "#f7d038",
+  "#a3e048",
+  "#49da9a",
+  "#34bbe6",
+  "#4355db",
+  "#d23be7"
 ];
 
 mapboxgl.accessToken = 'pk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdqaWxrN3gwZXQ4MnFxbjAwZXRpbG8zIn0.XhAdk2ASwdipubccCWTfoQ';
@@ -153,10 +195,10 @@ const snapValues = [
 
 function sliderUpdate(values){
   map.getSource('highlight').setData(null);
-  const filter = map.getFilter('pathways');
+  const filter = map.getFilter(Mapbox.layerName);
   filter[1][2][1][2] = parseFloat(values[0]);
   filter[1][2][2][2] = parseFloat(values[1])==5 ? 100 : parseFloat(values[1]);
-  map.setFilter('pathways', filter);
+  map.setFilter(Mapbox.layerName, filter);
 }
 
 function addStyleSwitcher(){
@@ -175,13 +217,13 @@ function switchLayer(layer) {
 
 function init() {
   map.addLayer({
-    "id": 'pathways',
+    "id": Mapbox.layerName,
     "type": "line",
     "source": {
         type: 'vector',
-        url: 'mapbox://bikeottawa.6wnvt0cx',
+        url: 'mapbox://'+Mapbox.url,
     },
-    "source-layer": '6wnvt0cx',
+    "source-layer": Mapbox.layer,
     "layout": {
         "line-join": "round",
         "line-cap": "round"
@@ -274,9 +316,9 @@ map.on('style.load', function () {
 });
 
 function toggleUnknown(checkbox) {
-  const filter = map.getFilter('pathways');
+  const filter = map.getFilter(Mapbox.layerName);
   filter[1][1][0]=(document.getElementById('unknown_width').checked)?'==':'<';
-  map.setFilter('pathways', filter);
+  map.setFilter(Mapbox.layerName, filter);
 }
 
 function toggleMapillary(checkbox) {
@@ -285,7 +327,7 @@ function toggleMapillary(checkbox) {
 
 
 function toggleSurfaces(checkbox) {
-  const filter = map.getFilter('pathways');
+  const filter = map.getFilter(Mapbox.layerName);
   const surfacesOn = Array.from(
     document.querySelector('.surfaces').querySelectorAll('input:checked')
   ).map(function(el) { return el.id });
@@ -293,14 +335,14 @@ function toggleSurfaces(checkbox) {
   surfacesOn.forEach(function(s){
     filter[2].push(['==', ['get', 'surface'], (s=='unknown_surface')?null:s]);
   });
-  map.setFilter('pathways', filter);
+  map.setFilter(Mapbox.layerName, filter);
 }
 
 
 map.on('click', function(e) {
 
   const features = map.queryRenderedFeatures(e.point, {
-              layers: ['pathways']
+              layers: [Mapbox.layerName]
           });
   if (!features.length) {
       return;
@@ -313,30 +355,114 @@ map.on('click', function(e) {
 
 map.on('mousemove', function(e) {
     const features = map.queryRenderedFeatures(e.point, {
-                layers: ['pathways']
+                layers: [Mapbox.layerName]
             });
     map.getCanvas().style.cursor = (features.length) ? 'pointer' : '';
 });
 
-map.on('load', function(e) {
-    addUpdatedDate('bikeottawa.03jqtlpj')
-    document.getElementById("loader").style.visibility = "hidden";
-    url = parseUrl(window.location.search.substr(1).split('&'));
-    const lat = url['lat']
-    const lng = url['lng']
-    if(lat && lng){
-      map.flyTo({center: [lng, lat]})
-      map.once('moveend', function(){
-          map.fire("click", {point : map.project([lng, lat]), lngLat: {lng:lng, lat:lat}});
-      });
+function graphClickEvent(event, array){
+    if(array[0]){
+      //  alert(array[0]._chart.config.data.labels[array[0]._index]);
     }
+}
 
-
-    slider.noUiSlider.on('update', function (values, handle) {
-        const val=parseFloat(values[handle]);
-        snapValues[handle].innerHTML = val.toFixed(1) + (val==5?'+ m':' m');
-        sliderUpdate(values);
+map.on('load', function(e) {
+  const features = map.querySourceFeatures(Mapbox.layerName,{sourceLayer:Mapbox.layer, filter:['!=',['get','total_highways'],null]})
+  if(features.length!=0){
+    Stats = features[0].properties;
+    const widthStats = getStats(Stats, 'width');
+    let keys = Object.keys(widthStats).sort((a,b)=>{return widthStats[b] - widthStats[a]});
+    let data = {
+      label: "Width",
+      datasets: [{
+        data: keys.map(k => widthStats[k]),
+        "backgroundColor": ChartBackgroundColors
+      }],
+      labels: keys.map(k => (k=='unknown')?k:k+' m'),
+    };
+    new Chart(document.getElementById('width_chart'), //{"type":"doughnut","data":{"labels":["Red","Blue","Yellow"],"datasets":[{"label":"My First Dataset","data":[300,50,100],"backgroundColor":["rgb(255, 99, 132)","rgb(54, 162, 235)","rgb(255, 205, 86)"]}]}});
+    {
+        type: 'pie',
+        data: data,
+        options: {
+          legend: {display: false},
+          mode: 'label',
+          tooltips: {
+            callbacks: {
+              label: (item,data) => ` ${data.labels[item.index]}: ${data.datasets[0].data[item.index]} km`,
+            },
+          },
+        }
     });
+
+    const surfaceStats = getStats(Stats, 'surface');
+    keys = Object.keys(surfaceStats).sort((a,b)=>{return surfaceStats[b] - surfaceStats[a]});
+    data = {
+      label: "Surface",
+      datasets: [{
+        data: keys.map(k => surfaceStats[k]),
+        "backgroundColor": ChartBackgroundColors
+      }],
+      labels: keys,
+    };
+    new Chart(document.getElementById('surface_chart'), //{"type":"doughnut","data":{"labels":["Red","Blue","Yellow"],"datasets":[{"label":"My First Dataset","data":[300,50,100],"backgroundColor":["rgb(255, 99, 132)","rgb(54, 162, 235)","rgb(255, 205, 86)"]}]}});
+    {
+        type: 'pie',
+        data: data,
+        options: {
+          legend: {display: false},
+          tooltips: {
+            callbacks: {
+              label: (item,data) => ` ${data.labels[item.index]}: ${data.datasets[0].data[item.index]} km`,
+            },
+          },
+        }
+    });
+
+    const smoothStats = getStats(Stats, 'smoothness');
+    keys = Object.keys(smoothStats).sort((a,b)=>{return smoothStats[b] - smoothStats[a]});
+    data = {
+      label: "Smoothness",
+      datasets: [{
+        data: keys.map(k => smoothStats[k]),
+        "backgroundColor": ChartBackgroundColors
+      }],
+      labels: keys,
+    };
+    new Chart(document.getElementById('smooth_chart'), //{"type":"doughnut","data":{"labels":["Red","Blue","Yellow"],"datasets":[{"label":"My First Dataset","data":[300,50,100],"backgroundColor":["rgb(255, 99, 132)","rgb(54, 162, 235)","rgb(255, 205, 86)"]}]}});
+    {
+        type: 'pie',
+        data: data,
+        options: {
+          legend: {display: false},
+          tooltips: {
+            callbacks: {
+              label: (item,data) => ` ${data.labels[item.index]}: ${data.datasets[0].data[item.index]} km`,
+            },
+          },
+        }
+    });
+
+  }
+
+  addUpdatedDate(Mapbox.url)
+  document.getElementById("loader").style.visibility = "hidden";
+  url = parseUrl(window.location.search.substr(1).split('&'));
+  const lat = url['lat']
+  const lng = url['lng']
+  if(lat && lng){
+    map.flyTo({center: [lng, lat]})
+    map.once('moveend', function(){
+        map.fire("click", {point : map.project([lng, lat]), lngLat: {lng:lng, lat:lat}});
+    });
+  }
+
+
+  slider.noUiSlider.on('update', function (values, handle) {
+      const val=parseFloat(values[handle]);
+      snapValues[handle].innerHTML = val.toFixed(1) + (val==5?'+ m':' m');
+      sliderUpdate(values);
+  });
 
 });
 

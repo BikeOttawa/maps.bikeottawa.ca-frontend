@@ -186,3 +186,16 @@ function nominatimGeocoder(query){
     });
   });
 };
+
+function getStats(Stats, prefix){
+  const ret = {'unknown': Stats.total_meters};
+  for(tag of Object.keys(Stats)){
+    if(tag.indexOf(prefix+':')==0){
+      const value = tag.replace(prefix+':','');
+      ret[value] = (Stats[tag]/1000).toFixed(2);
+      ret['unknown']-=Stats[tag];
+    }
+  }
+  ret['unknown'] = (ret['unknown']/1000).toFixed(2);
+  return ret;
+}
