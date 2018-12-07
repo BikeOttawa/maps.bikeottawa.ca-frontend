@@ -301,8 +301,8 @@ function init() {
         },
         "paint": {
             "line-opacity": ["interpolate", ["exponential", 2], ["zoom"],
-                            14, 0,
-                            17, 0.5
+                            13, 0,
+                            17, 0.8
                           ],
             "line-color": "#ff00bf", //"rgb(53, 175, 109)",
             "line-width": 1
@@ -366,83 +366,41 @@ function graphClickEvent(event, array){
     }
 }
 
+function addChart(Stats, tag, title, divId, labelPostfix=''){
+  const statsObj = getStats(Stats, tag);
+  const keys = Object.keys(statsObj).sort((a,b)=>{return statsObj[b] - statsObj[a]});
+  data = {
+    label: title,
+    datasets: [{
+      data: keys.map(k => statsObj[k]),
+      "backgroundColor": ChartBackgroundColors,
+    }],
+    labels: keys.map(k => (k=='unknown')?k:k+labelPostfix),
+  };
+  new Chart(document.getElementById(divId), {
+      type: 'pie',
+      data: data,
+      options: {
+        legend: {display: false},
+        tooltips: {
+          callbacks: {
+            label: (item,data) => ` ${data.labels[item.index]}: ${data.datasets[0].data[item.index]} km`,
+          },
+        },
+      }
+  });
+}
+
 map.on('load', function(e) {
   const features = map.querySourceFeatures(Mapbox.layerName,{sourceLayer:Mapbox.layer, filter:['!=',['get','total_highways'],null]})
   if(features.length!=0){
-    Stats = features[0].properties;
-    const widthStats = getStats(Stats, 'width');
-    let keys = Object.keys(widthStats).sort((a,b)=>{return widthStats[b] - widthStats[a]});
-    let data = {
-      label: "Width",
-      datasets: [{
-        data: keys.map(k => widthStats[k]),
-        "backgroundColor": ChartBackgroundColors
-      }],
-      labels: keys.map(k => (k=='unknown')?k:k+' m'),
-    };
-    new Chart(document.getElementById('width_chart'), //{"type":"doughnut","data":{"labels":["Red","Blue","Yellow"],"datasets":[{"label":"My First Dataset","data":[300,50,100],"backgroundColor":["rgb(255, 99, 132)","rgb(54, 162, 235)","rgb(255, 205, 86)"]}]}});
-    {
-        type: 'pie',
-        data: data,
-        options: {
-          legend: {display: false},
-          mode: 'label',
-          tooltips: {
-            callbacks: {
-              label: (item,data) => ` ${data.labels[item.index]}: ${data.datasets[0].data[item.index]} km`,
-            },
-          },
-        }
-    });
-
-    const surfaceStats = getStats(Stats, 'surface');
-    keys = Object.keys(surfaceStats).sort((a,b)=>{return surfaceStats[b] - surfaceStats[a]});
-    data = {
-      label: "Surface",
-      datasets: [{
-        data: keys.map(k => surfaceStats[k]),
-        "backgroundColor": ChartBackgroundColors
-      }],
-      labels: keys,
-    };
-    new Chart(document.getElementById('surface_chart'), //{"type":"doughnut","data":{"labels":["Red","Blue","Yellow"],"datasets":[{"label":"My First Dataset","data":[300,50,100],"backgroundColor":["rgb(255, 99, 132)","rgb(54, 162, 235)","rgb(255, 205, 86)"]}]}});
-    {
-        type: 'pie',
-        data: data,
-        options: {
-          legend: {display: false},
-          tooltips: {
-            callbacks: {
-              label: (item,data) => ` ${data.labels[item.index]}: ${data.datasets[0].data[item.index]} km`,
-            },
-          },
-        }
-    });
-
-    const smoothStats = getStats(Stats, 'smoothness');
-    keys = Object.keys(smoothStats).sort((a,b)=>{return smoothStats[b] - smoothStats[a]});
-    data = {
-      label: "Smoothness",
-      datasets: [{
-        data: keys.map(k => smoothStats[k]),
-        "backgroundColor": ChartBackgroundColors
-      }],
-      labels: keys,
-    };
-    new Chart(document.getElementById('smooth_chart'), //{"type":"doughnut","data":{"labels":["Red","Blue","Yellow"],"datasets":[{"label":"My First Dataset","data":[300,50,100],"backgroundColor":["rgb(255, 99, 132)","rgb(54, 162, 235)","rgb(255, 205, 86)"]}]}});
-    {
-        type: 'pie',
-        data: data,
-        options: {
-          legend: {display: false},
-          tooltips: {
-            callbacks: {
-              label: (item,data) => ` ${data.labels[item.index]}: ${data.datasets[0].data[item.index]} km`,
-            },
-          },
-        }
-    });
-
+    const Stats = features[0].properties;
+    addChart(Stats, 'width', 'Width', 'width_chart', ' m');
+    //  labels: keys.map(k => (k=='unknown')?k:k+' m'),
+    addChart(Stats, 'surface', 'Surface', 'surface_chart');
+    addChart(Stats, 'smoothness', 'Smoothness', 'smooth_chart');
+    //addChart(Stats, 'lit', 'Lit', 'lit_chart');
+    //addChart(Stats, 'winter_service', 'Snowplowing', 'snowplow_chart');
   }
 
   addUpdatedDate(Mapbox.url)
