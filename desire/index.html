@@ -121,6 +121,10 @@ map.once('style.load', function () {
     map.addControl(new mapboxgl.AttributionControl({compact: true }), 'bottom-right');
 });
 
+map.on('moveend', function(e) {
+  window.history.replaceState(null, null, window.location.pathname+'?&lat='+map.getCenter().lat+'&lng='+map.getCenter().lng+'&zoom='+map.getZoom());
+});
+
 map.on('click', function(e) {
 
     var features = map.queryRenderedFeatures(e.point, {
@@ -129,12 +133,13 @@ map.on('click', function(e) {
     if (!features.length || typeof features[0].properties.id == 'undefined')
     {
         displayFeedbackPopup(e.lngLat);
+        window.history.replaceState(null, null, window.location.pathname+'?&lat='+e.lngLat.lat+'&lng='+e.lngLat.lng+'&zoom='+map.getZoom());
         window.history.replaceState(null, null, window.location.pathname+'?&lat='+e.lngLat.lat+'&lng='+e.lngLat.lng);
         return;
     }
     var feature = features[0];
     displayOsmElementInfo(feature.properties.id, e.lngLat);
-    window.history.replaceState(null, null, window.location.pathname+'?&lat='+e.lngLat.lat+'&lng='+e.lngLat.lng+'&id='+feature.properties.id);
+    window.history.replaceState(null, null, window.location.pathname+'?&lat='+e.lngLat.lat+'&lng='+e.lngLat.lng+'&zoom='+map.getZoom()+'&id='+feature.properties.id);
       //TODO: highlight using filters
     map.getSource('highlight').setData(feature);
 
@@ -165,8 +170,12 @@ map.on('load', function(e) {
     })(window.location.search.substr(1).split('&'));
     const lat = url['lat']
     const lng = url['lng']
+    let z = url['zoom']
     if(lat && lng){
-      map.flyTo({center: [lng, lat]})
+      if(!z){
+        z = 18;
+      }
+      map.flyTo({center: [lng, lat], zoom: z})
       map.once('moveend', function(){
           map.fire("click", {point : map.project([lng, lat]), lngLat: {lng:lng, lat:lat}});
       });
