@@ -338,6 +338,9 @@ function toggleSurfaces(checkbox) {
   map.setFilter(Mapbox.layerName, filter);
 }
 
+map.on('moveend', function(e) {
+  window.history.replaceState(null, null, window.location.pathname+'?&lat='+map.getCenter().lat+'&lng='+map.getCenter().lng+'&zoom='+map.getZoom());
+});
 
 map.on('click', function(e) {
 
@@ -349,7 +352,7 @@ map.on('click', function(e) {
   }
   const feature = features[0];
   displayOsmElementInfo(feature.properties.id, e.lngLat,['name','highway','surface','width','smoothness','lit','winter_service','fixme']);
-  window.history.replaceState(null, null, window.location.pathname+'?&lat='+e.lngLat.lat+'&lng='+e.lngLat.lng+'&id='+feature.properties.id);
+  window.history.replaceState(null, null, window.location.pathname+'?&lat='+e.lngLat.lat+'&lng='+e.lngLat.lng+'&zoom='+map.getZoom()+'&id='+feature.properties.id);
   map.getSource('highlight').setData(feature);
 });
 
@@ -359,6 +362,8 @@ map.on('mousemove', function(e) {
             });
     map.getCanvas().style.cursor = (features.length) ? 'pointer' : '';
 });
+
+
 
 function graphClickEvent(event, array){
     if(array[0]){
@@ -408,8 +413,12 @@ map.on('load', function(e) {
   url = parseUrl(window.location.search.substr(1).split('&'));
   const lat = url['lat']
   const lng = url['lng']
+  let z = url['zoom']
   if(lat && lng){
-    map.flyTo({center: [lng, lat]})
+    if(!z){
+      z = 18;
+    }
+    map.flyTo({center: [lng, lat], zoom: z})
     map.once('moveend', function(){
         map.fire("click", {point : map.project([lng, lat]), lngLat: {lng:lng, lat:lat}});
     });
