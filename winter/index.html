@@ -234,7 +234,7 @@ map.on('click', function(e) {
       return;
   }
   const feature = features[0];
-  displayOsmElementInfo(feature.properties.id, e.lngLat,['name','highway','surface','winter_service','winter_service:quality','fixme']);
+  displayOsmElementInfo(feature.properties.id, e.lngLat,['name','highway','surface','winter_service','winter_service:quality','fixme'], 'Winter pathways based on mapillary and local knowledge - https://maps.bikeottawa.ca/winter');
   window.history.replaceState(null, null, window.location.pathname+'?&lat='+e.lngLat.lat+'&lng='+e.lngLat.lng+'&zoom='+map.getZoom()+'&id='+feature.properties.id);
   map.getSource('highlight').setData(feature);
 });

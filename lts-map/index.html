@@ -9,20 +9,11 @@
     <script  data-cfasync="false" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
     <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
+    <link href='../css/maps.css' rel='stylesheet' />
     <style>
         body { margin:0; padding:0; }
         #app { position:absolute; top:0; right:0; bottom:0; left:0; }
         #map { position:absolute; top:0; bottom:0; width:100%; }
-        .enlarge-onhover {
-             width: 160px;
-             height: 100px;
-             transition-duration: 0.5s; /* delays for 1 second */
-             -webkit-transition-duration: 0.5s; /* for Safari & Chrome */
-        }
-        .enlarge-onhover:hover {
-             width: 640px;
-             height: 400px;
-        }
         #menu {
            position: absolute;
            background: #fff;
@@ -81,6 +72,7 @@
 </div>
 
 <script src='../js/maps.js'></script>
+<script src='../js/osm-bundle.js'></script>
 <script>
 var ltsLayers = [
     {id:"lts1", name:'LTS 1 - Suitable for children', color:'#0099cc', opacity:0.9, tileset:'mapbox://bikeottawa.7gev94ax', layer:'7gev94ax'},
@@ -181,6 +173,10 @@ map.on('style.load', function () {
     init()
 });
 
+map.on('moveend', function(e) {
+  window.history.replaceState(null, null, window.location.pathname+'?&lat='+map.getCenter().lat+'&lng='+map.getCenter().lng+'&zoom='+map.getZoom());
+});
+
 map.on('click', function(e) {
 
     var features = map.queryRenderedFeatures(e.point, {
@@ -190,9 +186,8 @@ map.on('click', function(e) {
         return;
     }
     var feature = features[0];
-    displayOsmElementInfo(feature.properties.id, e.lngLat);
-    window.history.replaceState(null, null, window.location.pathname+'?&lat='+e.lngLat.lat+'&lng='+e.lngLat.lng+'&id='+feature.properties.id);
-      //TODO: highlight using filters
+    displayOsmElementInfo(feature.properties.id, e.lngLat, ['name','highway','surface','lit','maxspeed','lanes','fixme'], 'Road details based on mapillary and local knowledge - https://maps.bikeottawa.ca/lts-map');
+    window.history.replaceState(null, null, window.location.pathname+'?&lat='+e.lngLat.lat+'&lng='+e.lngLat.lng+'&zoom='+map.getZoom()+'&id='+feature.properties.id);  //TODO: highlight using filters
     map.getSource('highlight').setData(feature);
 
 });
@@ -209,8 +204,12 @@ map.on('load', function(e) {
     url = parseUrl(window.location.search.substr(1).split('&'));
     const lat = url['lat']
     const lng = url['lng']
+    let z = url['zoom']
     if(lat && lng){
-      map.flyTo({center: [lng, lat]})
+      if(!z){
+        z = 18;
+      }
+      map.flyTo({center: [lng, lat], zoom: z})
       map.once('moveend', function(){
           map.fire("click", {point : map.project([lng, lat]), lngLat: {lng:lng, lat:lat}});
       });
@@ -218,7 +217,7 @@ map.on('load', function(e) {
     }
 
 })
-
+/*
 function displayOsmElementInfo(element, lngLat) {
   if(typeof element == 'undefined') return;
   const xhr = new XMLHttpRequest()
@@ -291,7 +290,7 @@ function displayOsmElementInfo(element, lngLat) {
   }
   xhr.send()
 }
-
+*/
 </script>
 <!--https://docs.google.com/spreadsheets/d/1Rx1SjhWXwkMsHFAioP9XE42Or9S7Ob7JYPLUzSMe-T8/edit?usp=sharing -->
 </body>
