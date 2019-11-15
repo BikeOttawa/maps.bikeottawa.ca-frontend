@@ -14,9 +14,9 @@ const osm = new OsmRequest({
 
 var oldChangesetId = 1;
 
-global.submitOsmChangeset = function (osmElement, tags) {
+global.submitOsmChangeset = function (osmElement, tags, comment) {
   return new Promise(function(resolve, reject) {
-
+    osm.comment = comment;
     osm.fetchElement(osmElement)
     .then(function(element) {
       for (var key of Object.keys(tags)) {
@@ -31,7 +31,7 @@ global.submitOsmChangeset = function (osmElement, tags) {
     .then(function(element){
       return osm.isChangesetStillOpen(oldChangesetId)
       .catch(function(e) {
-        return osm.createChangeset('BikeOttawaMaps', 'Pathway details based on mapillary and local knowledge - https://maps.bikeottawa.ca')
+        return osm.createChangeset('BikeOttawaMaps', osm.comment?osm.comment:'Pathway details based on mapillary and local knowledge - https://maps.bikeottawa.ca')
       })
       .then(function(newChangesetId){
         osm.sendElement(element, newChangesetId)
