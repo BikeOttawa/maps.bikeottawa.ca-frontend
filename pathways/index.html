@@ -166,6 +166,12 @@ var map = new mapboxgl.Map({
 map.addControl(new mapboxgl.NavigationControl(),'bottom-right');
 map.addControl(new mapboxgl.ScaleControl(), 'bottom-left');
 map.addControl(new mapboxgl.AttributionControl({compact: true }), 'bottom-right');
+map.addControl(new mapboxgl.GeolocateControl({
+  positionOptions: {
+    enableHighAccuracy: true
+  },
+    trackUserLocation: true
+  }), 'bottom-left');
 
 addStyleSwitcher();
 
