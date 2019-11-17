@@ -104,7 +104,13 @@ const geocoder = new MapboxGeocoder({
     asyncGeocoder: nominatimGeocoder
 })
 map.addControl(geocoder, 'bottom-left')
-
+map.addControl(new mapboxgl.GeolocateControl({
+  positionOptions: {
+    enableHighAccuracy: true
+  },
+    trackUserLocation: true
+  }), 'bottom-left');
+  
 addStyleSwitcher();
 
 document.getElementById('plowed').onclick = toggleFilter
