@@ -30,42 +30,41 @@
   <input id='satellite' type='radio' name='rtoggle' value='satellite'>
   <label for='satellite'>satellite</label>
 </div>
-<div class='col4 pad1 scroll-styled pin-topright '>
-  <div id='legendbtn' class='fill-darken2 pad1 icon book button hidden fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
-  <div id='legend' class='fill-darken2 round'>
-    <div id='closebtn' class='fill-darken2 pad1 icon close button fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
+<div id='legendbtn' class='fill-darken2 pad1 icon book button hidden fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
+<div id='legend' class='fill-darken2 col4 round pin-topright'>
+  <div id='closebtn' class='fill-darken2 pad1 icon close button fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
+  <div class='clearfix'></div>
+  <div class='pad1 dark'>
+    <h3>Winter Maintenance</h3><br>
+    <form>
+    <fieldset class='checkbox-pill clearfix '>
+      <input type='checkbox' id='plowed' checked='checked'>
+      <label for='plowed' id='plowed-label' class='button icon check quiet col12' style='text-align:left;'>Plowed</label>
+      <input type='checkbox' id='notplowed' checked='checked'>
+      <label for='notplowed' id='notplowed-label' class='button icon check quiet col12' style='text-align:left;'>Not Plowed</label>
+      <input type='checkbox' id='unknown' checked='checked'>
+      <label for='unknown' id='unknown-label' class='button icon check quiet col12' style='text-align:left;'>Unknown</label>
+      <br><br>
+      <input type='checkbox' id='plowtracks'>
+      <label for='plowtracks' id='plowtracks-label' class='button icon check quiet col12' style='text-align:left;'><span style="display: inline-block;width:50px; height:8px;background-color: #ff00bf"></span>&nbsp;&nbsp;City Plow Routes</label>
+    </fieldset>
+    </form>
+    <div class='pad1 small'>
+      <p>Our crowdsourced winter cycling map shows which pathways in Ottawa are plowed in the winter.</p>
+      <p>The map is maintained by Bike Ottawa volunteers like you. <p>
+      <p>If you see any mistakes or are familiar with the status of a pathway, click on the path and change its winter_service property. It's that easy!</p>
+      <p>See more maps and apps on our <a href='https://maps.bikeottawa.ca' target='_blank'>Maps webpage</a>. <p>
+    </div>
+    <div class='center pad2'>
+    	<a href='https://bikeottawa.ca' target="_blank"><img src="../img/logos/bikeottawa.png" style="width:32px; height:32px;"></a>
+      <a href='https://github.com/BikeOttawa/maps.bikeottawa.ca-frontend' target="_blank"><img src="../img/logos/github.png" style="width:32px; height:32px;"></a>
+      <a href='https://twitter.com/BikeOttawa' target="_blank"><img src="../img/logos/twitter.png" style="width:32px; height:32px;"></a>
+    </div>
+    <a class='fr fill-darken3 pad1 rounded-toggle short icon button bike' onclick="$('#about').toggle()"></a>
+    <div class='fr pad1 small'>Last update: <span id='dateUpdated'>[...]</span></div>
     <div class='clearfix'></div>
-    <div class='pad1 dark'>
-      <h3>Winter Maintenance</h3><br>
-      <form>
-      <fieldset class='checkbox-pill clearfix '>
-        <input type='checkbox' id='plowed' checked='checked'>
-        <label for='plowed' id='plowed-label' class='button icon check quiet col12' style='text-align:left;'>Plowed</label>
-        <input type='checkbox' id='notplowed' checked='checked'>
-        <label for='notplowed' id='notplowed-label' class='button icon check quiet col12' style='text-align:left;'>Not Plowed</label>
-        <input type='checkbox' id='unknown' checked='checked'>
-        <label for='unknown' id='unknown-label' class='button icon check quiet col12' style='text-align:left;'>Unknown</label>
-        <br><br>
-        <input type='checkbox' id='plowtracks'>
-        <label for='plowtracks' id='plowtracks-label' class='button icon check quiet col12' style='text-align:left;'><span style="display: inline-block;width:50px; height:8px;background-color: #ff00bf"></span>&nbsp;&nbsp;City Plow Routes</label>
-      </fieldset>
-      </form>
-      <div class='pad1 small'>
-        <p>Winter cycling map shows which pathways in the city of Ottawa are plowed in winter.</p>
-        <p>The map is maintained by Bike Ottawa volunteers like you. <p>
-        <p>If you see any mistakes or are familiar with the status of a pathway, click on the path and change its winter_service property. It's that easy!</p>
-      </div>
-      <div class='center pad2'>
-      	<a href='https://bikeottawa.ca' target="_blank"><img src="../img/logos/bikeottawa.png" style="width:32px; height:32px;"></a>
-        <a href='https://github.com/BikeOttawa/maps.bikeottawa.ca-frontend' target="_blank"><img src="../img/logos/github.png" style="width:32px; height:32px;"></a>
-        <a href='https://twitter.com/BikeOttawa' target="_blank"><img src="../img/logos/twitter.png" style="width:32px; height:32px;"></a>
-      </div>
-      <a class='fr fill-darken3 pad1 rounded-toggle short icon button bike' onclick="$('#about').toggle()"></a>
-      <div class='fr pad1 small'>Last update: <span id='dateUpdated'>[...]</span></div>
-      <div class='clearfix'></div>
-      <div id='about' class='center small hidden'>
-          Made possible with City of Ottawa Open Data, funding from Councilor Jeff Leiper, and the help of OpenStreetMap Canada and Bike Ottawa volunteers. Main contributors: Heather Shearer, Yaro Shkvorets, Rob McCrae, Alex deVries, Matthew Darwin, JP Torunski, Shawn Gettler and others
-      </div>
+    <div id='about' class='center small hidden'>
+        Made possible with City of Ottawa Open Data, funding from Councilor Jeff Leiper, and the help of OpenStreetMap Canada and Bike Ottawa volunteers. Main contributors: Heather Shearer, Yaro Shkvorets, Rob McCrae, Alex deVries, Matthew Darwin, JP Torunski, Shawn Gettler and others
     </div>
   </div>
 </div>
@@ -110,7 +109,7 @@ map.addControl(new mapboxgl.GeolocateControl({
   },
     trackUserLocation: true
   }), 'bottom-left');
-  
+
 addStyleSwitcher();
 
 document.getElementById('plowed').onclick = toggleFilter
