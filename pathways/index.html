@@ -21,7 +21,7 @@
 <body>
 <div id='app' class='col12 contain clip'>
 <div id='map'></div>
-<div id='menu' class='hide-mobile'>
+<div id='menu'>
   <input id='dark' type='radio' name='rtoggle' value='dark' checked='checked'>
   <label for='dark'>dark</label>
   <input id='light' type='radio' name='rtoggle' value='light' >
@@ -31,10 +31,10 @@
   <input id='satellite' type='radio' name='rtoggle' value='satellite'>
   <label for='satellite'>satellite</label>
 </div>
-<div class='col4 pad1 scroll-styled pin-topright '>
-  <div id='legendbtn' class='fill-darken2 pad1 icon book button hidden fr' onclick="$('#statsbtn').toggle();$('#legendbtn').toggle();$('#legend').toggle()"></div>
-  <div id='statsbtn' class='fill-darken2 pad1 icon graph button hidden fr' onclick="$('#legendbtn').toggle();$('#statsbtn').toggle();$('#stats').toggle()"></div>
-  <div id='legend' class='fill-darken1 round'>
+<!--<div class='col4 pad1 scroll-styled pin-topright '>-->
+  <div id='legendbtn' class='fill-darken2 icon book button fr' onclick="$('#statsbtn').toggle();$('#legendbtn').toggle();$('#legend').toggle()"></div>
+  <div id='statsbtn' class='fill-darken2 icon graph button fr' onclick="$('#legendbtn').toggle();$('#statsbtn').toggle();$('#stats').toggle()"></div>
+  <div id='legend' class='fill-darken1 round col4 pin-topright hidden'>
     <div id='closebtn' class='fill-darken2 pad1 icon close button fr' onclick="$('#statsbtn').toggle();$('#legendbtn').toggle();$('#legend').toggle()"></div>
     <div class='clearfix'></div>
     <div class='pad1 dark'>
@@ -97,7 +97,7 @@
       </div>
     </div>
   </div>
-  <div id='stats' class='fill-darken1 round hidden'>
+  <div id='stats' class='fill-darken1 round col4 pin-topright hidden'>
     <div id='closebtn' class='fill-darken2 pad1 icon close button fr' onclick="$('#legendbtn').toggle();$('#statsbtn').toggle();$('#stats').toggle()"></div>
     <div class='clearfix'></div>
     <div class='pad1 dark center'>
@@ -109,7 +109,6 @@
       <canvas id='smooth_chart'></canvas><br>
     </div>
   </div>
-</div>
 <div class="loading" title="loading..." id="loader"></div>
 </div>
 
@@ -177,6 +176,12 @@ addStyleSwitcher();
 
 document.getElementById('unknown_width').onclick = toggleUnknown;
 document.getElementById('mapillary_tracks').onclick = toggleMapillary;
+
+if (!/Mobi/.test(navigator.userAgent)) {
+  $('#legend').show();
+  $('#legendbtn').hide();
+  $('#statsbtn').hide();
+}
 
 Array.from(
   document.querySelector('.surfaces').querySelectorAll('input')

@@ -30,8 +30,8 @@
   <input id='satellite' type='radio' name='rtoggle' value='satellite'>
   <label for='satellite'>satellite</label>
 </div>
-<div id='legendbtn' class='fill-darken2 pad1 icon book button hidden fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
-<div id='legend' class='fill-darken2 col4 round pin-topright'>
+<div id='legendbtn' class='fill-darken2 pad1 icon book button fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
+<div id='legend' class='fill-darken2 col4 round pin-topright hidden'>
   <div id='closebtn' class='fill-darken2 pad1 icon close button fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
   <div class='clearfix'></div>
   <div class='pad1 dark'>
@@ -117,6 +117,11 @@ document.getElementById('notplowed').onclick = toggleFilter
 document.getElementById('unknown').onclick = toggleFilter
 document.getElementById('plowtracks').onclick = togglePlowTracks
 
+if (!/Mobi/.test(navigator.userAgent)) {
+  $('#legend').show();
+  $('#legendbtn').hide();
+}
+
 //helpers & handlers below
 
 function addStyleSwitcher(){
@@ -134,6 +139,7 @@ function switchLayer(layer) {
 }
 
 function init() {
+
   map.addLayer({
     "id": 'pathways',
     "type": "line",
@@ -199,7 +205,9 @@ function init() {
    });
 }
 
+
 map.on('style.load', function () {
+
     init()
 });
 
