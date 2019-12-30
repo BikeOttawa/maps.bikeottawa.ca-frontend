@@ -3,8 +3,8 @@
 <head>
     <meta charset='utf-8' />
     <title>Ottawa Collision Map</title>
-    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
-    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css' rel='stylesheet' />
     <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
     <style>
         body { margin:0; padding:0; }
@@ -106,7 +106,7 @@ let activeLayer = 0
 mapboxgl.accessToken = 'pk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdqaWxrN3gwZXQ4MnFxbjAwZXRpbG8zIn0.XhAdk2ASwdipubccCWTfoQ';
 const map = new mapboxgl.Map({
     container: 'map',
-    style: 'mapbox://styles/mapbox/dark-v8',
+    style: 'mapbox://styles/mapbox/dark-v10',
     center: [-75.697927,45.417431],
     zoom: 13,
     //pitch: 40,
@@ -197,7 +197,7 @@ function init() {
 
        },
        'filter': ['>=', 'col_peds', 1]
-    }, 'waterway-label');
+    });
   })
 }
 
