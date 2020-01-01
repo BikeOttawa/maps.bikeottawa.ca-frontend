@@ -40,10 +40,14 @@ function displayOsmElementInfo(element, lngLat, showTags, changesetComment) {
                           ['lit', 'Lit', 'Is it lit'],
                           ['lanes','Lanes','Total number of lanes'],
                           ['maxspeed','Speed Limit','Speed limit on this street'],
-                          ['fixme', 'Other info', 'Describe in a few words if there is anything wrong with this path']
+                          ['fixme', 'Other info', 'Describe in a few words if there is anything wrong with this feature']
                         ];
 
   if(typeof element == 'undefined') return;
+  const pop = new mapboxgl.Popup()
+  .setLngLat(lngLat)
+  .setHTML('Loading...')
+  .addTo(map)
   const xhr = new XMLHttpRequest()
   xhr.open('GET','https://api.openstreetmap.org/api/0.6/'+element)
   xhr.onload = function () {
@@ -111,10 +115,7 @@ function displayOsmElementInfo(element, lngLat, showTags, changesetComment) {
     } else {
       popup += 'Failed to request details from osm.org';
     }
-    const pop = new mapboxgl.Popup()
-    .setLngLat(lngLat)
-    .setHTML(popup)
-    .addTo(map)
+    pop.setHTML(popup)
     if(showTags.includes('winter_service:quality') && showTags.includes('winter_service')){
       document.querySelector("#winter_service").onchange = function (e) {
         document.getElementById("winter_service:quality-div").style.display = (document.querySelector("#winter_service").value == 'yes')?'block':'none';
@@ -136,7 +137,7 @@ function displayOsmElementInfo(element, lngLat, showTags, changesetComment) {
 
       submitOsmChangeset(element, tags, changesetComment)
       .then(function(){
-        $('#result').html('Your changes submitted!');
+        $('#result').html('Your changes were submitted!');
         setTimeout(function(){pop.remove();} , 1500);
       })
       .catch(function(){
