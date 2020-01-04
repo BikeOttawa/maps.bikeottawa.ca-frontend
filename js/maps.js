@@ -58,6 +58,7 @@ function displayOsmElementInfo(element, lngLat, showTags, changesetComment, titl
   .setLngLat(lngLat)
   .setHTML('Loading...')
   .addTo(map)
+  .setMaxWidth('640px')
   const xhr = new XMLHttpRequest()
   xhr.open('GET','https://api.openstreetmap.org/api/0.6/'+element)
   xhr.onload = function () {
