@@ -89,7 +89,7 @@ function displayOsmElementInfo(element, lngLat, showTags, changesetComment, titl
         if(key[3]==false && tag=='') continue;
         if(showTags.length>0 && !showTags.includes(key[0])) continue;
 
-        popup += `<div id="${key[0]}-div"><li style="margin:4px 0 4px 0"><div class="tooltip">${key[1]}:&nbsp;&nbsp;`;
+        popup += `<div id="${key[0]}-div" style="max-width:200px"><li style="margin:4px 0 4px 0"><div class="tooltip">${key[1]}:&nbsp;&nbsp;`;
         if(key[0] == 'width'){
           popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" name="width" >`;
           ['',0.5,1,1.5,2,2.5,3,4,5,10].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`});
@@ -127,7 +127,7 @@ function displayOsmElementInfo(element, lngLat, showTags, changesetComment, titl
         }
         else if(key[0] == 'capacity'){
           popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="capacity" name="capacity" >`;
-          ['',1,2,3,4,5,10,20,30,50,100].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`});
+          ['',1,2,3,4,5,6,8,10,20,30,50,100].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`});
           popup += '</select>';
         }
         else if(key[0] == 'bicycle_parking'){
