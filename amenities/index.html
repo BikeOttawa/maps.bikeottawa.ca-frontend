@@ -74,6 +74,7 @@ const layers = [
     {id:"icecream", name:'Ice Cream', color:'#f175e8', image:'../img/bike-icecream.png', key:'amenity', val:'ice_cream', showName:true, tags: ['amenity','name','outdoor_seating','description','phone','website','fixme'], title:'Ice cream shop'},
     {id:"drinking_water", name:'Drinking Water', color:'#ff5722', image:'../img/bike-fountain.png', key:'amenity', val:'drinking_water', showName:false, tags: ['amenity','indoor','seasonal','description','fixme'], title:'Drinking fountain'},
     {id:"toilets", name:'Toilets', color:'#009688', image:'../img/bike-toilet.png', key:'amenity', val:'toilets', showName:false, tags: ['amenity','indoor','seasonal','fee','description','fixme'], title:'Toilets'},
+    {id:"shelters", name:'Shelters', color:'#607d8b', image:'../img/bike-shelter.png', key:'amenity', val:'shelter', showName:false, tags: ['amenity','description','fixme'], title:'Shelter'},
 ];
 
 mapboxgl.accessToken = 'pk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdqaWxrN3gwZXQ4MnFxbjAwZXRpbG8zIn0.XhAdk2ASwdipubccCWTfoQ';
@@ -162,7 +163,7 @@ function initFromFile() {
         });
       });
 
-      document.getElementById(layer.id+'-label').innerHTML = '<span style="display: inline-block;width:50px; height:8px;background-color: '+layer.color+'"></span>&nbsp;&nbsp;'+layer.name;
+      document.getElementById(layer.id+'-label').innerHTML = '<span style="display: inline-block;width:20px; height:8px;background-color: '+layer.color+'"></span>&nbsp;&nbsp;'+layer.name;
     });
 }
 
@@ -220,7 +221,7 @@ layers.forEach(l => {
   form.appendChild(input);
   const label = document.createElement('label')
   label.setAttribute('for',l.id)
-  label.setAttribute('class','button icon check quiet col12')
+  label.setAttribute('class','unround short button icon check quiet col6')
   label.setAttribute('style','text-align:left;')
   label.setAttribute('value', l.name);
   label.setAttribute('id',l.id+'-label')
