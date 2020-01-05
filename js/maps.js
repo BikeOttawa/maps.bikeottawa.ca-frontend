@@ -49,6 +49,9 @@ function displayOsmElementInfo(element, lngLat, showTags, changesetComment, titl
                           ['outdoor_seating','Outdoor Seating','Place has outdoor chairs',true],
                           ['phone','Phone','',false],
                           ['website','Web','',false],
+                          ['indoor', 'Indoor', 'Is it located indoors',true],
+                          ['seasonal', 'Seasonal', 'Works only during warm months',true],
+                          ['fee', 'Fee', 'Need to pay to use',true],
                           ['description','Description','',false],
                           ['fixme', 'Other info', 'Describe in a few words if there is anything wrong with this feature',true]
                         ];
@@ -162,6 +165,21 @@ function displayOsmElementInfo(element, lngLat, showTags, changesetComment, titl
         }
         else if(key[0] == 'website' && tag!=''){
           popup += `<span class="tooltiptext">${key[2]}</span></div><a href="${tag}">${tag}</a>`;
+        }
+        else if(key[0] == 'indoor'){
+          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="indoor" name="indoor">`;
+          ['','yes','no'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
+          popup += '</select>';
+        }
+        else if(key[0] == 'seasonal'){
+          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="seasonsl" name="seasonal">`;
+          ['','yes','no'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
+          popup += '</select>';
+        }
+        else if(key[0] == 'fee'){
+          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="fee" name="fee">`;
+          ['','yes','no'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
+          popup += '</select>';
         }
         else if(key[0] == 'fixme'){
           popup += `<span class="tooltiptext">${key[2]}</span></div><input type="text" class="fill-lighten3 small"  style="height:initial;padding:initial" id="fixme" value="${tag}">`
