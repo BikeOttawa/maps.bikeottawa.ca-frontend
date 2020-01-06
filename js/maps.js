@@ -50,6 +50,7 @@ function displayOsmElementInfo(element, lngLat, showTags, changesetComment, titl
                           ['phone','Phone','',false],
                           ['website','Web','',false],
                           ['indoor', 'Indoor', 'Is it located indoors',true],
+                          ['bottle', 'Bottling station', 'Bottles can be easily filled',true],
                           ['seasonal', 'Seasonal', 'Works only during warm months',true],
                           ['fee', 'Fee', 'Need to pay to use',true],
                           ['description','Description','',false],
@@ -168,6 +169,11 @@ function displayOsmElementInfo(element, lngLat, showTags, changesetComment, titl
         }
         else if(key[0] == 'indoor'){
           popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="indoor" name="indoor">`;
+          ['','yes','no'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
+          popup += '</select>';
+        }
+        else if(key[0] == 'bottle'){
+          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="bottle" name="bottle">`;
           ['','yes','no'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
           popup += '</select>';
         }
