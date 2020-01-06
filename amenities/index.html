@@ -165,7 +165,8 @@ function initFromFile() {
         });
       });
 
-      document.getElementById(layer.id+'-label').innerHTML = '<span style="display: inline-block;width:20px; height:8px;background-color: '+layer.color+'"></span>&nbsp;&nbsp;'+layer.name;
+      //document.getElementById(layer.id+'-label').innerHTML = '<span style="display: inline-block;width:20px; height:8px;background-color: '+layer.color+'"></span>&nbsp;&nbsp;'+layer.name;
+      document.getElementById(layer.id+'-label').innerHTML = '<img src="'+layer.image+'" style="width:16px">&nbsp;&nbsp;'+layer.name;
     });
 }
 
