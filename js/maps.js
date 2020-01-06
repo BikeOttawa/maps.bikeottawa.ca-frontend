@@ -46,9 +46,11 @@ function displayOsmElementInfo(element, lngLat, showTags, changesetComment, titl
                           ['service:bicycle:repair','Repair','Shop offers repairs',true],
                           ['service:bicycle:pump','Pump','Bicycle pump',true],
                           ['service:bicycle:chain_tool','Chain Tool','Bicycle chain tool',true],
+                          ['cuisine','Cuisine','',true],
                           ['outdoor_seating','Outdoor Seating','Place has outdoor chairs',true],
                           ['phone','Phone','',false],
                           ['website','Web','',false],
+                          ['takeaway','Takeaway','Place offers takeaway',false],
                           ['indoor', 'Indoor', 'Is it located indoors',true],
                           ['fuel', 'Fuel', 'What kind of fuel can be used',true],
                           ['bottle', 'Bottling station', 'Bottles can be easily filled',true],
@@ -184,9 +186,17 @@ function displayOsmElementInfo(element, lngLat, showTags, changesetComment, titl
           popup += '</select>';
         }
         else if(key[0] == 'seasonal'){
-          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="seasonsl" name="seasonal">`;
+          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="seasonal" name="seasonal">`;
           ['','yes','no','summer','winter'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
           popup += '</select>';
+        }
+        else if(key[0] == 'takeaway'){
+          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="takeaway" name="takeaway">`;
+          ['','yes','no'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
+          popup += '</select>';
+        }
+        else if(key[0] == 'cuisine'){
+          popup += `<span class="tooltiptext">${key[2]}</span></div><input type="text" class="fill-lighten3 small" style="height:initial;padding:initial" id="cuisine" value="${tag}">`
         }
         else if(key[0] == 'fee'){
           popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="fee" name="fee">`;
