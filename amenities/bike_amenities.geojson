@@ -21555,6 +21555,27 @@
 },
 {
   "type": "Feature",
+  "id": "node/2191038210",
+  "properties": {
+    "timestamp": "2018-07-11T19:08:11Z",
+    "version": "2",
+    "changeset": "60625636",
+    "user": "Kakurady",
+    "uid": "623769",
+    "amenity": "compressed_air",
+    "name": "Mec Air",
+    "id": "node/2191038210"
+  },
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      -75.7551335,
+      45.3913378
+    ]
+  }
+},
+{
+  "type": "Feature",
   "id": "node/2291021418",
   "properties": {
     "timestamp": "2018-08-13T19:50:04Z",
@@ -30404,6 +30425,28 @@
 },
 {
   "type": "Feature",
+  "id": "node/4940326561",
+  "properties": {
+    "timestamp": "2017-06-28T12:14:41Z",
+    "version": "1",
+    "changeset": "49886791",
+    "user": "Kakurady",
+    "uid": "623769",
+    "amenity": "compressed_air",
+    "fee": "yes",
+    "operator": "Petro-Canada",
+    "id": "node/4940326561"
+  },
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      -75.6852865,
+      45.4285234
+    ]
+  }
+},
+{
+  "type": "Feature",
   "id": "node/4947124821",
   "properties": {
     "timestamp": "2017-07-02T14:58:30Z",
@@ -31563,6 +31606,28 @@
     "coordinates": [
       -75.9075161,
       45.3367147
+    ]
+  }
+},
+{
+  "type": "Feature",
+  "id": "node/5122779378",
+  "properties": {
+    "timestamp": "2017-09-22T20:12:17Z",
+    "version": "1",
+    "changeset": "52288654",
+    "user": "drmiller",
+    "uid": "6313007",
+    "amenity": "compressed_air",
+    "fee": "yes",
+    "operator": "Shell",
+    "id": "node/5122779378"
+  },
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      -75.9263128,
+      45.350696
     ]
   }
 },
@@ -52715,6 +52780,69 @@
     "coordinates": [
       -75.9141883,
       45.3112165
+    ]
+  }
+},
+{
+  "type": "Feature",
+  "id": "node/6659231816",
+  "properties": {
+    "timestamp": "2019-07-29T22:19:38Z",
+    "version": "1",
+    "changeset": "72788608",
+    "user": "Matthew Darwin",
+    "uid": "5633991",
+    "amenity": "compressed_air",
+    "fee": "yes",
+    "id": "node/6659231816"
+  },
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      -75.917358,
+      45.3423617
+    ]
+  }
+},
+{
+  "type": "Feature",
+  "id": "node/6659231817",
+  "properties": {
+    "timestamp": "2019-07-29T22:19:38Z",
+    "version": "1",
+    "changeset": "72788608",
+    "user": "Matthew Darwin",
+    "uid": "5633991",
+    "amenity": "compressed_air",
+    "fee": "yes",
+    "id": "node/6659231817"
+  },
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      -75.9156346,
+      45.3077937
+    ]
+  }
+},
+{
+  "type": "Feature",
+  "id": "node/6659231818",
+  "properties": {
+    "timestamp": "2019-07-29T22:19:38Z",
+    "version": "1",
+    "changeset": "72788608",
+    "user": "Matthew Darwin",
+    "uid": "5633991",
+    "amenity": "compressed_air",
+    "fee": "yes",
+    "id": "node/6659231818"
+  },
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      -75.917936,
+      45.3101743
     ]
   }
 },
