@@ -147,6 +147,7 @@ function initFromFile() {
           "id": layer.id,
           "type": "symbol",
           "source": 'bike_amenities',
+          "filter": ['==',layer.key,layer.val],
           "layout": {
               'visibility': layer.enabled?'visible':'none',
               'icon-image': ["match",['get',layer.key],layer.val,'image_'+layer.id,''],
