@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset='utf-8' />
-    <title>Ottawa Bike Parking Map</title>
+    <title>Ottawa Bike Amenities Map</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js'></script>
     <script  data-cfasync="false" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
@@ -67,15 +67,17 @@
 <script src='../js/mapbox-gl-geocoder.min.js'></script>
 <script>
 const layers = [
-    {id:"bicycle_parking", name:'Bike parking', enabled: false, color:'#0099CC', image:'../img/bike-parking.png', key:'amenity', val:'bicycle_parking', showName:false, tags: ['amenity','description','bicycle_parking','capacity','covered','fixme'], title:'Bike parking'},
-    {id:"bicycle_repair_stations", name:'Repair Stations', enabled: false, color:'#DD5454', image:'../img/bike-repair.png', key:'amenity', val:'bicycle_repair_station', showName:false, tags: ['amenity','service:bicycle:pump','service:bicycle:chain_tool','fixme'], title:'Bike repair station'},
-    {id:"bicycle_shop", name:'Bike Shops', enabled: false, color:'#F0C808', image:'../img/bike-shop.png', key:'shop', val:'bicycle', showName:true, tags: ['name','service:bicycle:repair','service:bicycle:pump','description','phone','website','fixme'], title:'Bike shop'},
-    {id:"pubs", name:'Pubs', enabled: false, color:'#4caf50', image:'../img/bike-pub.png', key:'amenity', val:'pub', showName:true, tags: ['amenity','name','outdoor_seating','description','phone','website','fixme'], title:'Pub'},
-    {id:"icecream", name:'Ice Cream', enabled: false, color:'#f175e8', image:'../img/bike-icecream.png', key:'amenity', val:'ice_cream', showName:true, tags: ['amenity','name','outdoor_seating','description','phone','website','fixme'], title:'Ice cream shop'},
-    {id:"drinking_water", name:'Drinking Water', enabled: false, color:'#ff5722', image:'../img/bike-fountain.png', key:'amenity', val:'drinking_water', showName:false, tags: ['amenity','indoor','seasonal','bottle','description','fixme'], title:'Drinking fountain'},
-    {id:"toilets", name:'Toilets', enabled: false, color:'#009688', image:'../img/bike-toilet.png', key:'amenity', val:'toilets', showName:false, tags: ['amenity','indoor','seasonal','fee','description','fixme'], title:'Toilets'},
-    {id:"shelters", name:'Shelters', enabled: false, color:'#607d8b', image:'../img/bike-shelter.png', key:'amenity', val:'shelter', showName:false, tags: ['amenity','description','fixme'], title:'Shelter'},
-    {id:"air_compressors", name:'Compressed Air', enabled: false, color:'#607d8b', image:'../img/bike-compressor.png', key:'amenity', val:'compressed_air', showName:false, tags: ['amenity','description','fee','fixme'], title:'Compressed air'},
+    {id:"osm_bicycle_parking", name:'Bike parking', enabled: false, color:'#0099CC', image:'../img/bike-parking.png', key:'amenity', val:'bicycle_parking', showName:false, tags: ['amenity','description','bicycle_parking','capacity','covered','fixme'], title:'Bike parking'},
+    {id:"osm_bicycle_repair_stations", name:'Repair Stations', enabled: false, color:'#DD5454', image:'../img/bike-repair.png', key:'amenity', val:'bicycle_repair_station', showName:false, tags: ['amenity','service:bicycle:pump','service:bicycle:chain_tool','fixme'], title:'Bike repair station'},
+    {id:"osm_bicycle_shop", name:'Bike Shops', enabled: false, color:'#F0C808', image:'../img/bike-shop.png', key:'shop', val:'bicycle', showName:true, tags: ['name','service:bicycle:repair','service:bicycle:pump','description','phone','website','fixme'], title:'Bike shop'},
+    {id:"osm_pubs", name:'Pubs', enabled: false, color:'#4caf50', image:'../img/bike-pub.png', key:'amenity', val:'pub', showName:true, tags: ['amenity','name','outdoor_seating','description','phone','website','fixme'], title:'Pub'},
+    {id:"osm_icecream", name:'Ice Cream', enabled: false, color:'#f175e8', image:'../img/bike-icecream.png', key:'amenity', val:'ice_cream', showName:true, tags: ['amenity','name','outdoor_seating','description','phone','website','fixme'], title:'Ice cream shop'},
+    {id:"osm_drinking_water", name:'Drinking Water', enabled: false, color:'#ff5722', image:'../img/bike-fountain.png', key:'amenity', val:'drinking_water', showName:false, tags: ['amenity','indoor','seasonal','bottle','description','fixme'], title:'Drinking fountain'},
+    {id:"osm_toilets", name:'Toilets', enabled: false, color:'#009688', image:'../img/bike-toilet.png', key:'amenity', val:'toilets', showName:false, tags: ['amenity','indoor','seasonal','fee','description','fixme'], title:'Toilets'},
+    {id:"osm_shelters", name:'Shelters', enabled: false, color:'#607d8b', image:'../img/bike-shelter.png', key:'amenity', val:'shelter', showName:false, tags: ['amenity','description','fixme'], title:'Shelter'},
+    {id:"osm_air_compressors", name:'Compressed Air', enabled: false, color:'#607d8b', image:'../img/bike-compressor.png', key:'amenity', val:'compressed_air', showName:false, tags: ['amenity','description','fee','fixme'], title:'Compressed air'},
+    {id:"osm_picnic_tables", name:'Picnic Tables', enabled: false, color:'#607d8b', image:'../img/bike-picnic.png', key:'leisure', val:'picnic_table', showName:false, tags: ['amenity','covered','description','fixme'], title:'Picnic table'},
+    {id:"osm_bbq", name:'Outdoor Grills', enabled: false, color:'#607d8b', image:'../img/bike-bbq.png', key:'amenity', val:'bbq', showName:false, tags: ['amenity','covered','fuel','description','fixme'], title:'Outdoor grill'},
 ];
 
 mapboxgl.accessToken = 'pk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdqaWxrN3gwZXQ4MnFxbjAwZXRpbG8zIn0.XhAdk2ASwdipubccCWTfoQ';

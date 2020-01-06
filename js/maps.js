@@ -41,7 +41,7 @@ function displayOsmElementInfo(element, lngLat, showTags, changesetComment, titl
                           ['lanes','Lanes','Total number of lanes',true],
                           ['maxspeed','Speed Limit','Speed limit on this street',true],
                           ['bicycle_parking','Type','Bike parking type',true],
-                          ['covered','Covered','Whether bike parking is covered or not',true],
+                          ['covered','Covered','Whether this place is covered or not',true],
                           ['capacity','Capacity','How many bikes can comfortably fit',true],
                           ['service:bicycle:repair','Repair','Shop offers repairs',true],
                           ['service:bicycle:pump','Pump','Bicycle pump',true],
@@ -50,6 +50,7 @@ function displayOsmElementInfo(element, lngLat, showTags, changesetComment, titl
                           ['phone','Phone','',false],
                           ['website','Web','',false],
                           ['indoor', 'Indoor', 'Is it located indoors',true],
+                          ['fuel', 'Fuel', 'What kind of fuel can be used',true],
                           ['bottle', 'Bottling station', 'Bottles can be easily filled',true],
                           ['seasonal', 'Seasonal', 'Works only during warm months',true],
                           ['fee', 'Fee', 'Need to pay to use',true],
@@ -144,6 +145,11 @@ function displayOsmElementInfo(element, lngLat, showTags, changesetComment, titl
           ['','yes','no'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
           popup += '</select>';
         }
+        else if(key[0] == 'fuel'){
+          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="fuel" name="fuel" >`;
+          ['','charcoal','wood','electric'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`});
+          popup += '</select>';
+        }
         else if(key[0] == 'service:bicycle:pump'){
           popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="service:bicycle:pump" name="service:bicycle:pump">`;
           ['','yes','no'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
@@ -179,7 +185,7 @@ function displayOsmElementInfo(element, lngLat, showTags, changesetComment, titl
         }
         else if(key[0] == 'seasonal'){
           popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="seasonsl" name="seasonal">`;
-          ['','yes','no'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
+          ['','yes','no','summer','winter'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
           popup += '</select>';
         }
         else if(key[0] == 'fee'){
