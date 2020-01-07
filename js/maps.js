@@ -54,7 +54,7 @@ function displayOsmElementInfo(element, lngLat, showTags, changesetComment, titl
                           ['indoor', 'Indoor', 'Is it located indoors',true],
                           ['fuel', 'Fuel', 'What kind of fuel can be used',true],
                           ['bottle', 'Bottling station', 'Bottles can be easily filled',true],
-                          ['seasonal', 'Seasonal', 'Works only during warm months',true],
+                          ['seasonal', 'Seasonal', 'Works only during part of the year',true],
                           ['fee', 'Fee', 'Need to pay to use',true],
                           ['description','Description','',false],
                           ['fixme', 'Other info', 'Describe in a few words if there is anything wrong with this feature',true]
