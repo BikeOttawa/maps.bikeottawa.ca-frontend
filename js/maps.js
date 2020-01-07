@@ -30,34 +30,34 @@ function parseUrl(url)  //workaround for edge that doesn't support URLSearchPara
 }
 
 function displayOsmElementInfo(element, lngLat, showTags, changesetComment, title='') {
-  const TagsDefinitions = [ ['name','Name','',false],        //[actual OSM tag, display name for tag in popup, tooltip, show empty tag]
-                          ['highway','Type','',false],
-                          ['winter_service', 'Snowplowing', 'Is pathway plowed in winter',true],
-                          ['winter_service:quality', 'Plow quality', 'Optional: how well is the path typically plowed',true],
-                          ['width', 'Width', 'Width in meters',true],
-                          ['surface', 'Surface', 'Pathway/road surface',true],
-                          ['smoothness', 'Smoothness', 'How smooth is the surface in summer',true],
-                          ['lit', 'Lit', 'Is it lit',true],
-                          ['lanes','Lanes','Total number of lanes',true],
-                          ['maxspeed','Speed Limit','Speed limit on this street',true],
-                          ['bicycle_parking','Type','Bike parking type',true],
-                          ['covered','Covered','Whether this place is covered or not',true],
-                          ['capacity','Capacity','How many bikes can comfortably fit',true],
-                          ['service:bicycle:repair','Repair','Shop offers repairs',true],
-                          ['service:bicycle:pump','Pump','Bicycle pump',true],
-                          ['service:bicycle:chain_tool','Chain Tool','Bicycle chain tool',true],
-                          ['cuisine','Cuisine','',true],
-                          ['outdoor_seating','Outdoor Seating','Place has outdoor chairs',true],
-                          ['phone','Phone','',false],
-                          ['website','Web','',false],
-                          ['takeaway','Takeaway','Place offers takeaway',false],
-                          ['indoor', 'Indoor', 'Is it located indoors',true],
-                          ['fuel', 'Fuel', 'What kind of fuel can be used',true],
-                          ['bottle', 'Bottling station', 'Bottles can be easily filled',true],
-                          ['seasonal', 'Seasonal', 'Works only during part of the year',true],
-                          ['fee', 'Fee', 'Need to pay to use',true],
-                          ['description','Description','',false],
-                          ['fixme', 'Other info', 'Describe in a few words if there is anything wrong with this feature',true]
+  const TagsDefinitions = [ {tag:'name', name:'Name',hint:'',showEmpty:false, options:['text']},        //[actual OSM tag, display name for tag in popup, tooltip, show empty tag]
+                          {tag:'highway', name:'Type', hint:'',showEmpty:false, options:['text']},
+                          {tag:'winter_service', name:'Snowplowing', hint:'Is pathway plowed in winter', showEmpty:true, options:['','yes','no']},
+                          {tag:'winter_service:quality', name:'Plow quality', hint:'Optional: how well is the path typically plowed', showEmpty:true, options:['','good','intermediate','bad']},
+                          {tag:'width', name:'Width', hint:'Width in meters', showEmpty:true, options:['',0.5,1,1.5,2,2.5,3,4,5,10], suffix:' m'},
+                          {tag:'surface', name:'Surface', hint:'Pathway/road surface', showEmpty:true, options:['','asphalt','concrete','ground','fine_gravel','gravel','paving_stones','grass','wood','sand']},
+                          {tag:'smoothness', name:'Smoothness', hint:'How smooth is the surface in summer', showEmpty:true, options:['','excellent','good','intermediate','bad','horrible','impassable']},
+                          {tag:'lit', name:'Lit', hint:'Is it lit', showEmpty:true, options:['','yes','no']},
+                          {tag:'lanes', name:'Lanes', hint:'Total number of lanes', showEmpty:true, options:['text']},
+                          {tag:'maxspeed', name:'Speed Limit', hint:'Speed limit on this street', showEmpty:true, options:['',10,15,20,30,40,50,60,70,80,90]},
+                          {tag:'bicycle_parking', name:'Type', hint:'Bike parking type', showEmpty:true, options:['','stands','rack','wall_loops','bollard','shed','other']},
+                          {tag:'covered', name:'Covered', hint:'Whether this place is covered or not', showEmpty:true, options:['','yes','no']},
+                          {tag:'capacity', name:'Capacity', hint:'How many bikes can comfortably fit', showEmpty:true, options:['',1,2,3,4,5,6,8,10,15,20,30,50,100]},
+                          {tag:'service:bicycle:repair', name:'Repair', hint:'Shop offers repairs', showEmpty:true, options:['','yes','no']},
+                          {tag:'service:bicycle:pump', name:'Pump', hint:'Bicycle pump', showEmpty:true, options:['','yes','no']},
+                          {tag:'service:bicycle:chain_tool', name:'Chain Tool', hint:'Bicycle chain tool', showEmpty:true, options:['','yes','no']},
+                          {tag:'cuisine', name:'Cuisine', hint:'', showEmpty:true, options:['text']},
+                          {tag:'outdoor_seating', name:'Outdoor Seating', hint:'Place has outdoor chairs', showEmpty:true, options:['','yes','no']},
+                          {tag:'phone', name:'Phone', hint:'', showEmpty:false, options:['text']},
+                          {tag:'website', name:'Web', hint:'', showEmpty:false, options:['text']},
+                          {tag:'takeaway', name:'Takeaway', hint:'Place offers takeaway', showEmpty:false, options:['','yes','no']},
+                          {tag:'indoor', name:'Indoor', hint:'Is it located indoors', showEmpty:true, options:['','yes','no']},
+                          {tag:'fuel', name:'Fuel', hint:'What kind of fuel can be used', showEmpty:true, options:['','charcoal','wood','electric']},
+                          {tag:'bottle', name:'Bottling station', hint:'Bottles can be easily filled', showEmpty:true, options:['','yes','no']},
+                          {tag:'seasonal', name:'Seasonal', hint:'Works only during part of the year', showEmpty:true, options:['','yes','no','summer','winter']},
+                          {tag:'fee', name:'Fee', hint:'Need to pay to use', showEmpty:true, options:['','yes','no']},
+                          {tag:'description', name:'Description', hint:'', showEmpty:false, options:['text']},
+                          {tag:'fixme', name:'Other info', hint:'Describe in a few words if there is anything wrong with this feature', showEmpty:true, options:['edit']}
                         ];
 
   if(typeof element == 'undefined') return;
@@ -91,125 +91,24 @@ function displayOsmElementInfo(element, lngLat, showTags, changesetComment, titl
         popup += `<strong>${title}</strong>`;
       }
       for(var key of TagsDefinitions){
-        const t = tags.find(function(ele){return ele.attributes['k'].value==key[0]});
+        const t = tags.find(function(ele){return ele.attributes['k'].value==key.tag});
         const tag = t ? t.attributes["v"].value : '';
-        if(key[3]==false && tag=='') continue;
-        if(showTags.length>0 && !showTags.includes(key[0])) continue;
+        if(key.showEmpty==false && tag=='') continue;
+        if(showTags.length>0 && !showTags.includes(key.tag)) continue;
+        if(!Array.isArray(key.options)) continue;
 
-        popup += `<div id="${key[0]}-div" style="max-width:200px"><li style="margin:4px 0 4px 0"><div class="tooltip">${key[1]}:&nbsp;&nbsp;`;
-        if(key[0] == 'width'){
-          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" name="width" >`;
-          ['',0.5,1,1.5,2,2.5,3,4,5,10].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`});
-          popup += '</select> m';
+        popup += `<div id="${key.tag}-div" style="max-width:200px"><li style="margin:4px 0 4px 0"><div class="tooltip">${key.name}:&nbsp;&nbsp;`;
+
+        if(key.options[0] == 'text'){
+          popup += '</div><strong>'+tag+'</strong>';
         }
-        else if(key[0] == 'surface'){
-          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" name="surface">`;
-          ['','asphalt','concrete','ground','fine_gravel','gravel','paving_stones','grass','wood','sand'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
-          popup += '</select>';
-        }
-        else if(key[0] == 'smoothness'){
-          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" name="smoothness">`;
-          ['','excellent','good','intermediate','bad','horrible','impassable'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
-          popup += '</select>';
-        }
-        else if(key[0] == 'maxspeed'){
-          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" name="maxspeed">`;
-          ['','20','30','40','50','60','70','80','90'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
-          popup += '</select>';
-        }
-        else if(key[0] == 'winter_service'){
-          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="winter_service" name="winter_service">`;
-          ['','yes','no'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
-          popup += '</select>';
-        }
-        else if(key[0] == 'winter_service:quality'){
-          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="winter_service:quality" name="winter_service:quality">`;
-          ['','good','intermediate','bad'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
-          popup += '</select>';
-        }
-        else if(key[0] == 'lit'){
-          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="lit" name="lit">`;
-          ['','yes','no'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
-          popup += '</select>';
-        }
-        else if(key[0] == 'capacity'){
-          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="capacity" name="capacity" >`;
-          ['',1,2,3,4,5,6,8,10,20,30,50,100].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`});
-          popup += '</select>';
-        }
-        else if(key[0] == 'bicycle_parking'){
-          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="bicycle_parking" name="bicycle_parking">`;
-          ['','stands','rack','wall_loops','bollard','shed','other'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
-          popup += '</select>';
-        }
-        else if(key[0] == 'covered'){
-          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="covered" name="covered">`;
-          ['','yes','no'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
-          popup += '</select>';
-        }
-        else if(key[0] == 'fuel'){
-          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="fuel" name="fuel" >`;
-          ['','charcoal','wood','electric'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`});
-          popup += '</select>';
-        }
-        else if(key[0] == 'service:bicycle:pump'){
-          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="service:bicycle:pump" name="service:bicycle:pump">`;
-          ['','yes','no'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
-          popup += '</select>';
-        }
-        else if(key[0] == 'service:bicycle:chain_tool'){
-          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="service:bicycle:chain_tool" name="service:bicycle:chain_tool">`;
-          ['','yes','no'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
-          popup += '</select>';
-        }
-        else if(key[0] == 'service:bicycle:repair'){
-          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="service:bicycle:repair" name="service:bicycle:repair">`;
-          ['','yes','no'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
-          popup += '</select>';
-        }
-        else if(key[0] == 'outdoor_seating'){
-          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="outdoor_seating" name="outdoor_seating">`;
-          ['','yes','no'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
-          popup += '</select>';
-        }
-        else if(key[0] == 'website' && tag!=''){
-          popup += `<span class="tooltiptext">${key[2]}</span></div><a href="${tag}">${tag}</a>`;
-        }
-        else if(key[0] == 'indoor'){
-          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="indoor" name="indoor">`;
-          ['','yes','no'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
-          popup += '</select>';
-        }
-        else if(key[0] == 'bottle'){
-          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="bottle" name="bottle">`;
-          ['','yes','no'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
-          popup += '</select>';
-        }
-        else if(key[0] == 'seasonal'){
-          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="seasonal" name="seasonal">`;
-          ['','yes','no','summer','winter'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
-          popup += '</select>';
-        }
-        else if(key[0] == 'takeaway'){
-          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="takeaway" name="takeaway">`;
-          ['','yes','no'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
-          popup += '</select>';
-        }
-        else if(key[0] == 'cuisine'){
-          popup += `<span class="tooltiptext">${key[2]}</span></div><input type="text" class="fill-lighten3 small" style="height:initial;padding:initial" id="cuisine" value="${tag}">`
-        }
-        else if(key[0] == 'fee'){
-          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="fee" name="fee">`;
-          ['','yes','no'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
-          popup += '</select>';
-        }
-        else if(key[0] == 'fixme'){
-          popup += `<span class="tooltiptext">${key[2]}</span></div><input type="text" class="fill-lighten3 small"  style="height:initial;padding:initial" id="fixme" value="${tag}">`
+        else if(key.options[0] == 'edit'){
+          popup += `<span class="tooltiptext">${key.hint}</span></div><input type="text" class="fill-lighten3 small" style="height:initial;padding:initial;width:120px" id="${key.tag}" name="${key.tag}" value="${tag}">`
         }
         else{
-          if(tag!=''){
-            popup += '</div><strong>'+tag+'</strong>';
-          }
+          popup += `<span class="tooltiptext">${key.hint}</span></div><select class="fill-lighten3" id="${key.tag}" name="${key.tag}" >`;
+          key.options.forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`});
+          popup += '</select>' + (key.suffix?key.suffix:'');
         }
         popup += '</li></div>\n';
       }
