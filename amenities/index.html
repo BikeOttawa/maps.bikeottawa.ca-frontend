@@ -72,6 +72,8 @@ const layers = [
     {id:"osm_bicycle_shop", name:'Bike Shops', enabled: false, image:'bike-shop.png', key:'shop', val:'bicycle', showName:true, tags: ['name','service:bicycle:repair','service:bicycle:pump','description','phone','website','fixme'], title:'Bike shop'},
     {id:"osm_pubs", name:'Pubs', enabled: false, image:'bike-pub.png', key:'amenity', val:'pub', showName:true, tags: ['amenity','name','outdoor_seating','description','phone','website','fixme'], title:'Pub'},
     {id:"osm_restaurants", name:'Restaurants', enabled: false, image:'bike-restaurant.png', key:'amenity', val:'restaurant', showName:true, tags: ['amenity','name','cuisine','takeaway','outdoor_seating','description','phone','website','fixme'], title:'Restaurant'},
+    {id:"osm_fastfood", name:'Fast Food', enabled: false, image:'bike-fastfood.png', key:'amenity', val:'fast_food', showName:true, tags: ['amenity','name','cuisine','outdoor_seating','description','phone','website','fixme'], title:'Fast food place'},
+    {id:"osm_cafes", name:'Cafes', enabled: false, image:'bike-cafe.png', key:'amenity', val:'cafe', showName:true, tags: ['amenity','name','cuisine','outdoor_seating','description','phone','website','fixme'], title:'Cafe'},
     {id:"osm_icecream", name:'Ice Cream', enabled: false, image:'bike-icecream.png', key:'amenity', val:'ice_cream', showName:true, tags: ['amenity','name','outdoor_seating','description','phone','website','fixme'], title:'Ice cream shop'},
     {id:"osm_drinking_water", name:'Drinking Water', enabled: false, image:'bike-fountain.png', key:'amenity', val:'drinking_water', showName:false, tags: ['amenity','indoor','seasonal','bottle','description','fixme'], title:'Drinking fountain'},
     {id:"osm_toilets", name:'Toilets', enabled: false, image:'bike-toilet.png', key:'amenity', val:'toilets', showName:false, tags: ['amenity','indoor','seasonal','fee','description','fixme'], title:'Toilets'},
@@ -88,7 +90,7 @@ var map = new mapboxgl.Map({
   center: [-75.697927,45.417431],
   zoom: 13,
   minZoom: 10,
-  maxZoom: 17,
+  maxZoom: 18,
   maxBounds: [[-76.385193,44.963826],[-75.011902,45.614998]],
   attributionControl: false
 });
