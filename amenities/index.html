@@ -15,11 +15,42 @@
         li { margin: 4px 0; }
         #app { position:absolute; top:0; right:0; bottom:0; left:0; }
         #map { position:absolute; top:0; bottom:0; width:100%; }
+        .mapbox-gl-add_amenity {
+          background-repeat: no-repeat;
+          background-position: center;
+          pointer-events: auto;
+          background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+PHN2ZyAgIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyIgICB4bWxuczpjYz0iaHR0cDovL2NyZWF0aXZlY29tbW9ucy5vcmcvbnMjIiAgIHhtbG5zOnJkZj0iaHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyIgICB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgICB4bWxuczpzb2RpcG9kaT0iaHR0cDovL3NvZGlwb2RpLnNvdXJjZWZvcmdlLm5ldC9EVEQvc29kaXBvZGktMC5kdGQiICAgeG1sbnM6aW5rc2NhcGU9Imh0dHA6Ly93d3cuaW5rc2NhcGUub3JnL25hbWVzcGFjZXMvaW5rc2NhcGUiICAgd2lkdGg9IjIwIiAgIGhlaWdodD0iMjAiICAgdmlld0JveD0iMCAwIDIwIDIwIiAgIGlkPSJzdmcxOTE2NyIgICB2ZXJzaW9uPSIxLjEiICAgaW5rc2NhcGU6dmVyc2lvbj0iMC45MStkZXZlbCtvc3htZW51IHIxMjkxMSIgICBzb2RpcG9kaTpkb2NuYW1lPSJtYXJrZXIuc3ZnIj4gIDxkZWZzICAgICBpZD0iZGVmczE5MTY5IiAvPiAgPHNvZGlwb2RpOm5hbWVkdmlldyAgICAgaWQ9ImJhc2UiICAgICBwYWdlY29sb3I9IiNmZmZmZmYiICAgICBib3JkZXJjb2xvcj0iIzY2NjY2NiIgICAgIGJvcmRlcm9wYWNpdHk9IjEuMCIgICAgIGlua3NjYXBlOnBhZ2VvcGFjaXR5PSIwLjAiICAgICBpbmtzY2FwZTpwYWdlc2hhZG93PSIyIiAgICAgaW5rc2NhcGU6em9vbT0iMTYiICAgICBpbmtzY2FwZTpjeD0iMTQuMTY0MjUzIiAgICAgaW5rc2NhcGU6Y3k9IjguODg1NzIiICAgICBpbmtzY2FwZTpkb2N1bWVudC11bml0cz0icHgiICAgICBpbmtzY2FwZTpjdXJyZW50LWxheWVyPSJsYXllcjEiICAgICBzaG93Z3JpZD0iZmFsc2UiICAgICB1bml0cz0icHgiICAgICBpbmtzY2FwZTp3aW5kb3ctd2lkdGg9IjEyODAiICAgICBpbmtzY2FwZTp3aW5kb3ctaGVpZ2h0PSI3NTEiICAgICBpbmtzY2FwZTp3aW5kb3cteD0iMjA4IiAgICAgaW5rc2NhcGU6d2luZG93LXk9IjE5MCIgICAgIGlua3NjYXBlOndpbmRvdy1tYXhpbWl6ZWQ9IjAiICAgICBpbmtzY2FwZTpvYmplY3Qtbm9kZXM9InRydWUiPiAgICA8aW5rc2NhcGU6Z3JpZCAgICAgICB0eXBlPSJ4eWdyaWQiICAgICAgIGlkPSJncmlkMTk3MTUiIC8+ICA8L3NvZGlwb2RpOm5hbWVkdmlldz4gIDxtZXRhZGF0YSAgICAgaWQ9Im1ldGFkYXRhMTkxNzIiPiAgICA8cmRmOlJERj4gICAgICA8Y2M6V29yayAgICAgICAgIHJkZjphYm91dD0iIj4gICAgICAgIDxkYzpmb3JtYXQ+aW1hZ2Uvc3ZnK3htbDwvZGM6Zm9ybWF0PiAgICAgICAgPGRjOnR5cGUgICAgICAgICAgIHJkZjpyZXNvdXJjZT0iaHR0cDovL3B1cmwub3JnL2RjL2RjbWl0eXBlL1N0aWxsSW1hZ2UiIC8+ICAgICAgICA8ZGM6dGl0bGUgLz4gICAgICA8L2NjOldvcms+ICAgIDwvcmRmOlJERj4gIDwvbWV0YWRhdGE+ICA8ZyAgICAgaW5rc2NhcGU6bGFiZWw9IkxheWVyIDEiICAgICBpbmtzY2FwZTpncm91cG1vZGU9ImxheWVyIiAgICAgaWQ9ImxheWVyMSIgICAgIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAsLTEwMzIuMzYyMikiPiAgICA8cGF0aCAgICAgICBzdHlsZT0iY29sb3I6IzAwMDAwMDtjbGlwLXJ1bGU6bm9uemVybztkaXNwbGF5OmlubGluZTtvdmVyZmxvdzp2aXNpYmxlO3Zpc2liaWxpdHk6dmlzaWJsZTtvcGFjaXR5OjE7aXNvbGF0aW9uOmF1dG87bWl4LWJsZW5kLW1vZGU6bm9ybWFsO2NvbG9yLWludGVycG9sYXRpb246c1JHQjtjb2xvci1pbnRlcnBvbGF0aW9uLWZpbHRlcnM6bGluZWFyUkdCO3NvbGlkLWNvbG9yOiMwMDAwMDA7c29saWQtb3BhY2l0eToxO2ZpbGw6IzAwMDAwMDtmaWxsLW9wYWNpdHk6MTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MjtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLWRhc2hvZmZzZXQ6MDtzdHJva2Utb3BhY2l0eToxO21hcmtlcjpub25lO2NvbG9yLXJlbmRlcmluZzphdXRvO2ltYWdlLXJlbmRlcmluZzphdXRvO3NoYXBlLXJlbmRlcmluZzphdXRvO3RleHQtcmVuZGVyaW5nOmF1dG87ZW5hYmxlLWJhY2tncm91bmQ6YWNjdW11bGF0ZSIgICAgICAgZD0ibSAzNiwxMDQwLjM2MjIgYyA2ZS02LDMuMzA5MyAtNS45ODg2MTIsMTAgLTUuOTg4NjEyLDEwIDAsMCAtNS45OTg3NzYsLTYuNjY4IC02LjAxMTM0NSwtOS45NzcyIC0wLjAxMjU3LC0zLjMwOTIgMi42NTY1NzYsLTYuMDAzOSA1Ljk2NTc5MiwtNi4wMjI3IDMuMzA5MTg5LC0wLjAxOSA2LjAwODg0LDIuNjQ1MiA2LjAzMzk5Miw1Ljk1NDMiICAgICAgIGlkPSJwYXRoMTI1NjEiICAgICAgIGlua3NjYXBlOmNvbm5lY3Rvci1jdXJ2YXR1cmU9IjAiICAgICAgIHNvZGlwb2RpOm5vZGV0eXBlcz0iY2Nzc2MiIC8+ICAgIDxwYXRoICAgICAgIHN0eWxlPSJjb2xvcjojMDAwMDAwO2NsaXAtcnVsZTpub256ZXJvO2Rpc3BsYXk6aW5saW5lO292ZXJmbG93OnZpc2libGU7dmlzaWJpbGl0eTp2aXNpYmxlO29wYWNpdHk6MTtpc29sYXRpb246YXV0bzttaXgtYmxlbmQtbW9kZTpub3JtYWw7Y29sb3ItaW50ZXJwb2xhdGlvbjpzUkdCO2NvbG9yLWludGVycG9sYXRpb24tZmlsdGVyczpsaW5lYXJSR0I7c29saWQtY29sb3I6IzAwMDAwMDtzb2xpZC1vcGFjaXR5OjE7ZmlsbDojZmZmZmZmO2ZpbGwtb3BhY2l0eToxO2ZpbGwtcnVsZTpldmVub2RkO3N0cm9rZTpub25lO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZTtzdHJva2UtZGFzaG9mZnNldDowO3N0cm9rZS1vcGFjaXR5OjE7bWFya2VyOm5vbmU7Y29sb3ItcmVuZGVyaW5nOmF1dG87aW1hZ2UtcmVuZGVyaW5nOmF1dG87c2hhcGUtcmVuZGVyaW5nOmF1dG87dGV4dC1yZW5kZXJpbmc6YXV0bztlbmFibGUtYmFja2dyb3VuZDphY2N1bXVsYXRlIiAgICAgICBkPSJtIDM0LjAwMDExNSwxMDQwLjM2MjIgYyAtNWUtNiwyLjIwNjIgLTMuOTkyNTIzLDcuMDAwMSAtMy45OTI1MjMsNy4wMDAxIDAsMCAtMy45OTkyOTEsLTQuNzc4NyAtNC4wMDc2NzksLTYuOTg0OSAtMC4wMDg0LC0yLjIwNjIgMS43NzEwODIsLTQuMDAyNyAzLjk3NzMxLC00LjAxNTMgMi4yMDYyMSwtMC4wMTMgNC4wMDYwMzcsMS43NjM1IDQuMDIyNzc3LDMuOTY5NyIgICAgICAgaWQ9InBhdGgxMjU2MyIgICAgICAgaW5rc2NhcGU6Y29ubmVjdG9yLWN1cnZhdHVyZT0iMCIgICAgICAgc29kaXBvZGk6bm9kZXR5cGVzPSJjY2NzYyIgLz4gICAgPHBhdGggICAgICAgc3R5bGU9ImNvbG9yOiMwMDAwMDA7Y2xpcC1ydWxlOm5vbnplcm87ZGlzcGxheTppbmxpbmU7b3ZlcmZsb3c6dmlzaWJsZTt2aXNpYmlsaXR5OnZpc2libGU7b3BhY2l0eToxO2lzb2xhdGlvbjphdXRvO21peC1ibGVuZC1tb2RlOm5vcm1hbDtjb2xvci1pbnRlcnBvbGF0aW9uOnNSR0I7Y29sb3ItaW50ZXJwb2xhdGlvbi1maWx0ZXJzOmxpbmVhclJHQjtzb2xpZC1jb2xvcjojMDAwMDAwO3NvbGlkLW9wYWNpdHk6MTtmaWxsOiMwMDAwMDA7ZmlsbC1vcGFjaXR5OjE7ZmlsbC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlOm5vbmU7c3Ryb2tlLXdpZHRoOjI7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjQ7c3Ryb2tlLWRhc2hhcnJheTpub25lO3N0cm9rZS1kYXNob2Zmc2V0OjA7c3Ryb2tlLW9wYWNpdHk6MTttYXJrZXI6bm9uZTtjb2xvci1yZW5kZXJpbmc6YXV0bztpbWFnZS1yZW5kZXJpbmc6YXV0bztzaGFwZS1yZW5kZXJpbmc6YXV0bzt0ZXh0LXJlbmRlcmluZzphdXRvO2VuYWJsZS1iYWNrZ3JvdW5kOmFjY3VtdWxhdGUiICAgICAgIGQ9Ik0gOS45NjY3OTY5LDEwMTQuMzYyMiBDIDYuNjU3NTgwOSwxMDE0LjM4MSAzLjk4NzQzLDEwMTcuMDc2NCA0LDEwMjAuMzg1NiBjIDAuMDEyNTY5LDMuMzA5MiA2LjAxMTcxOSw4Ljk3NjYgNi4wMTE3MTksOC45NzY2IDAsMCA1Ljk4ODI4NywtNS42OTA3IDUuOTg4MjgxLC05IGwgMCwtMC4wNDUgYyAtMC4wMjUxNSwtMy4zMDkxIC0yLjcyNDAxNCwtNS45NzQxIC02LjAzMzIwMzEsLTUuOTU1MSB6IG0gMC4wMDk3NywyIGMgMi4yMDYyMDYxLC0wLjAxMyA0LjAwNjY5MzEsMS43NjI2IDQuMDIzNDMzMSwzLjk2ODggbCAwLDAuMDMxIGMgLTVlLTYsMi4yMDYyIC0zLjk5MjE4OCw2IC0zLjk5MjE4OCw2IDAsMCAtMy45OTk0MjQsLTMuNzc4MiAtNC4wMDc4MTIsLTUuOTg0NCAtMC4wMDg0LC0yLjIwNjIgMS43NzAzMzQ1LC00LjAwMyAzLjk3NjU2MjUsLTQuMDE1NiB6IiAgICAgICBpZD0icGF0aDEyNTY4IiAgICAgICBpbmtzY2FwZTpjb25uZWN0b3ItY3VydmF0dXJlPSIwIiAgICAgICBzb2RpcG9kaTpub2RldHlwZXM9ImNzY3NjY2Njc2NzYyIgLz4gICAgPHBhdGggICAgICAgc3R5bGU9Im9wYWNpdHk6MTtmaWxsOiMwMDAwMDA7ZmlsbC1vcGFjaXR5OjE7c3Ryb2tlOm5vbmU7c3Ryb2tlLXdpZHRoOjI7c3Ryb2tlLWxpbmVjYXA6YnV0dDtzdHJva2UtbGluZWpvaW46YmV2ZWw7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLWRhc2hvZmZzZXQ6MDtzdHJva2Utb3BhY2l0eToxO21hcmtlcjpub25lIiAgICAgICBkPSJNIDEwIDIgQyA2LjY4NjI5MiAyIDQgNC42ODYzIDQgOCBDIDQgMTEuMzEzNyAxMCAxNyAxMCAxNyBDIDEwIDE3IDE2IDExLjMxMzcgMTYgOCBDIDE2IDQuNjg2MyAxMy4zMTM3MDggMiAxMCAyIHogTSAxMCA0IEMgMTIuMDcxMDY4IDQgMTMuNzUgNS42Nzg5IDEzLjc1IDcuNzUgQyAxMy43NSA5LjIwNTMyNzggMTEuOTMxMTEgMTEuNjQ0MzkzIDEwLjgzMDA3OCAxMyBMIDkuMTY5OTIxOSAxMyBDIDguMDY4ODkwMyAxMS42NDQzOTMgNi4yNSA5LjIwNTMyNzggNi4yNSA3Ljc1IEMgNi4yNSA1LjY3ODkgNy45Mjg5MzIgNCAxMCA0IHogIiAgICAgICB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLDEwMzIuMzYyMikiICAgICAgIGlkPSJwYXRoMTczMDUiIC8+ICA8L2c+PC9zdmc+);
+        }
+      .centered {
+          position: fixed;
+          top: 30%;
+          left: 30%;
+          margin-top: -50px;
+          margin-left: -100px;
+          z-index: 10;
+        }
     </style>
 </head>
 <body>
 <div id='app' class='col12 contain clip'>
+<div id='newPlace' class='centered fill-darken2 col4 round hidden' >
+  <div class='pad1 dark col10'>
+    <h3>Create new place</h3>
+  </div>
+  <div class='fill-darken1 icon col2 close button fr' onclick="document.getElementById('newPlace').classList.add('hidden')"></div>
+  <div class='clearfix'></div>
+  <div id='newPlaceButtons' class='pad1 dark'></div>
+</div>
+<div class="loading" title="loading..." id="loader"></div>
 <div id='map'></div>
+<div id='success' class='note warning contain col6 margin4 hidden pad2'>
+  <h3>Success!</h3>
+  <p>New place successfully created. It should appear on the map in the next few hours</p>
+</div>
+<div id='error' class='note error contain col6 margin4 hidden pad2'>
+  <h3>Error</h3>
+  <p>Something went wrong. Failed to submit new place. Try again</p>
+</div>
 <div id='menu'>
   <input id='dark-v10' type='radio' name='rtoggle' value='dark'>
   <label for='dark-v10'>dark</label>
@@ -41,9 +72,9 @@
     </fieldset>
     </form>
     <div class='pad1 small'>
+      <p>To add missing amenity click on the pin button in the bottom left corner</p>
       <p>This crowdsourced map shows amenities that could be useful for people on bikes.</p>
       <p>The map is maintained by Bike Ottawa volunteers like you. <p>
-      <p>Help us add more stuff on the map and contribute to what's already on it!</p>
       <p>See more maps and apps on our <a href='https://maps.bikeottawa.ca' target='_blank'>Maps webpage</a>. <p>
     </div>
     <div class='center pad2'>
@@ -59,31 +90,32 @@
     </div>
   </div>
 </div>
-<div class="loading" title="loading..." id="loader"></div>
 </div>
 
 <script src='../js/maps.js'></script>
 <script src='../js/osm-bundle.js'></script>
 <script src='../js/mapbox-gl-geocoder.min.js'></script>
+<script src='../js/mapbox-button-control.js'></script>
 <script>
 const layers = [
-    {id:"osm_bicycle_parking", name:'Bike parking', enabled: false, image:'bike-parking.png', key:'amenity', val:'bicycle_parking', showName:false, tags: ['amenity','description','bicycle_parking','capacity','covered','fixme'], title:'Bike parking'},
-    {id:"osm_bicycle_repair_stations", name:'Repair Stations', enabled: false, image:'bike-repair.png', key:'amenity', val:'bicycle_repair_station', showName:false, tags: ['amenity','service:bicycle:pump','service:bicycle:chain_tool','fixme'], title:'Bike repair station'},
-    {id:"osm_bicycle_shop", name:'Bike Shops', enabled: false, image:'bike-shop.png', key:'shop', val:'bicycle', showName:true, tags: ['name','service:bicycle:repair','service:bicycle:pump','description','phone','website','fixme'], title:'Bike shop'},
-    {id:"osm_pubs", name:'Pubs', enabled: false, image:'bike-pub.png', key:'amenity', val:'pub', showName:true, tags: ['amenity','name','outdoor_seating','description','phone','website','fixme'], title:'Pub'},
-    {id:"osm_restaurants", name:'Restaurants', enabled: false, image:'bike-restaurant.png', key:'amenity', val:'restaurant', showName:true, tags: ['amenity','name','cuisine','takeaway','outdoor_seating','description','phone','website','fixme'], title:'Restaurant'},
-    {id:"osm_fastfood", name:'Fast Food', enabled: false, image:'bike-fastfood.png', key:'amenity', val:'fast_food', showName:true, tags: ['amenity','name','cuisine','outdoor_seating','description','phone','website','fixme'], title:'Fast food place'},
-    {id:"osm_cafes", name:'Cafes', enabled: false, image:'bike-cafe.png', key:'amenity', val:'cafe', showName:true, tags: ['amenity','name','cuisine','outdoor_seating','description','phone','website','fixme'], title:'Cafe'},
-    {id:"osm_icecream", name:'Ice Cream', enabled: false, image:'bike-icecream.png', key:'amenity', val:'ice_cream', showName:true, tags: ['amenity','name','outdoor_seating','description','phone','website','fixme'], title:'Ice cream shop'},
-    {id:"osm_drinking_water", name:'Drinking Water', enabled: false, image:'bike-fountain.png', key:'amenity', val:'drinking_water', showName:false, tags: ['amenity','indoor','seasonal','bottle','description','fixme'], title:'Drinking fountain'},
-    {id:"osm_toilets", name:'Toilets', enabled: false, image:'bike-toilet.png', key:'amenity', val:'toilets', showName:false, tags: ['amenity','indoor','seasonal','fee','description','fixme'], title:'Toilets'},
-    {id:"osm_shelters", name:'Shelters', enabled: false, image:'bike-shelter.png', key:'amenity', val:'shelter', showName:false, tags: ['amenity','description','fixme'], title:'Shelter'},
-    {id:"osm_air_compressors", name:'Compressed Air', enabled: false, image:'bike-compressor.png', key:'amenity', val:'compressed_air', showName:false, tags: ['amenity','description','fee','fixme'], title:'Compressed air'},
-    {id:"osm_picnic_tables", name:'Picnic Tables', enabled: false, image:'bike-picnic.png', key:'leisure', val:'picnic_table', showName:false, tags: ['amenity','covered','description','fixme'], title:'Picnic table'},
-    {id:"osm_bbq", name:'Outdoor Grills', enabled: false, image:'bike-bbq.png', key:'amenity', val:'bbq', showName:false, tags: ['amenity','covered','fuel','description','fixme'], title:'Outdoor grill'},
-    {id:"osm_splashpad", name:'Splash Pads', enabled: false, image:'bike-splashpad.png', key:'playground', val:'splash_pad', showName:true, tags: ['name','description','fixme'], title:'Splash pad'},
+    {id:"osm_bicycle_parking", names:'Bike parking', name:'Bike parking', enabled: false, image:'bike-parking.png', key:'amenity', val:'bicycle_parking', showName:false, tags: ['amenity','description','bicycle_parking','capacity','covered','fixme'], title:'Bike parking', createTags:{amenity:'bicycle_parking'}},
+    {id:"osm_bicycle_repair_stations", names:'Repair Stations',name:'Repair Station', enabled: false, image:'bike-repair.png', key:'amenity', val:'bicycle_repair_station', showName:false, tags: ['amenity','service:bicycle:pump','service:bicycle:chain_tool','fixme'], title:'Bike repair station', createTags:{amenity:'bicycle_repair_station'}},
+    {id:"osm_bicycle_shop", names:'Bike Shops', name:'Bike Shop', enabled: false, image:'bike-shop.png', key:'shop', val:'bicycle', showName:true, tags: ['name','service:bicycle:repair','service:bicycle:pump','description','phone','website','fixme'], title:'Bike shop', createTags:{shop:'bicycle'}},
+    {id:"osm_pubs", names:'Pubs', name:'Pub', enabled: false, image:'bike-pub.png', key:'amenity', val:'pub', showName:true, tags: ['amenity','name','outdoor_seating','description','phone','website','fixme'], title:'Pub', createTags:{amenity:'pub'}},
+    {id:"osm_restaurants", names:'Restaurants', name:'Restaurant', enabled: false, image:'bike-restaurant.png', key:'amenity', val:'restaurant', showName:true, tags: ['amenity','name','cuisine','takeaway','outdoor_seating','description','phone','website','fixme'], title:'Restaurant', createTags:{amenity:'restaurant'}},
+    {id:"osm_cafes", names:'Cafes', name:'Cafe', enabled: false, image:'bike-cafe.png', key:'amenity', val:'cafe', showName:true, tags: ['amenity','name','cuisine','outdoor_seating','description','phone','website','fixme'], title:'Cafe', createTags:{amenity:'cafe'}},
+    {id:"osm_fastfood", names:'Fast Food', name:'Fast Food Place', enabled: false, image:'bike-fastfood.png', key:'amenity', val:'fast_food', showName:true, tags: ['amenity','name','cuisine','outdoor_seating','description','phone','website','fixme'], title:'Fast food place', createTags:{amenity:'fast_food'}},
+    {id:"osm_icecream", names:'Ice Cream', name:'Ice Cream Place', enabled: false, image:'bike-icecream.png', key:'amenity', val:'ice_cream', showName:true, tags: ['amenity','name','outdoor_seating','description','phone','website','fixme'], title:'Ice cream shop', createTags:{amenity:'ice_cream'}},
+    {id:"osm_drinking_water", names:'Drinking Water', name:'Drinking Water', enabled: false, image:'bike-fountain.png', key:'amenity', val:'drinking_water', showName:false, tags: ['amenity','indoor','seasonal','bottle','description','fixme'], title:'Drinking fountain', createTags:{amenity:'drinking_water'}},
+    {id:"osm_toilets", names:'Toilets', name:'Toilet', enabled: false, image:'bike-toilet.png', key:'amenity', val:'toilets', showName:false, tags: ['amenity','indoor','seasonal','fee','description','fixme'], title:'Toilet', createTags:{amenity:'toilets'}},
+    {id:"osm_shelters", names:'Shelters', name:'Shelter', enabled: false, image:'bike-shelter.png', key:'amenity', val:'shelter', showName:false, tags: ['amenity','description','fixme'], title:'Shelter', createTags:{amenity:'shelter'}},
+    {id:"osm_air_compressors", names:'Compressed Air', name:'Compressed Air', enabled: false, image:'bike-compressor.png', key:'amenity', val:'compressed_air', showName:false, tags: ['amenity','description','fee','fixme'], title:'Compressed air', createTags:{amenity:'compressed_air'}},
+    {id:"osm_picnic_tables", names:'Picnic Tables', name:'Picnic Table', enabled: false, image:'bike-picnic.png', key:'leisure', val:'picnic_table', showName:false, tags: ['amenity','covered','description','fixme'], title:'Picnic table', createTags:{leisure:'picnic_table'}},
+    {id:"osm_bbq", names:'Outdoor Grills', name:'Outdoor Grill', enabled: false, image:'bike-bbq.png', key:'amenity', val:'bbq', showName:false, tags: ['amenity','covered','fuel','description','fixme'], title:'Outdoor grill', createTags:{amenity:'bbq'}},
+    {id:"osm_splashpad", names:'Splash Pads', name:'Splash Pad', enabled: false, image:'bike-splashpad.png', key:'playground', val:'splash_pad', showName:true, tags: ['name','description','fixme'], title:'Splash pad', createTags:{leisure:'playground', playground:'splash_pad'}},
 ];
 
+let MapCursor = ''
 mapboxgl.accessToken = 'pk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdqaWxrN3gwZXQ4MnFxbjAwZXRpbG8zIn0.XhAdk2ASwdipubccCWTfoQ';
 var map = new mapboxgl.Map({
   container: 'map',
@@ -114,6 +146,23 @@ map.addControl(new mapboxgl.GeolocateControl({
   }), 'bottom-left');
 
 addStyleSwitcher();
+
+function addAmenity(event) {
+  if(MapCursor=='crosshair'){
+    MapCursor = ''
+  }
+  else{
+    MapCursor = 'crosshair'
+  }
+  //alert("Event handler when clicking on \r\n" + event.target.className);
+}
+
+const ctrlAdd = new MapboxGLButtonControl({
+  className: "mapbox-gl-add_amenity",
+  title: "Add Amenity",
+  eventHandler: addAmenity
+});
+map.addControl(ctrlAdd, 'bottom-left')
 
 if (!/Mobi/.test(navigator.userAgent)) {
   $('#legend').show();
@@ -172,8 +221,6 @@ function initFromFile() {
         });
       });
 
-      //document.getElementById(layer.id+'-label').innerHTML = '<span style="display: inline-block;width:20px; height:8px;background-color: '+layer.color+'"></span>&nbsp;&nbsp;'+layer.name;
-      document.getElementById(layer.id+'-label').innerHTML = '<img src="../img/amenities/'+layer.image+'" style="width:16px">&nbsp;&nbsp;'+layer.name;
     });
 }
 
@@ -211,8 +258,6 @@ function init() {
           }
         });
       });
-
-      document.getElementById(layer.id+'-label').innerHTML = '<span style="display: inline-block;width:50px; height:8px;background-color: '+layer.color+'"></span>&nbsp;&nbsp;'+layer.name;
     });
 }
 
@@ -233,20 +278,72 @@ layers.forEach(l => {
   label.setAttribute('for',l.id)
   label.setAttribute('class','unround short button icon check quiet col6')
   label.setAttribute('style','text-align:left;')
-  label.setAttribute('value', l.name);
   label.setAttribute('id',l.id+'-label')
+  label.innerHTML = '<img src="../img/amenities/'+l.image+'" style="width:16px">&nbsp;&nbsp;'+l.names;
+
   form.appendChild(label);
 })
+
+
+const buttons = document.getElementById("newPlaceButtons");
+layers.forEach(l => {
+  const input = document.createElement("input");
+  input.setAttribute('type', 'checkbox')
+  input.setAttribute('id','new_'+l.id)
+  input.setAttribute('class','hidden')
+  input.onclick = chooseNewPlace
+  buttons.appendChild(input);
+  const label = document.createElement('label')
+  label.setAttribute('for','new_'+l.id)
+  label.setAttribute('class','unround short button check quiet col6')
+  label.setAttribute('style','text-align:left;')
+  label.innerHTML = '<img src="../img/amenities/'+l.image+'" style="width:16px">&nbsp;&nbsp;'+l.name;
+  buttons.appendChild(label);
+})
+const bottom = document.createElement("div");
+bottom.setAttribute('class','clearfix')
+buttons.appendChild(bottom);
 
 function toggleFilter(checkbox) {
   map.setLayoutProperty(checkbox.toElement.id, 'visibility', document.getElementById(checkbox.toElement.id).checked?'visible':'none')
 }
 
+let g_newPlaceLatLng = {lat:0,lng:0}
+
+function chooseNewPlace(checkbox) {
+  document.getElementById("newPlace").classList.add('hidden')
+  const name = checkbox.toElement.id.replace('new_', '')
+  const tags = layers.find(function(x){return x.id === name}).createTags
+  createOsmNode(g_newPlaceLatLng.lat, g_newPlaceLatLng.lng, tags, 'Created amenity based on mapillary and local knowledge - https://maps.bikeottawa.ca/amenities')
+  .then(function(){
+    document.getElementById('success').classList.remove('hidden');
+    //setTimeout(function(){pop.remove();} , 1500);
+  })
+  .catch(function(){
+    document.getElementById('error').classList.remove('hidden');
+  })
+}
+
 map.on('moveend', function(e) {
+  document.getElementById('success').classList.add('hidden');
+  document.getElementById('error').classList.add('hidden');
   window.history.replaceState(null, null, window.location.pathname+'?&lat='+map.getCenter().lat+'&lng='+map.getCenter().lng+'&zoom='+map.getZoom());
 });
 
 map.on('click', function(e) {
+
+  document.getElementById('success').classList.add('hidden');
+  document.getElementById('error').classList.add('hidden');
+
+  if(MapCursor=='crosshair'){
+    MapCursor = ''
+    document.getElementById("newPlace").classList.remove('hidden');
+    g_newPlaceLatLng = e.lngLat;
+    return;
+  }
+  else{
+    document.getElementById("newPlace").classList.add('hidden');
+  }
 
   const features = map.queryRenderedFeatures(e.point, {
               layers: layers.map(l=>l.id)
@@ -270,7 +367,7 @@ map.on('mousemove', function(e) {
     const features = map.queryRenderedFeatures(e.point, {
                 layers: layers.map(l=>l.id)
             });
-    map.getCanvas().style.cursor = (features.length) ? 'pointer' : '';
+    map.getCanvas().style.cursor = (features.length) ? 'pointer' : MapCursor;
 });
 
 map.on('load', function(e) {

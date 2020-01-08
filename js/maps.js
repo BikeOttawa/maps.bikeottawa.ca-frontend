@@ -140,7 +140,7 @@ function displayOsmElementInfo(element, lngLat, showTags, changesetComment, titl
       });
       tags['fixme']=$('#fixme')[0].value;
 
-      submitOsmChangeset(element, tags, changesetComment)
+      modifyOsmElement(element, tags, changesetComment)
       .then(function(){
         $('#result').html('Your changes were submitted!');
         setTimeout(function(){pop.remove();} , 1500);
