@@ -5,7 +5,6 @@
     <title>Ottawa Bike Amenities Map</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js'></script>
-    <script  data-cfasync="false" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css' rel='stylesheet' />
     <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
     <link rel='stylesheet' href='../css/mapbox-gl-geocoder.css' type='text/css' />
@@ -61,9 +60,9 @@
   <input id='satellite-streets-v11' type='radio' name='rtoggle' value='satellite'>
   <label for='satellite-streets-v11'>satellite</label>
 </div>
-<div id='legendbtn' class='fill-darken2 pad1 icon book button fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
-<div id='legend' class='fill-darken2 col4 round pin-topright hidden'>
-  <div id='closebtn' class='fill-darken2 pad1 icon close button fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
+<div id='legendbtn' class='fill-darken2 pad1 icon book button fr hidden' onclick="document.getElementById('legendbtn').classList.add('hidden');document.getElementById('legend').classList.remove('hidden')"></div>
+<div id='legend' class='fill-darken2 col4 round pin-topright'>
+  <div id='closebtn' class='fill-darken2 pad1 icon close button fr' onclick="document.getElementById('legendbtn').classList.remove('hidden');document.getElementById('legend').classList.add('hidden')"></div>
   <div class='clearfix'></div>
   <div class='pad1 dark'>
     <h3>Bicycle Amenities</h3><br>
@@ -72,17 +71,19 @@
     </fieldset>
     </form>
     <div class='pad1 small'>
-      <p>To add missing amenity click on the pin button in the bottom left corner</p>
+      <p>To add missing amenity click on the pin icon in the bottom left corner and carefully pin-point the location.</p>
+    </div>
+    <div class='pad1 small hide-mobile'>
       <p>This crowdsourced map shows amenities that could be useful for people on bikes.</p>
       <p>The map is maintained by Bike Ottawa volunteers like you. <p>
       <p>See more maps and apps on our <a href='https://maps.bikeottawa.ca' target='_blank'>Maps webpage</a>. <p>
     </div>
-    <div class='center pad2'>
+    <div class='center pad2 hide-mobile'>
     	<a href='https://bikeottawa.ca' target="_blank"><img src="../img/logos/bikeottawa.png" style="width:32px; height:32px;"></a>
       <a href='https://github.com/BikeOttawa/maps.bikeottawa.ca-frontend' target="_blank"><img src="../img/logos/github.png" style="width:32px; height:32px;"></a>
       <a href='https://twitter.com/BikeOttawa' target="_blank"><img src="../img/logos/twitter.png" style="width:32px; height:32px;"></a>
     </div>
-    <a class='fr fill-darken3 pad1 rounded-toggle short icon button bike' onclick="$('#about').toggle()"></a>
+    <a class='fr fill-darken3 pad1 rounded-toggle short icon button bike hide-mobile' onclick="document.getElementById('about').classList.remove('hidden');"></a>
     <div class='fr pad1 small'>Last update: <span id='dateUpdated'>[...]</span></div>
     <div class='clearfix'></div>
     <div id='about' class='center small hidden'>
@@ -153,6 +154,10 @@ function addAmenity(event) {
   }
   else{
     MapCursor = 'crosshair'
+    if (/Mobi/.test(navigator.userAgent)) {  //for mobiles - hide legend
+      document.getElementById('legendbtn').classList.add('hidden');
+      document.getElementById('legend').classList.add('hidden');
+    }
   }
   //alert("Event handler when clicking on \r\n" + event.target.className);
 }
@@ -163,11 +168,6 @@ const ctrlAdd = new MapboxGLButtonControl({
   eventHandler: addAmenity
 });
 map.addControl(ctrlAdd, 'bottom-left')
-
-if (!/Mobi/.test(navigator.userAgent)) {
-  $('#legend').show();
-  $('#legendbtn').hide();
-}
 
 //helpers & handlers below
 
