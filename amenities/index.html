@@ -243,7 +243,7 @@ function init() {
       url: 'mapbox://bikeottawa.6e5700mn',
     });
   layers.forEach(layer => {
-    map.loadImage(layer.image, function(error, image) {
+    map.loadImage('../img/amenities/'+layer.image, function(error, image) {
       if (error) throw error;
       map.addImage('image_'+layer.id, image);
       map.addLayer({
@@ -251,22 +251,24 @@ function init() {
           "type": "symbol",
           "source": 'bike_amenities',
           "source-layer": 'bike_amenities-0vebvb',
+          "filter": ['==',layer.key,layer.val],
           "layout": {
-              'icon-image': ["match",['get',layer.key],layer.val,'image_'+layer.id,''],
-              'icon-size': 0.5,
-              "icon-allow-overlap" : true,
-              "text-allow-overlap": true,
-              'text-field': layer.showName?['get', 'name']:'',
-              //'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-              'text-offset': [0, 0.6],
-              "text-size": {
-                  "stops": [
-                      [0, 0],
-                      [15, 0],
-                      [15.1, 10]
-                  ]
-              },
-              'text-anchor': 'top'
+            'visibility': layer.enabled?'visible':'none',
+            'icon-image': ["match",['get',layer.key],layer.val,'image_'+layer.id,''],
+            'icon-size': 0.5,
+            "icon-allow-overlap" : true,
+            "text-allow-overlap": true,
+            'text-field': layer.showName?['get', 'name']:'',
+            //'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+            'text-offset': [0, 0.6],
+            "text-size": {
+                "stops": [
+                    [0, 0],
+                    [15, 0],
+                    [15.1, 10]
+                ]
+            },
+            'text-anchor': 'top'
           }
         });
       });
