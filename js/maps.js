@@ -29,36 +29,37 @@ function parseUrl(url)  //workaround for edge that doesn't support URLSearchPara
     return ret;
 }
 
+const g_TagsDefinitions = [ {tag:'name', name:'Name',hint:'',showEmpty:false, options:['text']},        //[actual OSM tag, display name for tag in popup, tooltip, show empty tag]
+                        {tag:'highway', name:'Type', hint:'',showEmpty:false, options:['text']},
+                        {tag:'winter_service', name:'Snowplowing', hint:'Is pathway plowed in winter', showEmpty:true, options:['','yes','no']},
+                        {tag:'winter_service:quality', name:'Plow quality', hint:'Optional: how well is the path typically plowed', showEmpty:true, options:['','good','intermediate','bad']},
+                        {tag:'width', name:'Width', hint:'Width in meters', showEmpty:true, options:['',0.5,1,1.5,2,2.5,3,4,5,10], suffix:' m'},
+                        {tag:'surface', name:'Surface', hint:'Pathway/road surface', showEmpty:true, options:['','asphalt','concrete','ground','fine_gravel','gravel','paving_stones','grass','wood','sand']},
+                        {tag:'smoothness', name:'Smoothness', hint:'How smooth is the surface in summer', showEmpty:true, options:['','excellent','good','intermediate','bad','horrible','impassable']},
+                        {tag:'lit', name:'Lit', hint:'Is it lit', showEmpty:true, options:['','yes','no']},
+                        {tag:'lanes', name:'Lanes', hint:'Total number of lanes', showEmpty:true, options:['text']},
+                        {tag:'maxspeed', name:'Speed Limit', hint:'Speed limit on this street', showEmpty:true, options:['',10,15,20,30,40,50,60,70,80,90]},
+                        {tag:'bicycle_parking', name:'Type', hint:'Bike parking type', showEmpty:true, options:['','stands','rack','wall_loops','bollard','shed','other']},
+                        {tag:'covered', name:'Covered', hint:'Whether this place is covered or not', showEmpty:true, options:['','yes','no']},
+                        {tag:'capacity', name:'Capacity', hint:'How many bikes can comfortably fit', showEmpty:true, options:['',1,2,3,4,5,6,7,8,9,10,15,20,30,40,50,100]},
+                        {tag:'service:bicycle:repair', name:'Repair', hint:'Shop offers repairs', showEmpty:true, options:['','yes','no']},
+                        {tag:'service:bicycle:pump', name:'Pump', hint:'Bicycle pump', showEmpty:true, options:['','yes','no']},
+                        {tag:'service:bicycle:chain_tool', name:'Chain Tool', hint:'Bicycle chain tool', showEmpty:true, options:['','yes','no']},
+                        {tag:'cuisine', name:'Cuisine', hint:'', showEmpty:true, options:['text']},
+                        {tag:'outdoor_seating', name:'Outdoor Seating', hint:'Place has outdoor chairs', showEmpty:true, options:['','yes','no']},
+                        {tag:'phone', name:'Phone', hint:'', showEmpty:false, options:['text']},
+                        {tag:'website', name:'Web', hint:'', showEmpty:false, options:['text']},
+                        {tag:'takeaway', name:'Takeaway', hint:'Place offers takeaway', showEmpty:false, options:['','yes','no']},
+                        {tag:'indoor', name:'Indoor', hint:'Is it located indoors', showEmpty:true, options:['','yes','no']},
+                        {tag:'fuel', name:'Fuel', hint:'What kind of fuel can be used', showEmpty:true, options:['','charcoal','wood','electric']},
+                        {tag:'bottle', name:'Bottling station', hint:'Bottles can be easily filled', showEmpty:true, options:['','yes','no']},
+                        {tag:'seasonal', name:'Seasonal', hint:'Works only during part of the year', showEmpty:true, options:['','yes','no','summer','winter']},
+                        {tag:'fee', name:'Fee', hint:'Need to pay to use', showEmpty:true, options:['','yes','no']},
+                        {tag:'description', name:'Description', hint:'', showEmpty:false, options:['text']},
+                        {tag:'fixme', name:'Other info', hint:'Describe in a few words if there is anything wrong with this feature', showEmpty:true, options:['edit']}
+                      ];
+
 function displayOsmElementInfo(element, lngLat, showTags, changesetComment, title='') {
-  const TagsDefinitions = [ {tag:'name', name:'Name',hint:'',showEmpty:false, options:['text']},        //[actual OSM tag, display name for tag in popup, tooltip, show empty tag]
-                          {tag:'highway', name:'Type', hint:'',showEmpty:false, options:['text']},
-                          {tag:'winter_service', name:'Snowplowing', hint:'Is pathway plowed in winter', showEmpty:true, options:['','yes','no']},
-                          {tag:'winter_service:quality', name:'Plow quality', hint:'Optional: how well is the path typically plowed', showEmpty:true, options:['','good','intermediate','bad']},
-                          {tag:'width', name:'Width', hint:'Width in meters', showEmpty:true, options:['',0.5,1,1.5,2,2.5,3,4,5,10], suffix:' m'},
-                          {tag:'surface', name:'Surface', hint:'Pathway/road surface', showEmpty:true, options:['','asphalt','concrete','ground','fine_gravel','gravel','paving_stones','grass','wood','sand']},
-                          {tag:'smoothness', name:'Smoothness', hint:'How smooth is the surface in summer', showEmpty:true, options:['','excellent','good','intermediate','bad','horrible','impassable']},
-                          {tag:'lit', name:'Lit', hint:'Is it lit', showEmpty:true, options:['','yes','no']},
-                          {tag:'lanes', name:'Lanes', hint:'Total number of lanes', showEmpty:true, options:['text']},
-                          {tag:'maxspeed', name:'Speed Limit', hint:'Speed limit on this street', showEmpty:true, options:['',10,15,20,30,40,50,60,70,80,90]},
-                          {tag:'bicycle_parking', name:'Type', hint:'Bike parking type', showEmpty:true, options:['','stands','rack','wall_loops','bollard','shed','other']},
-                          {tag:'covered', name:'Covered', hint:'Whether this place is covered or not', showEmpty:true, options:['','yes','no']},
-                          {tag:'capacity', name:'Capacity', hint:'How many bikes can comfortably fit', showEmpty:true, options:['',1,2,3,4,5,6,8,10,15,20,30,50,100]},
-                          {tag:'service:bicycle:repair', name:'Repair', hint:'Shop offers repairs', showEmpty:true, options:['','yes','no']},
-                          {tag:'service:bicycle:pump', name:'Pump', hint:'Bicycle pump', showEmpty:true, options:['','yes','no']},
-                          {tag:'service:bicycle:chain_tool', name:'Chain Tool', hint:'Bicycle chain tool', showEmpty:true, options:['','yes','no']},
-                          {tag:'cuisine', name:'Cuisine', hint:'', showEmpty:true, options:['text']},
-                          {tag:'outdoor_seating', name:'Outdoor Seating', hint:'Place has outdoor chairs', showEmpty:true, options:['','yes','no']},
-                          {tag:'phone', name:'Phone', hint:'', showEmpty:false, options:['text']},
-                          {tag:'website', name:'Web', hint:'', showEmpty:false, options:['text']},
-                          {tag:'takeaway', name:'Takeaway', hint:'Place offers takeaway', showEmpty:false, options:['','yes','no']},
-                          {tag:'indoor', name:'Indoor', hint:'Is it located indoors', showEmpty:true, options:['','yes','no']},
-                          {tag:'fuel', name:'Fuel', hint:'What kind of fuel can be used', showEmpty:true, options:['','charcoal','wood','electric']},
-                          {tag:'bottle', name:'Bottling station', hint:'Bottles can be easily filled', showEmpty:true, options:['','yes','no']},
-                          {tag:'seasonal', name:'Seasonal', hint:'Works only during part of the year', showEmpty:true, options:['','yes','no','summer','winter']},
-                          {tag:'fee', name:'Fee', hint:'Need to pay to use', showEmpty:true, options:['','yes','no']},
-                          {tag:'description', name:'Description', hint:'', showEmpty:false, options:['text']},
-                          {tag:'fixme', name:'Other info', hint:'Describe in a few words if there is anything wrong with this feature', showEmpty:true, options:['edit']}
-                        ];
 
   if(typeof element == 'undefined') return;
   const pop = new mapboxgl.Popup()
