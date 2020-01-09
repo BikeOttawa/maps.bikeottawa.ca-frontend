@@ -274,8 +274,12 @@ function init() {
 }
 
 map.on('style.load', function () {
-  initFromFile()
-  //init()
+  if(window.location.hostname.indexOf('localhost')!=-1){
+    initFromFile()
+  }
+  else{
+    init()
+  }
 });
 
 const form = document.getElementById("layers");
