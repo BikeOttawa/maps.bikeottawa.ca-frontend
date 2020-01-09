@@ -60,7 +60,7 @@ const g_TagsDefinitions = [ {tag:'name', name:'Name',hint:'',showEmpty:false, op
                         {tag:'fixme', name:'Other info', hint:'Describe in a few words if there is anything wrong with this feature', showEmpty:true, options:['edit']}
                       ];
 
-function displayOsmElementInfo(element, lngLat, showTags, changesetComment, title='') {
+function displayOsmElementInfo(element, lngLat, showTags, changesetComment, title='', showGoogle=false) {
 
   if(typeof element == 'undefined') return;
   const pop = new mapboxgl.Popup()
@@ -82,8 +82,14 @@ function displayOsmElementInfo(element, lngLat, showTags, changesetComment, titl
         mapval = mapkey ? mapkey.attributes["v"].value : '';
       }
       if(mapval==''){
-        popup+='<li><div id="showMapillary"></div></li>'
-        showMapillaryImage(lngLat)
+        if(showGoogle){
+          popup+='<li><div id="showGoogle"><a href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint='+lngLat.lat+','+lngLat.lng
+          popup+='" target="_blank"><img class="enlarge-onhover" src="https://maps.googleapis.com/maps/api/streetview?size=640x400&fov=120&pitch=-30&key=AIzaSyDXbZYWFjz5Nr8N1c0OoTA_YFYCyV0V6Fs&location='+lngLat.lat+','+lngLat.lng+'"></a></div></li>'
+        }
+        else{
+          popup+='<li><div id="showMapillary"></div></li>'
+          showMapillaryImage(lngLat)
+        }
       }
       else{
         popup+=`<li><div id="showMapillary"><a href="https://www.mapillary.com/app/?focus=photo&pKey=${mapval}" target="_blank"><img class="enlarge-onhover" src="https://d1cuyjsrcm0gby.cloudfront.net/${mapval}/thumb-640.jpg"></a></div></li>`

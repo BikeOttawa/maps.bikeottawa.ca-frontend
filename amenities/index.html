@@ -427,7 +427,7 @@ map.on('click', function(e) {
   document.getElementById('success').classList.add('hidden');
   document.getElementById('error').classList.add('hidden');
 
-  if(MapCursor=='crosshair'){
+  if(MapCursor=='crosshair'){ //handle click to add new place
     MapCursor = ''
     document.getElementById("newPlace").classList.remove('hidden');
     g_newPlaceLatLng = e.lngLat;
@@ -446,10 +446,10 @@ map.on('click', function(e) {
   const feature = features[0];
   const layer = layers.filter(obj => {return obj.id === feature.layer.id})[0];
   if(layer && layer.tags && layer.title){
-    displayOsmElementInfo(feature.properties.id, e.lngLat, layer.tags, 'Bicycle amenities based on mapillary and local knowledge - https://maps.bikeottawa.ca/amenities', layer.title);
+    displayOsmElementInfo(feature.properties.id, e.lngLat, layer.tags, 'Bicycle amenities based on mapillary and local knowledge - https://maps.bikeottawa.ca/amenities', layer.title, true);
   }
   else {
-    displayOsmElementInfo(feature.properties.id, e.lngLat,['name','description','fixme'], 'Bicycle amenities based on mapillary and local knowledge - https://maps.bikeottawa.ca/amenities');
+    displayOsmElementInfo(feature.properties.id, e.lngLat,['name','description','fixme'], 'Bicycle amenities based on mapillary and local knowledge - https://maps.bikeottawa.ca/amenities', '', true);
   }
 
   window.history.replaceState(null, null, window.location.pathname+'?&lat='+e.lngLat.lat+'&lng='+e.lngLat.lng+'&zoom='+map.getZoom()+'&id='+feature.properties.id);
