@@ -92,7 +92,7 @@ function displayOsmElementInfo(element, lngLat, showTags, changesetComment, titl
       if(title!=''){
         popup += `<strong>${title}</strong>`;
       }
-      for(var key of TagsDefinitions){
+      for(var key of g_TagsDefinitions){
         const t = tags.find(function(ele){return ele.attributes['k'].value==key.tag});
         const tag = t ? t.attributes["v"].value : '';
         if(key.showEmpty==false && tag=='') continue;
