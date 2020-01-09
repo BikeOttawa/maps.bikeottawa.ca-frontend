@@ -5,6 +5,7 @@
     <title>Ottawa Bike Amenities Map</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js'></script>
+    <script  data-cfasync="false" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css' rel='stylesheet' />
     <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
     <link rel='stylesheet' href='../css/mapbox-gl-geocoder.css' type='text/css' />
@@ -124,6 +125,7 @@ const layers = [
     {id:"osm_picnic_tables", names:'Picnic Tables', name:'Picnic Table', enabled: false, image:'bike-picnic.png', key:'leisure', val:'picnic_table', showName:false, tags: ['amenity','covered','description','fixme'], title:'Picnic table', createTags:{leisure:'picnic_table'}, createOptTags:['covered']},
     {id:"osm_bbq", names:'Outdoor Grills', name:'Outdoor Grill', enabled: false, image:'bike-bbq.png', key:'amenity', val:'bbq', showName:false, tags: ['amenity','covered','fuel','description','fixme'], title:'Outdoor grill', createTags:{amenity:'bbq'}, createOptTags:['fuel']},
     {id:"osm_splashpad", names:'Splash Pads', name:'Splash Pad', enabled: false, image:'bike-splashpad.png', key:'playground', val:'splash_pad', showName:true, tags: ['name','description','fixme'], title:'Splash pad', createTags:{leisure:'playground', playground:'splash_pad'}, createOptTags:['description']},
+    {id:"osm_info", names:'Information', name:'Information', enabled: false, image:'bike-map.png', key:'tourism', val:'information', showName:true, tags: ['name','information','description','fixme'], title:'Information', createTags:{tourism:'information'}, createOptTags:['name','information','description']},
 ];
 
 let MapCursor = ''

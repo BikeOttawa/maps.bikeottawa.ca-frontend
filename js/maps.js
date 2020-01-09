@@ -56,6 +56,7 @@ const g_TagsDefinitions = [ {tag:'name', name:'Name',hint:'',showEmpty:false, op
                         {tag:'seasonal', name:'Seasonal', hint:'Works only during part of the year', showEmpty:true, options:['','yes','no','summer','winter']},
                         {tag:'fee', name:'Fee', hint:'Need to pay to use', showEmpty:true, options:['','yes','no']},
                         {tag:'description', name:'Description', hint:'', showEmpty:false, options:['text']},
+                        {tag:'information', name:'Type', hint:'What kind of information', showEmpty:true, options:['map','board','guidepost']},
                         {tag:'fixme', name:'Other info', hint:'Describe in a few words if there is anything wrong with this feature', showEmpty:true, options:['edit']}
                       ];
 
