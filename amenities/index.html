@@ -49,7 +49,7 @@
   <div class='fill-darken1 icon col2 close button fr' onclick="document.getElementById('newPlaceParams').classList.add('hidden')"></div>
   <div class='clearfix'></div>
   <div id='newPlaceParamsContent' class='pad1 dark'></div>
-  <div class='margin4 width8 fill-darken2 button space-bottom' onclick="newPlaceParamsSubmit()">Submit</div>
+  <div id='newPlaceParamsBtn' class='margin4 width8 fill-darken2 button space-bottom' onclick="newPlaceParamsSubmit()">Submit</div>
 </div>
 <div class="loading" title="loading..." id="loader"></div>
 <div id='map'></div>
@@ -322,17 +322,17 @@ const bottom = document.createElement("div");
 bottom.setAttribute('class','clearfix')
 buttons.appendChild(bottom);
 
-function toggleFilter(checkbox) {
-  map.setLayoutProperty(checkbox.toElement.id, 'visibility', document.getElementById(checkbox.toElement.id).checked?'visible':'none')
+function toggleFilter(event) {
+  map.setLayoutProperty(event.target.id, 'visibility', document.getElementById(event.target.id).checked?'visible':'none')
 }
 
 let g_newPlaceLatLng = {lat:0,lng:0}
 let g_newPlaceType = ''
 
-function chooseNewPlace(checkbox) {
+function chooseNewPlace(event) {
   document.getElementById("newPlace").classList.add('hidden')
   document.getElementById("newPlaceParams").classList.remove('hidden')
-  g_newPlaceType = checkbox.toElement.id.replace('new_', '')
+  g_newPlaceType = event.target.id.replace('new_', '')
 
   const place = layers.find(function(x){return x.id === g_newPlaceType})
   document.getElementById("newPlaceParamsTitle").innerHTML = '<h3>Create New '+place.name+'</h3>'
@@ -398,7 +398,7 @@ function newPlaceParamsSubmit() {
       }
       continue;
     }
-    for(val of tagDef.options){
+    for(let val of tagDef.options){
       if(val!='' && document.getElementById(tag+val).checked){
         createTags[tag]=val
         break
