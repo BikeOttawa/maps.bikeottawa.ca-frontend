@@ -29,21 +29,45 @@ function parseUrl(url)  //workaround for edge that doesn't support URLSearchPara
     return ret;
 }
 
-function displayOsmElementInfo(element, lngLat, showTags, changesetComment) {
-  const TagsDefinitions = [ ['name','Name',''],        //[actual OSM tag, display name for tag in popup, tooltip]
-                          ['highway','Type',''],
-                          ['winter_service', 'Snowplowing', 'Is pathway plowed in winter'],
-                          ['winter_service:quality', 'Plow quality', 'Optional: how well is the path typically plowed'],
-                          ['width', 'Width', 'Width in meters'],
-                          ['surface', 'Surface', 'Pathway/road surface'],
-                          ['smoothness', 'Smoothness', 'How smooth is the surface in summer'],
-                          ['lit', 'Lit', 'Is it lit'],
-                          ['lanes','Lanes','Total number of lanes'],
-                          ['maxspeed','Speed Limit','Speed limit on this street'],
-                          ['fixme', 'Other info', 'Describe in a few words if there is anything wrong with this path']
-                        ];
+const g_TagsDefinitions = [ {tag:'name', name:'Name',hint:'',showEmpty:false, options:['text']},        //[actual OSM tag, display name for tag in popup, tooltip, show empty tag]
+                        {tag:'highway', name:'Type', hint:'',showEmpty:false, options:['text']},
+                        {tag:'winter_service', name:'Snowplowing', hint:'Is pathway plowed in winter', showEmpty:true, options:['','yes','no']},
+                        {tag:'winter_service:quality', name:'Plow quality', hint:'Optional: how well is the path typically plowed', showEmpty:true, options:['','good','intermediate','bad']},
+                        {tag:'width', name:'Width', hint:'Width in meters', showEmpty:true, options:['',0.5,1,1.5,2,2.5,3,4,5,10], suffix:' m'},
+                        {tag:'surface', name:'Surface', hint:'Pathway/road surface', showEmpty:true, options:['','asphalt','concrete','ground','fine_gravel','gravel','paving_stones','grass','wood','sand']},
+                        {tag:'smoothness', name:'Smoothness', hint:'How smooth is the surface in summer', showEmpty:true, options:['','excellent','good','intermediate','bad','horrible','impassable']},
+                        {tag:'lit', name:'Lit', hint:'Is it lit', showEmpty:true, options:['','yes','no']},
+                        {tag:'lanes', name:'Lanes', hint:'Total number of lanes', showEmpty:true, options:['text']},
+                        {tag:'maxspeed', name:'Speed Limit', hint:'Speed limit on this street', showEmpty:true, options:['',10,15,20,30,40,50,60,70,80,90]},
+                        {tag:'bicycle_parking', name:'Type', hint:'Bike parking type', showEmpty:true, options:['','stands','rack','wall_loops','bollard','shed','other']},
+                        {tag:'covered', name:'Covered', hint:'Whether this place is covered or not', showEmpty:true, options:['','yes','no']},
+                        {tag:'capacity', name:'Capacity', hint:'How many bikes can comfortably fit', showEmpty:true, options:['',1,2,3,4,5,6,7,8,9,10,15,20,30,40,50,100]},
+                        {tag:'service:bicycle:repair', name:'Repair', hint:'Shop offers repairs', showEmpty:true, options:['','yes','no']},
+                        {tag:'service:bicycle:pump', name:'Pump', hint:'Bicycle pump', showEmpty:true, options:['','yes','no']},
+                        {tag:'service:bicycle:chain_tool', name:'Chain Tool', hint:'Bicycle chain tool', showEmpty:true, options:['','yes','no']},
+                        {tag:'cuisine', name:'Cuisine', hint:'', showEmpty:true, options:['text']},
+                        {tag:'outdoor_seating', name:'Outdoor Seating', hint:'Place has outdoor chairs', showEmpty:true, options:['','yes','no']},
+                        {tag:'phone', name:'Phone', hint:'', showEmpty:false, options:['text']},
+                        {tag:'website', name:'Web', hint:'', showEmpty:false, options:['text']},
+                        {tag:'takeaway', name:'Takeaway', hint:'Place offers takeaway', showEmpty:false, options:['','yes','no']},
+                        {tag:'indoor', name:'Indoor', hint:'Is it located indoors', showEmpty:true, options:['','yes','no']},
+                        {tag:'fuel', name:'Fuel', hint:'What kind of fuel can be used', showEmpty:true, options:['','charcoal','wood','electric']},
+                        {tag:'bottle', name:'Bottling station', hint:'Bottles can be easily filled', showEmpty:true, options:['','yes','no']},
+                        {tag:'seasonal', name:'Seasonal', hint:'Works only during part of the year', showEmpty:true, options:['','yes','no','summer','winter']},
+                        {tag:'fee', name:'Fee', hint:'Need to pay to use', showEmpty:true, options:['','yes','no']},
+                        {tag:'description', name:'Description', hint:'', showEmpty:false, options:['text']},
+                        {tag:'information', name:'Type', hint:'What kind of information', showEmpty:true, options:['map','board','guidepost']},
+                        {tag:'fixme', name:'Other info', hint:'Describe in a few words if there is anything wrong with this feature', showEmpty:true, options:['edit']}
+                      ];
+
+function displayOsmElementInfo(element, lngLat, showTags, changesetComment, title='') {
 
   if(typeof element == 'undefined') return;
+  const pop = new mapboxgl.Popup()
+  .setLngLat(lngLat)
+  .setHTML('Loading...')
+  .addTo(map)
+  .setMaxWidth('640px')
   const xhr = new XMLHttpRequest()
   xhr.open('GET','https://api.openstreetmap.org/api/0.6/'+element)
   xhr.onload = function () {
@@ -51,59 +75,46 @@ function displayOsmElementInfo(element, lngLat, showTags, changesetComment) {
     if (xhr.status === 200) {
       const xmlDOM = new DOMParser().parseFromString(xhr.responseText, 'text/xml');
       const tags = Array.from(xmlDOM.getElementsByTagName("tag"));
-      popup+='<div id="fform"><form id="feedback"><ul><li><div id="showMapillary"></div></li>'
+      popup+='<div id="fform"><form id="feedback"><ul>'
+      const mapkey = tags.find(function(ele){return ele.attributes['k'].value=='mapillary'});
+      let mapval=''
+      if(mapkey){
+        mapval = mapkey ? mapkey.attributes["v"].value : '';
+      }
+      if(mapval==''){
+        popup+='<li><div id="showMapillary"></div></li>'
+        showMapillaryImage(lngLat)
+      }
+      else{
+        popup+=`<li><div id="showMapillary"><a href="https://www.mapillary.com/app/?focus=photo&pKey=${mapval}" target="_blank"><img class="enlarge-onhover" src="https://d1cuyjsrcm0gby.cloudfront.net/${mapval}/thumb-640.jpg"></a></div></li>`
+      }
 
+      if(title!=''){
+        popup += `<strong>${title}</strong>`;
+      }
       for(var key of TagsDefinitions){
-        const t = tags.find(function(ele){return ele.attributes['k'].value==key[0]});
+        const t = tags.find(function(ele){return ele.attributes['k'].value==key.tag});
         const tag = t ? t.attributes["v"].value : '';
-        if(key[0]=='name' && tag=='') continue;
-        if(showTags.length>0 && !showTags.includes(key[0])) continue;
+        if(key.showEmpty==false && tag=='') continue;
+        if(showTags.length>0 && !showTags.includes(key.tag)) continue;
+        if(!Array.isArray(key.options)) continue;
 
-        popup += `<div id="${key[0]}-div"><li style="margin:4px 0 4px 0"><div class="tooltip">${key[1]}:&nbsp;&nbsp;`;
-        if(key[0] == 'width'){
-          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" name="width" >`;
-          ['',0.5,1,1.5,2,2.5,3,4,5,10].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`});
-          popup += '</select> m';
+        popup += `<div id="${key.tag}-div" style="max-width:200px"><li style="margin:4px 0 4px 0"><div class="tooltip">${key.name}:&nbsp;&nbsp;`;
+
+        if(key.options[0] == 'text'){
+          popup += '</div><strong>'+tag+'</strong>';
         }
-        else if(key[0] == 'surface'){
-          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" name="surface">`;
-          ['','asphalt','concrete','ground','fine_gravel','gravel','paving_stones','grass','wood','sand'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
-          popup += '</select>';
-        }
-        else if(key[0] == 'smoothness'){
-          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" name="smoothness">`;
-          ['','excellent','good','intermediate','bad','horrible','impassable'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
-          popup += '</select>';
-        }
-        else if(key[0] == 'maxspeed'){
-          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" name="maxspeed">`;
-          ['','20','30','40','50','60','70','80','90'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
-          popup += '</select>';
-        }
-        else if(key[0] == 'winter_service'){
-          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="winter_service" name="winter_service">`;
-          ['','yes','no'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
-          popup += '</select>';
-        }
-        else if(key[0] == 'winter_service:quality'){
-          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="winter_service:quality" name="winter_service:quality">`;
-          ['','good','intermediate','bad'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
-          popup += '</select>';
-        }
-        else if(key[0] == 'lit'){
-          popup += `<span class="tooltiptext">${key[2]}</span></div><select class="fill-lighten3" id="lit" name="lit">`;
-          ['','yes','no'].forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`})
-          popup += '</select>';
-        }
-        else if(key[0] == 'fixme'){
-          popup += `<span class="tooltiptext">${key[2]}</span></div><input type="text" class="fill-lighten3 small"  style="height:initial;padding:initial" id="fixme" value="${tag}">`
+        else if(key.options[0] == 'edit'){
+          popup += `<span class="tooltiptext">${key.hint}</span></div><input type="text" class="fill-lighten3 small" style="height:initial;padding:initial;width:120px" id="${key.tag}" name="${key.tag}" value="${tag}">`
         }
         else{
-          popup += '</div><strong>'+tag+'</strong>';
+          popup += `<span class="tooltiptext">${key.hint}</span></div><select class="fill-lighten3" id="${key.tag}" name="${key.tag}" >`;
+          key.options.forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`});
+          popup += '</select>' + (key.suffix?key.suffix:'');
         }
         popup += '</li></div>\n';
       }
-      showMapillaryImage(lngLat)
+
       popup+='</ul>';
       popup+='<input type="hidden" name="link" value="' + window.location.href + '">';
       popup+='<input type="hidden" name="osm_link" value="https://www.openstreetmap.org/' + element + '">';
@@ -111,10 +122,7 @@ function displayOsmElementInfo(element, lngLat, showTags, changesetComment) {
     } else {
       popup += 'Failed to request details from osm.org';
     }
-    const pop = new mapboxgl.Popup()
-    .setLngLat(lngLat)
-    .setHTML(popup)
-    .addTo(map)
+    pop.setHTML(popup)
     if(showTags.includes('winter_service:quality') && showTags.includes('winter_service')){
       document.querySelector("#winter_service").onchange = function (e) {
         document.getElementById("winter_service:quality-div").style.display = (document.querySelector("#winter_service").value == 'yes')?'block':'none';
@@ -134,9 +142,9 @@ function displayOsmElementInfo(element, lngLat, showTags, changesetComment) {
       });
       tags['fixme']=$('#fixme')[0].value;
 
-      submitOsmChangeset(element, tags, changesetComment)
+      modifyOsmElement(element, tags, changesetComment)
       .then(function(){
-        $('#result').html('Your changes submitted!');
+        $('#result').html('Your changes were submitted!');
         setTimeout(function(){pop.remove();} , 1500);
       })
       .catch(function(){

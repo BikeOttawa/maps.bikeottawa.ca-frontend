@@ -11,7 +11,7 @@ const osm = new OsmRequest({
 
 var oldChangesetId = 1;
 
-global.submitOsmChangeset = function (osmElement, tags, comment) {
+global.modifyOsmElement = function (osmElement, tags, comment) {
   return new Promise(function(resolve, reject) {
     osm.comment = comment;
     osm.fetchElement(osmElement)
@@ -46,30 +46,23 @@ global.submitOsmChangeset = function (osmElement, tags, comment) {
   })
 }
 
-/*  //version with async-await
-var changesetId = 1;
-
-global.submitOsmChangeset = async function (osmElement, tags) {
-    let element = await osm.fetchElement(osmElement);
-    for (const key of Object.keys(tags)) {
-      if(tags[key].trim()!='')
-        element = osm.setProperty(element, key, tags[key].trim());
-    }
-
-    let isOpen = false;
-    try {
-			await osm.isChangesetStillOpen(changesetId);
-		}
-		catch(e) {
-			changesetId = 1;
-		}
-
-    if(changesetId == 1)
-      changesetId = await osm.createChangeset('BikeOttawaMaps', 'Pathway details based on mapillary and local knowledge - https://maps.bikeottawa.ca');
-
-    const newElementVersion = await osm.sendElement(element, changesetId);
-
-    //element = osm.setVersion(element, newElementVersion);
-
+global.createOsmNode = function (lat, lng, tags, comment) {
+  return new Promise(function(resolve, reject) {
+    osm.comment = comment;
+    osm.isChangesetStillOpen(oldChangesetId)
+    .catch(function(e) {
+      return osm.createChangeset('BikeOttawaMaps', osm.comment?osm.comment:'Ottawa details based on mapillary and local knowledge - https://maps.bikeottawa.ca')
+    })
+    .then(function(newChangesetId){
+      oldChangesetId  = newChangesetId;
+      const element = osm.createNodeElement(lat, lng, tags)
+      osm.sendElement(element, newChangesetId)
+      .then(function(newElem){
+        resolve();
+      })
+      .catch(function(e) {
+        reject(e);
+      })
+    })
+  })
 }
-*/
