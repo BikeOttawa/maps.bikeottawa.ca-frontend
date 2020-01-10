@@ -336,7 +336,7 @@ function chooseNewPlace(event) {
   g_newPlaceType = event.target.id.replace('new_', '')
 
   const place = layers.find(function(x){return x.id === g_newPlaceType})
-  document.getElementById("newPlaceParamsTitle").innerHTML = '<h3>Create New '+place.name+'</h3>'
+  document.getElementById("newPlaceParamsTitle").innerHTML = '<h3>'+'<img src="../img/amenities/'+place.image+'" style="width:16px">&nbsp;&nbsp;New '+ place.name+'</h3>'
   const content = document.getElementById("newPlaceParamsContent");
   content.innerHTML = ''
   place.createOptTags.forEach(tag => {
