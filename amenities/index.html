@@ -29,6 +29,8 @@
           z-index: 10;
         }
       .width13{ width: 130px; float: left; }
+      .dark .rounded-toggle input[type=radio]:checked + label,
+      .dark .rounded-toggle .active { color: #333; }
     </style>
 </head>
 <body>
@@ -71,7 +73,7 @@
   <label for='satellite-streets-v11'>satellite</label>
 </div>
 <div id='legendbtn' class='fill-darken2 pad1 icon book button fr hidden' onclick="document.getElementById('legendbtn').classList.add('hidden');document.getElementById('legend').classList.remove('hidden')"></div>
-<div id='legend' class='fill-darken2 col4 round pin-topright'>
+<div id='legend' class='fill-darken2 width36 round pin-topright mobile-cols col12'>
   <div id='closebtn' class='fill-darken2 pad1 icon close button fr' onclick="document.getElementById('legendbtn').classList.remove('hidden');document.getElementById('legend').classList.add('hidden')"></div>
   <div class='clearfix'></div>
   <div class='pad1 dark'>
@@ -160,6 +162,14 @@ map.addControl(new mapboxgl.GeolocateControl({
 addStyleSwitcher();
 
 function addPlace(event) {
+
+  //hide any open dialogs
+  if(g_newPlaceMarker.isDraggable()){
+    g_newPlaceMarker.remove()
+  }
+  document.getElementById("newPlace").classList.add('hidden')
+  document.getElementById("newPlaceParams").classList.add('hidden')
+
   if(MapCursor=='crosshair'){
     MapCursor = ''
   }
@@ -293,8 +303,7 @@ layers.forEach(l => {
   form.appendChild(input);
   const label = document.createElement('label')
   label.setAttribute('for',l.id)
-  label.setAttribute('class','unround short button icon check quiet width16')
-  label.setAttribute('style','text-align:left;')
+  label.setAttribute('class','unround short button icon check quiet width16 text-left')
   label.setAttribute('id',l.id+'-label')
   label.innerHTML = '<img src="../img/amenities/'+l.image+'" style="width:16px">&nbsp;&nbsp;'+l.names;
 
@@ -327,7 +336,7 @@ function toggleFilter(event) {
 
 let g_newPlaceLatLng = {lat:0,lng:0}
 let g_newPlaceType = ''
-let g_newPlaceMarker
+let g_newPlaceMarker = new mapboxgl.Marker()
 
 function chooseNewPlace(event) {
   document.getElementById("newPlace").classList.add('hidden')
@@ -335,7 +344,7 @@ function chooseNewPlace(event) {
   g_newPlaceType = event.target.id.replace('new_', '')
 
   const place = layers.find(function(x){return x.id === g_newPlaceType})
-  document.getElementById("newPlaceParamsTitle").innerHTML = '<h3>Create New '+place.name+'</h3>'
+  document.getElementById("newPlaceParamsTitle").innerHTML = '<h3>'+'<img src="../img/amenities/'+place.image+'" style="width:16px">&nbsp;&nbsp;New '+ place.name+'</h3>'
   const content = document.getElementById("newPlaceParamsContent");
   content.innerHTML = ''
   place.createOptTags.forEach(tag => {
@@ -351,7 +360,7 @@ function chooseNewPlace(event) {
       const input = document.createElement("input");
       input.setAttribute('type', 'text')
       input.setAttribute('class','col12')
-      input.setAttribute('id',tag)
+      input.setAttribute('id',tag+'_text')
       content.appendChild(input);
     }
     else{
@@ -392,9 +401,9 @@ function newPlaceParamsSubmit() {
   for(let tag of amenity.createOptTags){
     const tagDef = g_TagsDefinitions.find(function(x){return x.tag === tag})
     if(tagDef.options[0]=='text'||tagDef.options[0]=='edit'){
-      const text = document.getElementById(tag)
-      if(text!=''){
-        createTags[tag]=text
+      const text = document.getElementById(tag+'_text')
+      if(text.value!=''){
+        createTags[tag]=text.value
       }
       continue;
     }
