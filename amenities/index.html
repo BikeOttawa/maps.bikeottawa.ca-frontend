@@ -73,7 +73,7 @@
   <label for='satellite-streets-v11'>satellite</label>
 </div>
 <div id='legendbtn' class='fill-darken2 pad1 icon book button fr hidden' onclick="document.getElementById('legendbtn').classList.add('hidden');document.getElementById('legend').classList.remove('hidden')"></div>
-<div id='legend' class='fill-darken2 col4 round pin-topright'>
+<div id='legend' class='fill-darken2 width36 round pin-topright mobile-cols col12'>
   <div id='closebtn' class='fill-darken2 pad1 icon close button fr' onclick="document.getElementById('legendbtn').classList.remove('hidden');document.getElementById('legend').classList.add('hidden')"></div>
   <div class='clearfix'></div>
   <div class='pad1 dark'>
@@ -295,8 +295,7 @@ layers.forEach(l => {
   form.appendChild(input);
   const label = document.createElement('label')
   label.setAttribute('for',l.id)
-  label.setAttribute('class','unround short button icon check quiet width16')
-  label.setAttribute('style','text-align:left;')
+  label.setAttribute('class','unround short button icon check quiet width16 text-left')
   label.setAttribute('id',l.id+'-label')
   label.innerHTML = '<img src="../img/amenities/'+l.image+'" style="width:16px">&nbsp;&nbsp;'+l.names;
 
