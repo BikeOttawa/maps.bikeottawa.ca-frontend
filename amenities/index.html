@@ -162,6 +162,14 @@ map.addControl(new mapboxgl.GeolocateControl({
 addStyleSwitcher();
 
 function addPlace(event) {
+
+  //hide any open dialogs
+  if(g_newPlaceMarker.isDraggable()){
+    g_newPlaceMarker.remove()
+  }
+  document.getElementById("newPlace").classList.add('hidden')
+  document.getElementById("newPlaceParams").classList.add('hidden')
+
   if(MapCursor=='crosshair'){
     MapCursor = ''
   }
@@ -328,7 +336,7 @@ function toggleFilter(event) {
 
 let g_newPlaceLatLng = {lat:0,lng:0}
 let g_newPlaceType = ''
-let g_newPlaceMarker
+let g_newPlaceMarker = new mapboxgl.Marker()
 
 function chooseNewPlace(event) {
   document.getElementById("newPlace").classList.add('hidden')
