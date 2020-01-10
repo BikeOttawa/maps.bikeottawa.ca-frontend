@@ -24,40 +24,39 @@
         }
       .centered {
           position: fixed;
-          top: 30%;
-          left: 30%;
-          margin-top: -50px;
-          margin-left: -100px;
+          margin-top: 50px;
+          margin-left: 10px;
           z-index: 10;
         }
+      .width13{ width: 130px; float: left; }
     </style>
 </head>
 <body>
 <div id='app' class='col12 contain clip'>
 <div id='newPlace' class='centered fill-darken2 width28 round hidden' >
-  <div class='pad1 dark col10'>
+  <div class='pad1 dark inline'>
     <h3>Create New Place</h3>
   </div>
-  <div class='fill-darken1 icon col2 close button fr' onclick="document.getElementById('newPlace').classList.add('hidden')"></div>
+  <div class='fill-darken1 icon close button fr' onclick="document.getElementById('newPlace').classList.add('hidden');g_newPlaceMarker.remove()"></div>
   <div class='clearfix'></div>
   <div id='newPlaceButtons' class='pad1 dark'></div>
 </div>
 <div id='newPlaceParams' class='centered fill-darken2 width28 round hidden' >
-  <div id='newPlaceParamsTitle' class='pad1 dark col10'>
+  <div id='newPlaceParamsTitle' class='pad1 dark inline'>
     <h3>Create New Place</h3>
   </div>
-  <div class='fill-darken1 icon col2 close button fr' onclick="document.getElementById('newPlaceParams').classList.add('hidden')"></div>
+  <div class='fill-darken1 icon close button fr' onclick="document.getElementById('newPlaceParams').classList.add('hidden');g_newPlaceMarker.remove()"></div>
   <div class='clearfix'></div>
   <div id='newPlaceParamsContent' class='pad1 dark'></div>
   <div id='newPlaceParamsBtn' class='margin4 width8 fill-darken2 button space-bottom' onclick="newPlaceParamsSubmit()">Submit</div>
 </div>
 <div class="loading" title="loading..." id="loader"></div>
 <div id='map'></div>
-<div id='success' class='note contain col6 margin4 hidden pad2'>
+<div id='success' class='note warning contain col6 margin4 hidden z100 pad4'>
   <h3>Success!</h3>
   <p>New place successfully created. It should appear on the map in the next few hours</p>
 </div>
-<div id='error' class='note error contain col6 margin4 hidden pad2'>
+<div id='error' class='note error contain col6 margin4 hidden z100 pad4'>
   <h3>Error</h3>
   <p>Something went wrong. Failed to submit new place. Try again</p>
 </div>
@@ -136,7 +135,7 @@ var map = new mapboxgl.Map({
   center: [-75.697927,45.417431],
   zoom: 13,
   minZoom: 10,
-  maxZoom: 18,
+  maxZoom: 20,
   maxBounds: [[-76.385193,44.963826],[-75.011902,45.614998]],
   attributionControl: false
 });
@@ -167,7 +166,7 @@ function addPlace(event) {
   else{
     MapCursor = 'crosshair'
     if (/Mobi/.test(navigator.userAgent)) {  //for mobiles - hide legend
-      document.getElementById('legendbtn').classList.add('hidden');
+      document.getElementById('legendbtn').classList.remove('hidden');
       document.getElementById('legend').classList.add('hidden');
     }
   }
@@ -294,7 +293,7 @@ layers.forEach(l => {
   form.appendChild(input);
   const label = document.createElement('label')
   label.setAttribute('for',l.id)
-  label.setAttribute('class','unround short button icon check quiet col6')
+  label.setAttribute('class','unround short button icon check quiet width16')
   label.setAttribute('style','text-align:left;')
   label.setAttribute('id',l.id+'-label')
   label.innerHTML = '<img src="../img/amenities/'+l.image+'" style="width:16px">&nbsp;&nbsp;'+l.names;
@@ -313,7 +312,7 @@ layers.forEach(l => {
   buttons.appendChild(input);
   const label = document.createElement('label')
   label.setAttribute('for','new_'+l.id)
-  label.setAttribute('class','unround short button check quiet col6')
+  label.setAttribute('class','unround short button check quiet width13')
   label.setAttribute('style','text-align:left;')
   label.innerHTML = '<img src="../img/amenities/'+l.image+'" style="width:16px">&nbsp;&nbsp;'+l.name;
   buttons.appendChild(label);
@@ -328,6 +327,7 @@ function toggleFilter(event) {
 
 let g_newPlaceLatLng = {lat:0,lng:0}
 let g_newPlaceType = ''
+let g_newPlaceMarker
 
 function chooseNewPlace(event) {
   document.getElementById("newPlace").classList.add('hidden')
@@ -392,7 +392,7 @@ function newPlaceParamsSubmit() {
   for(let tag of amenity.createOptTags){
     const tagDef = g_TagsDefinitions.find(function(x){return x.tag === tag})
     if(tagDef.options[0]=='text'||tagDef.options[0]=='edit'){
-      const text = document.getElementById(tag+val)
+      const text = document.getElementById(tag)
       if(text!=''){
         createTags[tag]=text
       }
@@ -406,8 +406,11 @@ function newPlaceParamsSubmit() {
     }
   }
 
+  g_newPlaceMarker.setDraggable(false);
+  var $elem = jQuery(g_newPlaceMarker.getElement());  //change color of the marker
+  $elem.find('svg g[fill="' + g_newPlaceMarker._color + '"]').attr('fill', '#aaa');
 
-  createOsmNode(g_newPlaceLatLng.lat, g_newPlaceLatLng.lng, createTags, 'Created amenity based on mapillary and local knowledge - https://maps.bikeottawa.ca/amenities')
+  createOsmNode(g_newPlaceMarker.getLngLat().lat, g_newPlaceMarker.getLngLat().lng, createTags, 'Created amenity based on mapillary and local knowledge - https://maps.bikeottawa.ca/amenities')
   .then(function(){
     document.getElementById('success').classList.remove('hidden');
   })
@@ -431,10 +434,12 @@ map.on('click', function(e) {
     MapCursor = ''
     document.getElementById("newPlace").classList.remove('hidden');
     g_newPlaceLatLng = e.lngLat;
+    g_newPlaceMarker = new mapboxgl.Marker({
+      draggable: true
+      })
+      .setLngLat(e.lngLat)
+      .addTo(map);
     return;
-  }
-  else{
-    document.getElementById("newPlace").classList.add('hidden');
   }
 
   const features = map.queryRenderedFeatures(e.point, {
