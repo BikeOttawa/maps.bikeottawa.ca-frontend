@@ -360,7 +360,7 @@ function chooseNewPlace(event) {
       const input = document.createElement("input");
       input.setAttribute('type', 'text')
       input.setAttribute('class','col12')
-      input.setAttribute('id',tag)
+      input.setAttribute('id',tag+'_text')
       content.appendChild(input);
     }
     else{
@@ -401,9 +401,9 @@ function newPlaceParamsSubmit() {
   for(let tag of amenity.createOptTags){
     const tagDef = g_TagsDefinitions.find(function(x){return x.tag === tag})
     if(tagDef.options[0]=='text'||tagDef.options[0]=='edit'){
-      const text = document.getElementById(tag)
-      if(text!=''){
-        createTags[tag]=text
+      const text = document.getElementById(tag+'_text')
+      if(text.value!=''){
+        createTags[tag]=text.value
       }
       continue;
     }
