@@ -204,6 +204,7 @@ function addStyleSwitcher(){
 function switchLayer(layer) {
     const layerId = layer.target.id;
     map.setStyle('mapbox://styles/mapbox/' + layerId);
+
 }
 
 function initFromFile() {
@@ -222,7 +223,7 @@ function initFromFile() {
           "source": 'bike_amenities',
           "filter": ['==',layer.key,layer.val],
           "layout": {
-              'visibility': layer.enabled?'visible':'none',
+              'visibility':  document.getElementById(layer.id).checked?'visible':'none',
               'icon-image': ["match",['get',layer.key],layer.val,'image_'+layer.id,''],
               'icon-size': 0.5,
               "icon-allow-overlap" : true,
@@ -262,7 +263,7 @@ function init() {
           "source-layer": '6e5700mn',
           "filter": ['==',layer.key,layer.val],
           "layout": {
-            'visibility': layer.enabled?'visible':'none',
+            'visibility': document.getElementById(layer.id).checked?'visible':'none',
             'icon-image': ["match",['get',layer.key],layer.val,'image_'+layer.id,''],
             'icon-size': 0.5,
             "icon-allow-overlap" : true,
