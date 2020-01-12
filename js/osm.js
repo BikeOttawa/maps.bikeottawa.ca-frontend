@@ -50,19 +50,14 @@ global.createOsmNode = function (lat, lng, tags, comment) {
   return new Promise(function(resolve, reject) {
     osm.comment = comment;
     osm.isChangesetStillOpen(oldChangesetId)
-    .catch(function(e) {
-      return osm.createChangeset('BikeOttawaMaps', osm.comment?osm.comment:'Ottawa details based on mapillary and local knowledge - https://maps.bikeottawa.ca')
-    })
-    .then(function(newChangesetId){
+    .catch(e => osm.createChangeset('BikeOttawaMaps', osm.comment?osm.comment:'Ottawa details based on mapillary and local knowledge - https://maps.bikeottawa.ca'))
+    .then(newChangesetId => {
+      if(!newChangesetId){throw new Error('Can\'t create new changeset')}
       oldChangesetId  = newChangesetId;
       const element = osm.createNodeElement(lat, lng, tags)
       osm.sendElement(element, newChangesetId)
-      .then(function(newElem){
-        resolve();
-      })
-      .catch(function(e) {
-        reject(e);
-      })
     })
+    .then(newElem => resolve())
+    .catch(e => reject(e))
   })
 }

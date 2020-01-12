@@ -204,6 +204,7 @@ function addStyleSwitcher(){
 function switchLayer(layer) {
     const layerId = layer.target.id;
     map.setStyle('mapbox://styles/mapbox/' + layerId);
+
 }
 
 function initFromFile() {
@@ -222,7 +223,7 @@ function initFromFile() {
           "source": 'bike_amenities',
           "filter": ['==',layer.key,layer.val],
           "layout": {
-              'visibility': layer.enabled?'visible':'none',
+              'visibility':  document.getElementById(layer.id).checked?'visible':'none',
               'icon-image': ["match",['get',layer.key],layer.val,'image_'+layer.id,''],
               'icon-size': 0.5,
               "icon-allow-overlap" : true,
@@ -262,7 +263,7 @@ function init() {
           "source-layer": '6e5700mn',
           "filter": ['==',layer.key,layer.val],
           "layout": {
-            'visibility': layer.enabled?'visible':'none',
+            'visibility': document.getElementById(layer.id).checked?'visible':'none',
             'icon-image': ["match",['get',layer.key],layer.val,'image_'+layer.id,''],
             'icon-size': 0.5,
             "icon-allow-overlap" : true,
@@ -395,6 +396,8 @@ function chooseNewPlace(event) {
 
 function newPlaceParamsSubmit() {
   document.getElementById("newPlaceParams").classList.add('hidden')
+  document.getElementById('success').classList.add('hidden');
+  document.getElementById('error').classList.add('hidden');
   const amenity = layers.find(function(x){return x.id === g_newPlaceType})
   const createTags = {};
   createTags[amenity.key] = amenity.val
@@ -415,16 +418,17 @@ function newPlaceParamsSubmit() {
     }
   }
 
-  g_newPlaceMarker.setDraggable(false);
-  var $elem = jQuery(g_newPlaceMarker.getElement());  //change color of the marker
-  $elem.find('svg g[fill="' + g_newPlaceMarker._color + '"]').attr('fill', '#aaa');
 
   createOsmNode(g_newPlaceMarker.getLngLat().lat, g_newPlaceMarker.getLngLat().lng, createTags, 'Created amenity based on mapillary and local knowledge - https://maps.bikeottawa.ca/amenities')
   .then(function(){
     document.getElementById('success').classList.remove('hidden');
+    g_newPlaceMarker.setDraggable(false);
+    var $elem = jQuery(g_newPlaceMarker.getElement());  //change color of the marker
+    $elem.find('svg g[fill="' + g_newPlaceMarker._color + '"]').attr('fill', '#aaa');
   })
   .catch(function(){
     document.getElementById('error').classList.remove('hidden');
+    document.getElementById("newPlaceParams").classList.remove('hidden')
   })
 }
 
