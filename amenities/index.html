@@ -6,9 +6,16 @@
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js'></script>
     <script  data-cfasync="false" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.4.2/mapbox-gl-geocoder.min.js"></script>
+    <script src='../js/maps.js'></script>
+    <script src='../js/osm-bundle.js'></script>
+    <script src='../js/mapbox-button-control.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.min.js"></script>
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css' rel='stylesheet' />
     <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
-    <link rel='stylesheet' href='../css/mapbox-gl-geocoder.css' type='text/css' />
+    <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.4.2/mapbox-gl-geocoder.css" rel="stylesheet" type="text/css" />
+    <!-- Promise polyfill script required to use Mapbox GL Geocoder in IE 11 -->
     <link href='../css/maps.css' rel='stylesheet' />
     <style>
         body { margin:0; padding:0; }
@@ -31,6 +38,12 @@
       .width13{ width: 130px; float: left; }
       .dark .rounded-toggle input[type=radio]:checked + label,
       .dark .rounded-toggle .active { color: #333; }
+      input[type=text].mapboxgl-ctrl-geocoder--input {    /*fixing geocode clash with base.css*/
+        border: 0px;
+        background-color: rgba(0,0,0,0);
+        padding: 6px 35px;
+        height: 36px;
+      }
     </style>
 </head>
 <body>
@@ -105,10 +118,6 @@
 </div>
 </div>
 
-<script src='../js/maps.js'></script>
-<script src='../js/osm-bundle.js'></script>
-<script src='../js/mapbox-gl-geocoder.min.js'></script>
-<script src='../js/mapbox-button-control.js'></script>
 <script>
 const layers = [
     {id:"osm_bicycle_parking", names:'Bike parking', name:'Bike parking', enabled: false, image:'bike-parking.png', key:'amenity', val:'bicycle_parking', showName:false, tags: ['amenity','description','bicycle_parking','capacity','covered','fixme'], title:'Bike parking', createTags:{amenity:'bicycle_parking'}, createOptTags:['bicycle_parking','capacity','covered']},
@@ -127,6 +136,7 @@ const layers = [
     {id:"osm_bbq", names:'Outdoor Grills', name:'Outdoor Grill', enabled: false, image:'bike-bbq.png', key:'amenity', val:'bbq', showName:false, tags: ['amenity','covered','fuel','description','fixme'], title:'Outdoor grill', createTags:{amenity:'bbq'}, createOptTags:['fuel']},
     {id:"osm_splashpad", names:'Splash Pads', name:'Splash Pad', enabled: false, image:'bike-splashpad.png', key:'playground', val:'splash_pad', showName:true, tags: ['name','description','fixme'], title:'Splash pad', createTags:{leisure:'playground', playground:'splash_pad'}, createOptTags:['description']},
     {id:"osm_info", names:'Information', name:'Information', enabled: false, image:'bike-map.png', key:'tourism', val:'information', showName:true, tags: ['name','information','description','fixme'], title:'Information', createTags:{tourism:'information'}, createOptTags:['name','information','description']},
+    {id:"osm_viewpoint", names:'Viewpoints', name:'Viewpoint', enabled: false, image:'bike-viewpoint.png', key:'tourism', val:'viewpoint', showName:true, tags: ['name','description','fixme'], title:'Viewpoint', createTags:{tourism:'viewpoint'}, createOptTags:['name','description']},
 ];
 
 let MapCursor = ''
@@ -146,10 +156,13 @@ map.addControl(new mapboxgl.NavigationControl(),'bottom-right');
 map.addControl(new mapboxgl.AttributionControl({compact: true }), 'bottom-right');
 const geocoder = new MapboxGeocoder({
     accessToken: mapboxgl.accessToken,
+    mapboxgl: mapboxgl,
     bbox: [-76.385193,44.963826,-75.011902,45.614998],
     zoom: 13,
     limit: 10,
-    asyncGeocoder: nominatimGeocoder
+    asyncGeocoder: nominatimGeocoder,
+    collapsed: true,
+    marker: true
 })
 map.addControl(geocoder, 'bottom-left')
 map.addControl(new mapboxgl.GeolocateControl({
