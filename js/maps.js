@@ -29,7 +29,7 @@ function parseUrl(url)  //workaround for edge that doesn't support URLSearchPara
     return ret;
 }
 
-const g_TagsDefinitions = [ {tag:'name', name:'Name',hint:'',showEmpty:false, options:['text']},        //[actual OSM tag, display name for tag in popup, tooltip, show empty tag]
+const g_TagsDefinitions = [ {tag:'name', name:'Name',hint:'',showEmpty:true, options:['edit']},        //[actual OSM tag, display name for tag in popup, tooltip, show empty tag]
                         {tag:'highway', name:'Type', hint:'',showEmpty:false, options:['text']},
                         {tag:'winter_service', name:'Snowplowing', hint:'Is pathway plowed in winter', showEmpty:true, options:['','yes','no']},
                         {tag:'winter_service:quality', name:'Plow quality', hint:'Optional: how well is the path typically plowed', showEmpty:true, options:['','good','intermediate','bad']},
@@ -45,7 +45,7 @@ const g_TagsDefinitions = [ {tag:'name', name:'Name',hint:'',showEmpty:false, op
                         {tag:'service:bicycle:repair', name:'Repair', hint:'Shop offers repairs', showEmpty:true, options:['','yes','no']},
                         {tag:'service:bicycle:pump', name:'Pump', hint:'Bicycle pump', showEmpty:true, options:['','yes','no']},
                         {tag:'service:bicycle:chain_tool', name:'Chain Tool', hint:'Bicycle chain tool', showEmpty:true, options:['','yes','no']},
-                        {tag:'cuisine', name:'Cuisine', hint:'', showEmpty:true, options:['text']},
+                        {tag:'cuisine', name:'Cuisine', hint:'', showEmpty:true, options:['edit']},
                         {tag:'outdoor_seating', name:'Outdoor Seating', hint:'Place has outdoor chairs', showEmpty:true, options:['','yes','no']},
                         {tag:'phone', name:'Phone', hint:'', showEmpty:false, options:['text']},
                         {tag:'website', name:'Web', hint:'', showEmpty:false, options:['text']},
@@ -111,7 +111,7 @@ function displayOsmElementInfo(element, lngLat, showTags, changesetComment, titl
           popup += '</div><strong>'+tag+'</strong>';
         }
         else if(key.options[0] == 'edit'){
-          popup += `<span class="tooltiptext">${key.hint}</span></div><input type="text" class="fill-lighten3 small" style="height:initial;padding:initial;width:120px" id="${key.tag}" name="${key.tag}" value="${tag}">`
+          popup += `<span class="tooltiptext">${key.hint}</span></div><input type="text" class="fill-lighten3 small" style="height:initial;padding:initial;width:120px;color:#333;" id="${key.tag}" name="${key.tag}" value="${tag}">`
         }
         else{
           popup += `<span class="tooltiptext">${key.hint}</span></div><select class="fill-lighten3" id="${key.tag}" name="${key.tag}" >`;
