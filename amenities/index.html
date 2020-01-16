@@ -210,10 +210,7 @@ addStyleSwitcher();
 
 function addPlace(event) {
 
-  //hide any open dialogs
-  if(g_newPlaceMarker.isDraggable()){
-    g_newPlaceMarker.remove()
-  }
+  g_newPlaceMarker.remove()
   document.getElementById("newPlace").classList.add('hidden')
   document.getElementById("newPlaceParams").classList.add('hidden')
 
@@ -227,7 +224,6 @@ function addPlace(event) {
       document.getElementById('legend').classList.add('hidden');
     }
   }
-  //alert("Event handler when clicking on \r\n" + event.target.className);
 }
 
 const ctrlAdd = new MapboxGLButtonControl({
@@ -382,7 +378,6 @@ function toggleFilter(event) {
   map.setLayoutProperty(event.target.id, 'visibility', document.getElementById(event.target.id).checked?'visible':'none')
 }
 
-let g_newPlaceLatLng = {lat:0,lng:0}
 let g_newPlaceType = ''
 let g_newPlaceMarker = new mapboxgl.Marker()
 
@@ -472,15 +467,12 @@ function newPlaceParamsSubmit() {
   createOsmNode(g_newPlaceMarker.getLngLat().lat, g_newPlaceMarker.getLngLat().lng, createTags, 'Created amenity based on mapillary and local knowledge - https://maps.bikeottawa.ca/amenities')
   .then(function(){
     document.getElementById('success').classList.remove('hidden');
-    g_newPlaceMarker.setDraggable(false);
-  //  var $elem = jQuery(g_newPlaceMarker.getElement());  //change color of the marker
-  //  $elem.find('svg g[fill="' + g_newPlaceMarker._color + '"]').attr('fill', '#aaa');
-    const els = g_newPlaceMarker.getElement().getElementsByTagName('svg')[0].getElementsByTagName('g')
-    for(let el of els){
-      if(el.getAttribute('fill')==g_newPlaceMarker._color){
-        el.setAttribute('fill', '#aaa')
-      }
-    }
+
+    new mapboxgl.Marker({color: '#aaa'})
+      .setLngLat(g_newPlaceMarker.getLngLat())
+      .addTo(map);
+
+    g_newPlaceMarker.remove();
   })
   .catch(function(){
     document.getElementById('error').classList.remove('hidden');
@@ -502,7 +494,6 @@ map.on('click', function(e) {
   if(MapCursor=='crosshair'){ //handle click to add new place
     MapCursor = ''
     document.getElementById("newPlace").classList.remove('hidden');
-    g_newPlaceLatLng = e.lngLat;
     g_newPlaceMarker = new mapboxgl.Marker({
       draggable: true
       })
