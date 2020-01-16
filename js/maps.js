@@ -39,7 +39,7 @@ const g_TagsDefinitions = [ {tag:'name', name:'Name',hint:'',showEmpty:true, opt
                         {tag:'lit', name:'Lit', hint:'Is it lit', showEmpty:true, options:['','yes','no']},
                         {tag:'lanes', name:'Lanes', hint:'Total number of lanes', showEmpty:true, options:['text']},
                         {tag:'maxspeed', name:'Speed Limit', hint:'Speed limit on this street', showEmpty:true, options:['',10,15,20,30,40,50,60,70,80,90]},
-                        {tag:'bicycle_parking', name:'Type', hint:'Bike parking type', showEmpty:true, options:['','stands','rack','wall_loops','bollard','shed','other']},
+                        {tag:'bicycle_parking', name:'Type', hint:'Bike parking type', showEmpty:true, options:['','bollard','rack','wall_loops','stands','shed','other']},
                         {tag:'covered', name:'Covered', hint:'Whether this place is covered or not', showEmpty:true, options:['','yes','no']},
                         {tag:'capacity', name:'Capacity', hint:'How many bikes can comfortably fit', showEmpty:true, options:['',1,2,3,4,5,6,7,8,9,10,15,20,30,40,50,100]},
                         {tag:'service:bicycle:repair', name:'Repair', hint:'Shop offers repairs', showEmpty:true, options:['','yes','no']},
@@ -117,6 +117,9 @@ function displayOsmElementInfo(element, lngLat, showTags, changesetComment, titl
           popup += `<span class="tooltiptext">${key.hint}</span></div><select class="fill-lighten3" id="${key.tag}" name="${key.tag}" >`;
           key.options.forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`});
           popup += '</select>' + (key.suffix?key.suffix:'');
+          if(key.tag=='bicycle_parking'){
+            popup+="<div class='fill-darken1 button space-left1' style='width:20px;height:20px;padding:0' onclick=document.getElementById('bikeParkingHint').classList.remove('hidden');>?</div>"
+          }
         }
         popup += '</li></div>\n';
       }
