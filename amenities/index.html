@@ -5,7 +5,6 @@
     <title>Ottawa Bike Amenities Map</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js'></script>
-    <script  data-cfasync="false" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.4.2/mapbox-gl-geocoder.min.js"></script>
     <script src='../js/maps.js'></script>
     <script src='../js/osm-bundle.js'></script>
@@ -474,8 +473,14 @@ function newPlaceParamsSubmit() {
   .then(function(){
     document.getElementById('success').classList.remove('hidden');
     g_newPlaceMarker.setDraggable(false);
-    var $elem = jQuery(g_newPlaceMarker.getElement());  //change color of the marker
-    $elem.find('svg g[fill="' + g_newPlaceMarker._color + '"]').attr('fill', '#aaa');
+  //  var $elem = jQuery(g_newPlaceMarker.getElement());  //change color of the marker
+  //  $elem.find('svg g[fill="' + g_newPlaceMarker._color + '"]').attr('fill', '#aaa');
+    const els = g_newPlaceMarker.getElement().getElementsByTagName('svg')[0].getElementsByTagName('g')
+    for(let el of els){
+      if(el.getAttribute('fill')==g_newPlaceMarker._color){
+        el.setAttribute('fill', '#aaa')
+      }
+    }
   })
   .catch(function(){
     document.getElementById('error').classList.remove('hidden');

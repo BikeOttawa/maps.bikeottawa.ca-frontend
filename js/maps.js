@@ -76,7 +76,33 @@ const g_TagsDefinitions = [ {tag:'name', name:'Name',hint:'',showEmpty:true, opt
                         {tag:'fixme', name:'Other info', hint:'Describe in a few words if there is anything wrong with this feature', showEmpty:true, options:['edit']}
                       ];
 
+
+
 function displayOsmElementInfo(element, lngLat, showTags, changesetComment, title='', showGoogle=false) {
+
+  function formSubmit(event){
+    event.preventDefault();
+    document.getElementById('result').innerHTML = 'Sending ...';
+
+    const elements = document.getElementById("feedback").elements
+    const tags = {};
+    for(let el of elements){
+      el.readOnly=true;
+      if(el.name!='' && el.type!='hidden' && !el.hidden){
+        tags[el.name]=el.value;
+      }
+    }
+
+    modifyOsmElement(element, tags, changesetComment)
+    .then(function(){
+    document.getElementById('result').innerHTML = 'Your changes were submitted!';
+      setTimeout(function(){pop.remove();} , 1500);
+    })
+    .catch(function(){
+      document.getElementById('result').innerHTML = '<font color="red">Failed to submit changes</font>';
+    })
+
+  }
 
   if(typeof element == 'undefined') return;
   const pop = new mapboxgl.Popup()
@@ -147,42 +173,19 @@ function displayOsmElementInfo(element, lngLat, showTags, changesetComment, titl
       popup+='</ul>';
       popup+='<input type="hidden" name="link" value="' + window.location.href + '">';
       popup+='<input type="hidden" name="osm_link" value="https://www.openstreetmap.org/' + element + '">';
-      popup+='<p id="result"></p><div class="center"><input class="button short fill-darken3" type="submit" value="Submit" /></div></form></div>';
+      popup+='<p id="result"></p><div class="center"><input class="button short fill-darken3" type="submit" value="Submit"/></div></form></div>';
     } else {
       popup += 'Failed to request details from osm.org';
     }
     pop.setHTML(popup)
+    document.getElementById('feedback').onsubmit=formSubmit;
     if(showTags.includes('winter_service:quality') && showTags.includes('winter_service')){
       document.querySelector("#winter_service").onchange = function (e) {
         document.getElementById("winter_service:quality-div").style.display = (document.querySelector("#winter_service").value == 'yes')?'block':'none';
       }
       document.getElementById("winter_service:quality-div").style.display = (document.querySelector("#winter_service").value == 'yes')?'block':'none';
     }
-    $("#feedback").submit(function(event){
 
-      const $form = $(this);
-  		const $inputs = $form.find("input, select, button, textarea");
-  		$inputs.prop("disabled", true);
-  		$('#result').text('Sending ...');
-
-      const tags = {};
-      for(let el of $(this)[0]){
-        if(el.name!='' && el.type!='hidden' && !el.hidden){
-          tags[el.name]=el.value;
-        }
-      }
-
-      modifyOsmElement(element, tags, changesetComment)
-      .then(function(){
-        $('#result').html('Your changes were submitted!');
-        setTimeout(function(){pop.remove();} , 1500);
-      })
-      .catch(function(){
-        $('#result').html('<font color="red">Failed to submit changes</font>');
-      })
-      event.preventDefault();
-
-  	});
   }
   xhr.send()
 }
