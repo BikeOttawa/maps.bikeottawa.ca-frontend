@@ -29,7 +29,23 @@ function parseUrl(url)  //workaround for edge that doesn't support URLSearchPara
     return ret;
 }
 
-const g_TagsDefinitions = [ {tag:'name', name:'Name',hint:'',showEmpty:true, options:['edit']},        //[actual OSM tag, display name for tag in popup, tooltip, show empty tag]
+function editTag(id, name, value=''){
+  const div = document.getElementById(id)
+  const input = document.createElement("input");
+  input.setAttribute('type', 'text')
+  input.setAttribute('id', name)
+  input.setAttribute('style', 'height:initial;padding:initial;width:120px;color:#333;')
+  input.setAttribute('class', 'fill-lighten3 small')
+  input.setAttribute('name', name)
+  input.setAttribute('value', value)
+  div.innerHTML=''
+  div.appendChild(input);
+  input.select()
+  document.getElementById('icon-'+name).classList.add('hidden');
+}
+
+
+const g_TagsDefinitions = [ {tag:'name', name:'Name',hint:'',showEmpty:true, options:['editable']},        //[actual OSM tag, display name for tag in popup, tooltip, show empty tag]
                         {tag:'highway', name:'Type', hint:'',showEmpty:false, options:['text']},
                         {tag:'winter_service', name:'Snowplowing', hint:'Is pathway plowed in winter', showEmpty:true, options:['','yes','no']},
                         {tag:'winter_service:quality', name:'Plow quality', hint:'Optional: how well is the path typically plowed', showEmpty:true, options:['','good','intermediate','bad']},
@@ -45,7 +61,7 @@ const g_TagsDefinitions = [ {tag:'name', name:'Name',hint:'',showEmpty:true, opt
                         {tag:'service:bicycle:repair', name:'Repair', hint:'Shop offers repairs', showEmpty:true, options:['','yes','no']},
                         {tag:'service:bicycle:pump', name:'Pump', hint:'Bicycle pump', showEmpty:true, options:['','yes','no']},
                         {tag:'service:bicycle:chain_tool', name:'Chain Tool', hint:'Bicycle chain tool', showEmpty:true, options:['','yes','no']},
-                        {tag:'cuisine', name:'Cuisine', hint:'', showEmpty:true, options:['edit']},
+                        {tag:'cuisine', name:'Cuisine', hint:'', showEmpty:true, options:['editable']},
                         {tag:'outdoor_seating', name:'Outdoor Seating', hint:'Place has outdoor chairs', showEmpty:true, options:['','yes','no']},
                         {tag:'phone', name:'Phone', hint:'', showEmpty:false, options:['text']},
                         {tag:'website', name:'Web', hint:'', showEmpty:false, options:['text']},
@@ -55,7 +71,7 @@ const g_TagsDefinitions = [ {tag:'name', name:'Name',hint:'',showEmpty:true, opt
                         {tag:'bottle', name:'Bottling station', hint:'Bottles can be easily filled', showEmpty:true, options:['','yes','no']},
                         {tag:'seasonal', name:'Seasonal', hint:'Works only during part of the year', showEmpty:true, options:['','yes','no','summer','winter']},
                         {tag:'fee', name:'Fee', hint:'Need to pay to use', showEmpty:true, options:['','yes','no']},
-                        {tag:'description', name:'Description', hint:'', showEmpty:false, options:['text']},
+                        {tag:'description', name:'Description', hint:'', showEmpty:false, options:['editable']},
                         {tag:'information', name:'Type', hint:'What kind of information', showEmpty:true, options:['map','board','guidepost']},
                         {tag:'fixme', name:'Other info', hint:'Describe in a few words if there is anything wrong with this feature', showEmpty:true, options:['edit']}
                       ];
@@ -108,7 +124,11 @@ function displayOsmElementInfo(element, lngLat, showTags, changesetComment, titl
         popup += `<div id="${key.tag}-div" style="max-width:200px"><li style="margin:4px 0 4px 0"><div class="tooltip">${key.name}:&nbsp;&nbsp;`;
 
         if(key.options[0] == 'text'){
-          popup += '</div><strong>'+tag+'</strong>';
+          popup += `</div><div class="inline" id="text-${key.tag}"><strong>${tag}</strong></div>`;
+        }
+        else if(key.options[0] == 'editable'){
+          popup += `</div><div class="inline" id="text-${key.tag}"><strong>${tag}</strong></div>`;
+          popup+=`<div id='icon-${key.tag}' class='fill-lighten1 button space-left0 edit-icon' style='width:15px;height:15px;padding:0' onclick='editTag("text-${key.tag}", "${key.tag}", "${tag}");'></div>`
         }
         else if(key.options[0] == 'edit'){
           popup += `<span class="tooltiptext">${key.hint}</span></div><input type="text" class="fill-lighten3 small" style="height:initial;padding:initial;width:120px;color:#333;" id="${key.tag}" name="${key.tag}" value="${tag}">`
@@ -146,10 +166,11 @@ function displayOsmElementInfo(element, lngLat, showTags, changesetComment, titl
   		$('#result').text('Sending ...');
 
       const tags = {};
-      $('select').each(function(index) {
-        tags[$(this)[0].name]=$(this)[0].value;
-      });
-      tags['fixme']=$('#fixme')[0].value;
+      for(let el of $(this)[0]){
+        if(el.name!='' && el.type!='hidden' && !el.hidden){
+          tags[el.name]=el.value;
+        }
+      }
 
       modifyOsmElement(element, tags, changesetComment)
       .then(function(){
