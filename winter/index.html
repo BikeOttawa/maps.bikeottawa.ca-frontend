@@ -203,8 +203,38 @@ function init() {
            "line-opacity": 0.5
        }
    });
+
+   map.addSource('modified', { type: 'geojson' , data: null});
+   map.addLayer({
+     "id": "modified",
+      "type": "line",
+      "source": 'modified',
+      "layout": {
+          "line-join": "round",
+          "line-cap": "round"
+      },
+      "paint": {
+          "line-color": ['match',
+                          ['get', 'winter_service'],
+                          'yes', layers[0].color,
+                          'no', layers[1].color,
+                          /* other */ layers[2].color],
+          "line-width": [
+                          'interpolate',
+                          ['exponential', 1.5],
+                          ['zoom'],
+                          10, 1,
+                          17, 10
+                        ],
+          "line-opacity": 1
+      }
+  });
 }
 
+const g_modified={
+  "type": "FeatureCollection",
+  "features": []
+}
 
 map.on('style.load', function () {
 
@@ -247,9 +277,18 @@ map.on('click', function(e) {
       return;
   }
   const feature = features[0];
-  displayOsmElementInfo(feature.properties.id, e.lngLat,['name','highway','surface','winter_service','winter_service:quality','fixme'], 'Winter pathways based on mapillary and local knowledge - https://maps.bikeottawa.ca/winter');
+  displayOsmElementInfo(feature.properties.id, e.lngLat,['name','highway','surface','winter_service','winter_service:quality','fixme'], 'Winter pathways based on mapillary and local knowledge - https://maps.bikeottawa.ca/winter')
+  .then(tags => {
+    feature.properties["winter_service"]=tags["winter_service"];
+    g_modified.features.push(feature);
+    map.getSource('modified').setData(g_modified);
+  })
+  .catch(e => {
+
+  });
   window.history.replaceState(null, null, window.location.pathname+'?&lat='+e.lngLat.lat+'&lng='+e.lngLat.lng+'&zoom='+map.getZoom()+'&id='+feature.properties.id);
   map.getSource('highlight').setData(feature);
+
 });
 
 map.on('mousemove', function(e) {

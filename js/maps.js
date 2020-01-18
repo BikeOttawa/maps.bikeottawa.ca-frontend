@@ -29,7 +29,23 @@ function parseUrl(url)  //workaround for edge that doesn't support URLSearchPara
     return ret;
 }
 
-const g_TagsDefinitions = [ {tag:'name', name:'Name',hint:'',showEmpty:false, options:['text']},        //[actual OSM tag, display name for tag in popup, tooltip, show empty tag]
+function editTag(id, name, value=''){
+  const div = document.getElementById(id)
+  const input = document.createElement("input");
+  input.setAttribute('type', 'text')
+  input.setAttribute('id', name)
+  input.setAttribute('style', 'height:initial;padding:initial;width:120px;color:#333;')
+  input.setAttribute('class', 'fill-lighten3 small')
+  input.setAttribute('name', name)
+  input.setAttribute('value', value)
+  div.innerHTML=''
+  div.appendChild(input);
+  input.select()
+  document.getElementById('icon-'+name).classList.add('hidden');
+}
+
+
+const g_TagsDefinitions = [ {tag:'name', name:'Name',hint:'',showEmpty:true, options:['editable']},        //[actual OSM tag, display name for tag in popup, tooltip, show empty tag]
                         {tag:'highway', name:'Type', hint:'',showEmpty:false, options:['text']},
                         {tag:'winter_service', name:'Snowplowing', hint:'Is pathway plowed in winter', showEmpty:true, options:['','yes','no']},
                         {tag:'winter_service:quality', name:'Plow quality', hint:'Optional: how well is the path typically plowed', showEmpty:true, options:['','good','intermediate','bad']},
@@ -39,13 +55,13 @@ const g_TagsDefinitions = [ {tag:'name', name:'Name',hint:'',showEmpty:false, op
                         {tag:'lit', name:'Lit', hint:'Is it lit', showEmpty:true, options:['','yes','no']},
                         {tag:'lanes', name:'Lanes', hint:'Total number of lanes', showEmpty:true, options:['text']},
                         {tag:'maxspeed', name:'Speed Limit', hint:'Speed limit on this street', showEmpty:true, options:['',10,15,20,30,40,50,60,70,80,90]},
-                        {tag:'bicycle_parking', name:'Type', hint:'Bike parking type', showEmpty:true, options:['','stands','rack','wall_loops','bollard','shed','other']},
+                        {tag:'bicycle_parking', name:'Type', hint:'Bike parking type', showEmpty:true, options:['','bollard','rack','wall_loops','stands','shed','other']},
                         {tag:'covered', name:'Covered', hint:'Whether this place is covered or not', showEmpty:true, options:['','yes','no']},
                         {tag:'capacity', name:'Capacity', hint:'How many bikes can comfortably fit', showEmpty:true, options:['',1,2,3,4,5,6,7,8,9,10,15,20,30,40,50,100]},
                         {tag:'service:bicycle:repair', name:'Repair', hint:'Shop offers repairs', showEmpty:true, options:['','yes','no']},
                         {tag:'service:bicycle:pump', name:'Pump', hint:'Bicycle pump', showEmpty:true, options:['','yes','no']},
                         {tag:'service:bicycle:chain_tool', name:'Chain Tool', hint:'Bicycle chain tool', showEmpty:true, options:['','yes','no']},
-                        {tag:'cuisine', name:'Cuisine', hint:'', showEmpty:true, options:['text']},
+                        {tag:'cuisine', name:'Cuisine', hint:'', showEmpty:true, options:['editable']},
                         {tag:'outdoor_seating', name:'Outdoor Seating', hint:'Place has outdoor chairs', showEmpty:true, options:['','yes','no']},
                         {tag:'phone', name:'Phone', hint:'', showEmpty:false, options:['text']},
                         {tag:'website', name:'Web', hint:'', showEmpty:false, options:['text']},
@@ -55,112 +71,126 @@ const g_TagsDefinitions = [ {tag:'name', name:'Name',hint:'',showEmpty:false, op
                         {tag:'bottle', name:'Bottling station', hint:'Bottles can be easily filled', showEmpty:true, options:['','yes','no']},
                         {tag:'seasonal', name:'Seasonal', hint:'Works only during part of the year', showEmpty:true, options:['','yes','no','summer','winter']},
                         {tag:'fee', name:'Fee', hint:'Need to pay to use', showEmpty:true, options:['','yes','no']},
-                        {tag:'description', name:'Description', hint:'', showEmpty:false, options:['text']},
+                        {tag:'description', name:'Description', hint:'', showEmpty:false, options:['editable']},
                         {tag:'information', name:'Type', hint:'What kind of information', showEmpty:true, options:['map','board','guidepost']},
                         {tag:'fixme', name:'Other info', hint:'Describe in a few words if there is anything wrong with this feature', showEmpty:true, options:['edit']}
                       ];
 
-function displayOsmElementInfo(element, lngLat, showTags, changesetComment, title='', showGoogle=false) {
 
-  if(typeof element == 'undefined') return;
-  const pop = new mapboxgl.Popup()
-  .setLngLat(lngLat)
-  .setHTML('Loading...')
-  .addTo(map)
-  .setMaxWidth('640px')
-  const xhr = new XMLHttpRequest()
-  xhr.open('GET','https://api.openstreetmap.org/api/0.6/'+element)
-  xhr.onload = function () {
-    var popup = '<h4><a href="https://www.openstreetmap.org/' + element + '" target="_blank">' + element + '</a></h4><hr>'
-    if (xhr.status === 200) {
-      const xmlDOM = new DOMParser().parseFromString(xhr.responseText, 'text/xml');
-      const tags = Array.from(xmlDOM.getElementsByTagName("tag"));
-      popup+='<div id="fform"><form id="feedback"><ul>'
-      const mapkey = tags.find(function(ele){return ele.attributes['k'].value=='mapillary'});
-      let mapval=''
-      if(mapkey){
-        mapval = mapkey ? mapkey.attributes["v"].value : '';
-      }
-      if(mapval==''){
-        if(showGoogle){
-          popup+='<li><div id="showGoogle"><a href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint='+lngLat.lat+','+lngLat.lng
-          popup+='" target="_blank"><img class="enlarge-onhover" src="https://maps.googleapis.com/maps/api/streetview?size=640x400&fov=120&pitch=-30&key=AIzaSyDXbZYWFjz5Nr8N1c0OoTA_YFYCyV0V6Fs&location='+lngLat.lat+','+lngLat.lng+'"></a></div></li>'
-        }
-        else{
-          popup+='<li><div id="showMapillary"></div></li>'
-          showMapillaryImage(lngLat)
-        }
-      }
-      else{
-        popup+=`<li><div id="showMapillary"><a href="https://www.mapillary.com/app/?focus=photo&pKey=${mapval}" target="_blank"><img class="enlarge-onhover" src="https://d1cuyjsrcm0gby.cloudfront.net/${mapval}/thumb-640.jpg"></a></div></li>`
-      }
 
-      if(title!=''){
-        popup += `<strong>${title}</strong>`;
-      }
-      for(var key of g_TagsDefinitions){
-        const t = tags.find(function(ele){return ele.attributes['k'].value==key.tag});
-        const tag = t ? t.attributes["v"].value : '';
-        if(key.showEmpty==false && tag=='') continue;
-        if(showTags.length>0 && !showTags.includes(key.tag)) continue;
-        if(!Array.isArray(key.options)) continue;
+displayOsmElementInfo = function (element, lngLat, showTags, changesetComment, title='', showGoogle=false) {
+  return new Promise(function(resolve, reject) {
+    function formSubmit(event){
+      event.preventDefault();
+      document.getElementById('result').innerHTML = 'Sending ...';
 
-        popup += `<div id="${key.tag}-div" style="max-width:200px"><li style="margin:4px 0 4px 0"><div class="tooltip">${key.name}:&nbsp;&nbsp;`;
-
-        if(key.options[0] == 'text'){
-          popup += '</div><strong>'+tag+'</strong>';
-        }
-        else if(key.options[0] == 'edit'){
-          popup += `<span class="tooltiptext">${key.hint}</span></div><input type="text" class="fill-lighten3 small" style="height:initial;padding:initial;width:120px" id="${key.tag}" name="${key.tag}" value="${tag}">`
-        }
-        else{
-          popup += `<span class="tooltiptext">${key.hint}</span></div><select class="fill-lighten3" id="${key.tag}" name="${key.tag}" >`;
-          key.options.forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`});
-          popup += '</select>' + (key.suffix?key.suffix:'');
-        }
-        popup += '</li></div>\n';
-      }
-
-      popup+='</ul>';
-      popup+='<input type="hidden" name="link" value="' + window.location.href + '">';
-      popup+='<input type="hidden" name="osm_link" value="https://www.openstreetmap.org/' + element + '">';
-      popup+='<p id="result"></p><div class="center"><input class="button short fill-darken3" type="submit" value="Submit" /></div></form></div>';
-    } else {
-      popup += 'Failed to request details from osm.org';
-    }
-    pop.setHTML(popup)
-    if(showTags.includes('winter_service:quality') && showTags.includes('winter_service')){
-      document.querySelector("#winter_service").onchange = function (e) {
-        document.getElementById("winter_service:quality-div").style.display = (document.querySelector("#winter_service").value == 'yes')?'block':'none';
-      }
-      document.getElementById("winter_service:quality-div").style.display = (document.querySelector("#winter_service").value == 'yes')?'block':'none';
-    }
-    $("#feedback").submit(function(event){
-
-      const $form = $(this);
-  		const $inputs = $form.find("input, select, button, textarea");
-  		$inputs.prop("disabled", true);
-  		$('#result').text('Sending ...');
-
+      const elements = document.getElementById("feedback").elements
       const tags = {};
-      $('select').each(function(index) {
-        tags[$(this)[0].name]=$(this)[0].value;
-      });
-      tags['fixme']=$('#fixme')[0].value;
+      for(let el of elements){
+        el.readOnly=true;
+        if(el.name!='' && el.type!='hidden' && !el.hidden){
+          tags[el.name]=el.value;
+        }
+      }
 
       modifyOsmElement(element, tags, changesetComment)
       .then(function(){
-        $('#result').html('Your changes were submitted!');
+      document.getElementById('result').innerHTML = 'Your changes were submitted!';
         setTimeout(function(){pop.remove();} , 1500);
+        resolve(tags)
       })
-      .catch(function(){
-        $('#result').html('<font color="red">Failed to submit changes</font>');
+      .catch(function(e){
+        document.getElementById('result').innerHTML = '<font color="red">Failed to submit changes</font>';
+        reject(e)
       })
-      event.preventDefault();
 
-  	});
-  }
-  xhr.send()
+    }
+
+    if(typeof element == 'undefined') return;
+    const pop = new mapboxgl.Popup()
+    .setLngLat(lngLat)
+    .setHTML('Loading...')
+    .addTo(map)
+    .setMaxWidth('640px')
+    const xhr = new XMLHttpRequest()
+    xhr.open('GET','https://api.openstreetmap.org/api/0.6/'+element)
+    xhr.onload = function () {
+      var popup = '<h4><a href="https://www.openstreetmap.org/' + element + '" target="_blank">' + element + '</a></h4><hr>'
+      if (xhr.status === 200) {
+        const xmlDOM = new DOMParser().parseFromString(xhr.responseText, 'text/xml');
+        const tags = Array.from(xmlDOM.getElementsByTagName("tag"));
+        popup+='<div id="fform"><form id="feedback"><ul>'
+        const mapkey = tags.find(function(ele){return ele.attributes['k'].value=='mapillary'});
+        let mapval=''
+        if(mapkey){
+          mapval = mapkey ? mapkey.attributes["v"].value : '';
+        }
+        if(mapval==''){
+          if(showGoogle){
+            popup+='<li><div id="showGoogle"><a href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint='+lngLat.lat+','+lngLat.lng
+            popup+='" target="_blank"><img class="enlarge-onhover" src="https://maps.googleapis.com/maps/api/streetview?size=640x400&fov=120&pitch=-30&key=AIzaSyDXbZYWFjz5Nr8N1c0OoTA_YFYCyV0V6Fs&location='+lngLat.lat+','+lngLat.lng+'"></a></div></li>'
+          }
+          else{
+            popup+='<li><div id="showMapillary"></div></li>'
+            showMapillaryImage(lngLat)
+          }
+        }
+        else{
+          popup+=`<li><div id="showMapillary"><a href="https://www.mapillary.com/app/?focus=photo&pKey=${mapval}" target="_blank"><img class="enlarge-onhover" src="https://d1cuyjsrcm0gby.cloudfront.net/${mapval}/thumb-640.jpg"></a></div></li>`
+        }
+
+        if(title!=''){
+          popup += `<strong>${title}</strong>`;
+        }
+        for(var key of g_TagsDefinitions){
+          const t = tags.find(function(ele){return ele.attributes['k'].value==key.tag});
+          const tag = t ? t.attributes["v"].value : '';
+          if(key.showEmpty==false && tag=='') continue;
+          if(showTags.length>0 && !showTags.includes(key.tag)) continue;
+          if(!Array.isArray(key.options)) continue;
+
+          popup += `<div id="${key.tag}-div" style="max-width:200px"><li style="margin:4px 0 4px 0"><div class="tooltip">${key.name}:&nbsp;&nbsp;`;
+
+          if(key.options[0] == 'text'){
+            popup += `</div><div class="inline" id="text-${key.tag}"><strong>${tag}</strong></div>`;
+          }
+          else if(key.options[0] == 'editable'){
+            popup += `</div><div class="inline" id="text-${key.tag}"><strong>${tag}</strong></div>`;
+            popup+=`<div id='icon-${key.tag}' class='fill-lighten1 button space-left0 edit-icon' style='width:15px;height:15px;padding:0' onclick='editTag("text-${key.tag}", "${key.tag}", "${tag}");'></div>`
+          }
+          else if(key.options[0] == 'edit'){
+            popup += `<span class="tooltiptext">${key.hint}</span></div><input type="text" class="fill-lighten3 small" style="height:initial;padding:initial;width:120px;color:#333;" id="${key.tag}" name="${key.tag}" value="${tag}">`
+          }
+          else{
+            popup += `<span class="tooltiptext">${key.hint}</span></div><select class="fill-lighten3" id="${key.tag}" name="${key.tag}" >`;
+            key.options.forEach(function(w){popup+=`<option value="${w}" ${tag==w?"selected":""}>${w}</option>`});
+            popup += '</select>' + (key.suffix?key.suffix:'');
+            if(key.tag=='bicycle_parking'){
+              popup+="<div class='fill-darken1 button space-left1' style='width:20px;height:20px;padding:0' onclick=document.getElementById('bikeParkingHint').classList.remove('hidden');>?</div>"
+            }
+          }
+          popup += '</li></div>\n';
+        }
+
+        popup+='</ul>';
+        popup+='<input type="hidden" name="link" value="' + window.location.href + '">';
+        popup+='<input type="hidden" name="osm_link" value="https://www.openstreetmap.org/' + element + '">';
+        popup+='<p id="result"></p><div class="center"><input class="button short fill-darken3" type="submit" value="Submit"/></div></form></div>';
+      } else {
+        popup += 'Failed to request details from osm.org';
+      }
+      pop.setHTML(popup)
+      document.getElementById('feedback').onsubmit=formSubmit;
+      if(showTags.includes('winter_service:quality') && showTags.includes('winter_service')){
+        document.querySelector("#winter_service").onchange = function (e) {
+          document.getElementById("winter_service:quality-div").style.display = (document.querySelector("#winter_service").value == 'yes')?'block':'none';
+        }
+        document.getElementById("winter_service:quality-div").style.display = (document.querySelector("#winter_service").value == 'yes')?'block':'none';
+      }
+
+    }
+    xhr.send()
+  });
 }
 
 
