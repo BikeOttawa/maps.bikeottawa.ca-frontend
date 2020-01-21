@@ -69,7 +69,7 @@ const g_TagsDefinitions = [ {tag:'name', name:'Name',hint:'',showEmpty:true, opt
                         {tag:'indoor', name:'Indoor', hint:'Is it located indoors', showEmpty:true, options:['','yes','no']},
                         {tag:'fuel', name:'Fuel', hint:'What kind of fuel can be used', showEmpty:true, options:['','charcoal','wood','electric']},
                         {tag:'bottle', name:'Bottling station', hint:'Bottles can be easily filled', showEmpty:true, options:['','yes','no']},
-                        {tag:'seasonal', name:'Seasonal', hint:'Works only during part of the year', showEmpty:true, options:['','yes','no','summer','winter']},
+                        {tag:'seasonal', name:'Seasonal', hint:'Functions only during part of a year', showEmpty:true, options:['','yes','no','summer','winter']},
                         {tag:'fee', name:'Fee', hint:'Need to pay to use', showEmpty:true, options:['','yes','no']},
                         {tag:'description', name:'Description', hint:'', showEmpty:false, options:['editable']},
                         {tag:'information', name:'Type', hint:'What kind of information', showEmpty:true, options:['map','board','guidepost']},
