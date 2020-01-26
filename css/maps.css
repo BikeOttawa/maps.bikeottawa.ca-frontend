@@ -12,7 +12,7 @@
      height: 125px;
      transition-duration: 0.5s; /* delays for 1 second */
      -webkit-transition-duration: 0.5s; /* for Safari & Chrome */
-     box-shadow: 1px 1px 3px 1px grey; 
+     box-shadow: 1px 1px 3px 1px grey;
 }
 .enlarge-onhover:hover {
      width: 640px;
@@ -51,4 +51,14 @@
 .tooltip:hover .tooltiptext {
     visibility: visible;
     opacity: 1;
+}
+
+input[type=text].mapboxgl-ctrl-geocoder--input {    /*fixing geocode clash with base.css*/
+  border: 0px;
+  background-color: rgba(0,0,0,0);
+  padding: 6px 35px;
+  height: 36px;
+}
+.mapboxgl-ctrl-geocoder--icon-search {
+  top: 7px;
 }
