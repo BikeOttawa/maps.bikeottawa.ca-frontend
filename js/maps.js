@@ -71,6 +71,8 @@ const g_TagsDefinitions = [ {tag:'name', name:'Name',hint:'',showEmpty:true, opt
                         {tag:'bottle', name:'Bottling station', hint:'Bottles can be easily filled', showEmpty:true, options:['','yes','no']},
                         {tag:'seasonal', name:'Seasonal', hint:'Functions only during part of a year', showEmpty:true, options:['','yes','no','summer','winter']},
                         {tag:'fee', name:'Fee', hint:'Need to pay to use', showEmpty:true, options:['','yes','no']},
+                        {tag:'backrest', name:'Backrest', hint:'Bench has a backrest', showEmpty:true, options:['','yes','no']},
+                        {tag:'material', name:'Material', hint:'What it\'s made of', showEmpty:true, options:['','wood','metal','concrete','stone','plastic']},
                         {tag:'description', name:'Description', hint:'', showEmpty:false, options:['editable']},
                         {tag:'information', name:'Type', hint:'What kind of information', showEmpty:true, options:['map','board','guidepost']},
                         {tag:'fixme', name:'Other info', hint:'Describe in a few words if there is anything wrong with this feature', showEmpty:true, options:['edit']}
