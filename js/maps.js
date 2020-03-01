@@ -128,6 +128,7 @@ displayOsmElementInfo = function (element, lngLat, showTags, changesetComment, t
           mapval = mapkey ? mapkey.attributes["v"].value : '';
         }
         if(mapval==''){
+          showGoogle = false; //google now requires api key. Disable for now.
           if(showGoogle){
             popup+='<li><div id="showGoogle"><a href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint='+lngLat.lat+','+lngLat.lng
             popup+='" target="_blank"><img class="enlarge-onhover" src="https://maps.googleapis.com/maps/api/streetview?size=640x400&fov=120&pitch=-30&key=AIzaSyDXbZYWFjz5Nr8N1c0OoTA_YFYCyV0V6Fs&location='+lngLat.lat+','+lngLat.lng+'"></a></div></li>'
