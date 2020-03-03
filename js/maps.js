@@ -69,8 +69,10 @@ const g_TagsDefinitions = [ {tag:'name', name:'Name',hint:'',showEmpty:true, opt
                         {tag:'indoor', name:'Indoor', hint:'Is it located indoors', showEmpty:true, options:['','yes','no']},
                         {tag:'fuel', name:'Fuel', hint:'What kind of fuel can be used', showEmpty:true, options:['','charcoal','wood','electric']},
                         {tag:'bottle', name:'Bottling station', hint:'Bottles can be easily filled', showEmpty:true, options:['','yes','no']},
-                        {tag:'seasonal', name:'Seasonal', hint:'Works only during part of the year', showEmpty:true, options:['','yes','no','summer','winter']},
+                        {tag:'seasonal', name:'Seasonal', hint:'Functions only during part of a year', showEmpty:true, options:['','yes','no','summer','winter']},
                         {tag:'fee', name:'Fee', hint:'Need to pay to use', showEmpty:true, options:['','yes','no']},
+                        {tag:'backrest', name:'Backrest', hint:'Bench has a backrest', showEmpty:true, options:['','yes','no']},
+                        {tag:'material', name:'Material', hint:'What it\'s made of', showEmpty:true, options:['','wood','metal','concrete','stone','plastic']},
                         {tag:'description', name:'Description', hint:'', showEmpty:false, options:['editable']},
                         {tag:'information', name:'Type', hint:'What kind of information', showEmpty:true, options:['map','board','guidepost']},
                         {tag:'fixme', name:'Other info', hint:'Describe in a few words if there is anything wrong with this feature', showEmpty:true, options:['edit']}
@@ -126,6 +128,7 @@ displayOsmElementInfo = function (element, lngLat, showTags, changesetComment, t
           mapval = mapkey ? mapkey.attributes["v"].value : '';
         }
         if(mapval==''){
+          showGoogle = false; //google now requires api key. Disable for now.
           if(showGoogle){
             popup+='<li><div id="showGoogle"><a href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint='+lngLat.lat+','+lngLat.lng
             popup+='" target="_blank"><img class="enlarge-onhover" src="https://maps.googleapis.com/maps/api/streetview?size=640x400&fov=120&pitch=-30&key=AIzaSyDXbZYWFjz5Nr8N1c0OoTA_YFYCyV0V6Fs&location='+lngLat.lat+','+lngLat.lng+'"></a></div></li>'

@@ -5,16 +5,20 @@
     <title>Ottawa Snowplowing Map</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js'></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.4.2/mapbox-gl-geocoder.min.js"></script>
     <script  data-cfasync="false" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.min.js"></script>
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css' rel='stylesheet' />
     <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
-    <link rel='stylesheet' href='../css/mapbox-gl-geocoder.css' type='text/css' />
+    <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.4.2/mapbox-gl-geocoder.css" rel="stylesheet" type="text/css" />
     <link href='../css/maps.css' rel='stylesheet' />
     <style>
         body { margin:0; padding:0; }
         li { margin: 4px 0; }
         #app { position:absolute; top:0; right:0; bottom:0; left:0; }
         #map { position:absolute; top:0; bottom:0; width:100%; }
+
     </style>
 </head>
 <body>
@@ -35,7 +39,10 @@
   <div id='closebtn' class='fill-darken2 pad1 icon close button fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
   <div class='clearfix'></div>
   <div class='pad1 dark'>
-    <h3>Winter Maintenance</h3><br>
+    <h3>Winter Maintenance</h3>
+    <div class='pad1 small'>
+      <p>Sidewalks and unpaved pathways are not shown.</p>
+    </div>
     <form>
     <fieldset class='checkbox-pill clearfix '>
       <input type='checkbox' id='plowed' checked='checked'>
@@ -73,7 +80,6 @@
 
 <script src='../js/maps.js'></script>
 <script src='../js/osm-bundle.js'></script>
-<script src='../js/mapbox-gl-geocoder.min.js'></script>
 <script>
 const layers = [
     {id:"plowed", name:'Plowed', color:'#0099CC', opacity:0.9, filter:['==', 'winter_service', 'yes']},
@@ -84,11 +90,11 @@ const layers = [
 mapboxgl.accessToken = 'pk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdqaWxrN3gwZXQ4MnFxbjAwZXRpbG8zIn0.XhAdk2ASwdipubccCWTfoQ';
 var map = new mapboxgl.Map({
   container: 'map',
-  style: 'mapbox://styles/mapbox/dark-v10',
+  style: 'mapbox://styles/mapbox/'+document.querySelector('input[name="rtoggle"]:checked').id,
   center: [-75.697927,45.417431],
   zoom: 13,
   minZoom: 10,
-  maxZoom: 17,
+  maxZoom: 20,
   maxBounds: [[-76.385193,44.963826],[-75.011902,45.614998]],
   attributionControl: false
 });
@@ -97,10 +103,13 @@ map.addControl(new mapboxgl.NavigationControl(),'bottom-right');
 map.addControl(new mapboxgl.AttributionControl({compact: true }), 'bottom-right');
 const geocoder = new MapboxGeocoder({
     accessToken: mapboxgl.accessToken,
+    mapboxgl: mapboxgl,
     bbox: [-76.385193,44.963826,-75.011902,45.614998],
     zoom: 13,
     limit: 10,
-    asyncGeocoder: nominatimGeocoder
+    asyncGeocoder: nominatimGeocoder,
+    collapsed: true,
+    marker: true
 })
 map.addControl(geocoder, 'bottom-left')
 map.addControl(new mapboxgl.GeolocateControl({
@@ -150,9 +159,9 @@ function init() {
     "type": "line",
     "source": {
         type: 'vector',
-        url: 'mapbox://bikeottawa.03jqtlpj',
+        url: 'mapbox://bikeottawa.0lwwjb4e',
     },
-    "source-layer": '03jqtlpj',
+    "source-layer": '0lwwjb4e',
     "layout": {
         "line-join": "round",
         "line-cap": "round"
