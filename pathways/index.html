@@ -153,7 +153,7 @@ const ChartBackgroundColors = [
 mapboxgl.accessToken = 'pk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdqaWxrN3gwZXQ4MnFxbjAwZXRpbG8zIn0.XhAdk2ASwdipubccCWTfoQ';
 var map = new mapboxgl.Map({
   container: 'map',
-  style: 'mapbox://styles/mapbox/dark-v10',
+  style: 'mapbox://styles/mapbox/'+document.querySelector('input[name="rtoggle"]:checked').id,
   center: [-75.697927,45.417431],
   zoom: 13,
   minZoom: 10,
