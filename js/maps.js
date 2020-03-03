@@ -159,7 +159,7 @@ displayOsmElementInfo = function (element, lngLat, showTags, changesetComment, t
           }
           else if(key.options[0] == 'editable'){
             popup += `</div><div class="inline" id="text-${key.tag}"><strong>${tag}</strong></div>`;
-            popup+=`<div id='icon-${key.tag}' class='fill-lighten1 button space-left0 edit-icon' style='width:15px;height:15px;padding:0' onclick='editTag("text-${key.tag}", "${key.tag}", "${tag}");'></div>`
+            popup+=`<div id='icon-${key.tag}' class='fill-lighten1 button space-left0 edit-icon' style='width:12px;height:12px;padding:0' onclick='editTag("text-${key.tag}", "${key.tag}", "${tag}");'></div>`
           }
           else if(key.options[0] == 'edit'){
             popup += `<span class="tooltiptext">${key.hint}</span></div><input type="text" class="fill-lighten3 small" style="height:initial;padding:initial;width:120px;color:#333;" id="${key.tag}" name="${key.tag}" value="${tag}">`
