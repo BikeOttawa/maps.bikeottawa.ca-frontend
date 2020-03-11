@@ -339,11 +339,16 @@ map.on('style.load', function () {
 });
 
 const form = document.getElementById("layers");
+const url = parseUrl(window.location.search.substr(1).split('&'));
+const enabled = url['layers'] ? url['layers'].split(';') : [];
+
 g_layers.forEach(l => {
   const input = document.createElement("input");
   input.setAttribute('type', 'checkbox')
   input.setAttribute('id',l.id)
-  if(l.enabled){ input.setAttribute('checked','checked')}
+  if(l.enabled || enabled.includes(l.id)){
+    input.setAttribute('checked','checked')
+  }
   input.onclick = toggleFilter
   form.appendChild(input);
   const label = document.createElement('label')
@@ -377,6 +382,7 @@ buttons.appendChild(bottom);
 
 function toggleFilter(event) {
   map.setLayoutProperty(event.target.id, 'visibility', document.getElementById(event.target.id).checked?'visible':'none')
+  buildUrl()
 }
 
 let g_newPlaceType = ''
@@ -440,6 +446,20 @@ function chooseNewPlace(event) {
 
 }
 
+function buildUrl(id=''){
+  let layers='';
+  for (let layer of g_layers){
+    layers += document.getElementById(layer.id).checked ? layer.id+';' : '';
+  }
+  window.history.replaceState(null, null, window.location.pathname
+    +'?&lat='+map.getCenter().lat
+    +'&lng='+map.getCenter().lng
+    +'&zoom='+map.getZoom()
+    +(layers==''?'':('&layers='+layers))
+    +(id==''?'':('&id='+id)));
+
+}
+
 function newPlaceParamsSubmit() {
   document.getElementById("newPlaceParams").classList.add('hidden')
   document.getElementById('success').classList.add('hidden');
@@ -491,7 +511,7 @@ function newPlaceParamsSubmit() {
 map.on('moveend', function(e) {
   document.getElementById('success').classList.add('hidden');
   document.getElementById('error').classList.add('hidden');
-  window.history.replaceState(null, null, window.location.pathname+'?&lat='+map.getCenter().lat+'&lng='+map.getCenter().lng+'&zoom='+map.getZoom());
+  buildUrl();
 });
 
 map.on('click', function(e) {
@@ -525,7 +545,8 @@ map.on('click', function(e) {
     displayOsmElementInfo(feature.properties.id, e.lngLat,['name','description','fixme'], 'Bicycle amenities based on mapillary and local knowledge - https://maps.bikeottawa.ca/amenities', '', true);
   }
 
-  window.history.replaceState(null, null, window.location.pathname+'?&lat='+e.lngLat.lat+'&lng='+e.lngLat.lng+'&zoom='+map.getZoom()+'&id='+feature.properties.id);
+  buildUrl(feature.properties.id);
+  //window.history.replaceState(null, null, window.location.pathname+'?&lat='+e.lngLat.lat+'&lng='+e.lngLat.lng+'&zoom='+map.getZoom()+'&id='+feature.properties.id+'&layers='+getCheckedLayers());
 });
 
 map.on('mousemove', function(e) {
@@ -538,7 +559,7 @@ map.on('mousemove', function(e) {
 map.on('load', function(e) {
     addUpdatedDate('bikeottawa.6e5700mn')
     document.getElementById("loader").style.visibility = "hidden";
-    url = parseUrl(window.location.search.substr(1).split('&'));
+    const url = parseUrl(window.location.search.substr(1).split('&'));
     const lat = url['lat']
     const lng = url['lng']
     let z = url['zoom']
