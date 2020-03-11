@@ -153,17 +153,18 @@
 <script>
 const g_layers = [
     {id:"osm_bicycle_parking", names:'Bike parking', name:'Bike parking', enabled: false, image:'bike-parking.png', key:'amenity', val:'bicycle_parking', showName:false, tags: ['amenity','description','bicycle_parking','capacity','covered','seasonal','fixme'], title:'Bike parking', createTags:{amenity:'bicycle_parking'}, createOptTags:['bicycle_parking','capacity','covered'], showGoogle:true},
-    {id:"osm_bicycle_repair_stations", names:'Repair Stations',name:'Repair Station', enabled: false, image:'bike-repair.png', key:'amenity', val:'bicycle_repair_station', showName:false, tags: ['amenity','service:bicycle:pump','service:bicycle:chain_tool','fixme'], title:'Bike repair station', createTags:{amenity:'bicycle_repair_station'}, createOptTags:['service:bicycle:pump','service:bicycle:chain_tool','description'], showGoogle:true},
     {id:"osm_bicycle_shop", names:'Bike Shops', name:'Bike Shop', enabled: false, image:'bike-shop.png', key:'shop', val:'bicycle', showName:true, tags: ['name','service:bicycle:repair','service:bicycle:pump','description','phone','website','fixme'], title:'Bike shop', createTags:{shop:'bicycle'}, createOptTags:['name','description'], showGoogle:true},
+    {id:"osm_bicycle_repair_stations", names:'Repair Stations',name:'Repair Station', enabled: false, image:'bike-repair.png', key:'amenity', val:'bicycle_repair_station', showName:false, tags: ['amenity','service:bicycle:pump','service:bicycle:chain_tool','fixme'], title:'Bike repair station', createTags:{amenity:'bicycle_repair_station'}, createOptTags:['service:bicycle:pump','service:bicycle:chain_tool','description'], showGoogle:true},
+    {id:"osm_air_compressors", names:'Compressed Air', name:'Compressed Air', enabled: false, image:'bike-compressor.png', key:'amenity', val:'compressed_air', showName:false, tags: ['amenity','description','fee','fixme'], title:'Compressed air', createTags:{amenity:'compressed_air'}, createOptTags:['fee'], showGoogle:true},
     {id:"osm_drinking_water", names:'Drinking Water', name:'Drinking Water', enabled: false, image:'bike-fountain.png', key:'amenity', val:'drinking_water', showName:false, tags: ['amenity','indoor','seasonal','bottle','description','fixme'], title:'Drinking fountain', createTags:{amenity:'drinking_water'}, createOptTags:['bottle','indoor'], showGoogle:true},
     {id:"osm_toilets", names:'Toilets', name:'Toilet', enabled: false, image:'bike-toilet.png', key:'amenity', val:'toilets', showName:false, tags: ['amenity','indoor','seasonal','fee','description','fixme'], title:'Toilet', createTags:{amenity:'toilets'}, createOptTags:['fee','description'], showGoogle:true},
     {id:"osm_shelters", names:'Shelters', name:'Shelter', enabled: false, image:'bike-shelter.png', key:'amenity', val:'shelter', showName:false, tags: ['amenity','description','fixme'], title:'Shelter', createTags:{amenity:'shelter'}, createOptTags:['description'], showGoogle:true},
-    {id:"osm_air_compressors", names:'Compressed Air', name:'Compressed Air', enabled: false, image:'bike-compressor.png', key:'amenity', val:'compressed_air', showName:false, tags: ['amenity','description','fee','fixme'], title:'Compressed air', createTags:{amenity:'compressed_air'}, createOptTags:['fee'], showGoogle:true},
     {id:"osm_phone", names:'Payphones', name:'Payphone', enabled: false, image:'bike-telephone.png', key:'amenity', val:'telephone', showName:false, tags: ['description','fixme'], title:'Payphone', createTags:{amenity:'telephone'}, createOptTags:['description'], showGoogle:true},
     {id:"osm_picnic_tables", names:'Picnic Tables', name:'Picnic Table', enabled: false, image:'bike-picnic.png', key:'leisure', val:'picnic_table', showName:false, tags: ['amenity','covered','description','fixme'], title:'Picnic table', createTags:{leisure:'picnic_table'}, createOptTags:['covered'], showGoogle:true},
     {id:"osm_bench", names:'Benches', name:'Bench', enabled: false, image:'bike-bench.png', key:'amenity', val:'bench', showName:false, tags: ['amenity','backrest','material','fixme'], title:'Bench', createTags:{amenity:'bench'}, createOptTags:['backrest','material'], showGoogle:true},
     {id:"osm_bbq", names:'Outdoor Grills', name:'Outdoor Grill', enabled: false, image:'bike-bbq.png', key:'amenity', val:'bbq', showName:false, tags: ['amenity','covered','fuel','description','fixme'], title:'Outdoor grill', createTags:{amenity:'bbq'}, createOptTags:['fuel'], showGoogle:true},
     {id:"osm_pubs", names:'Pubs', name:'Pub', enabled: false, image:'bike-pub.png', key:'amenity', val:'pub', showName:true, tags: ['amenity','name','outdoor_seating','description','phone','website','fixme'], title:'Pub', createTags:{amenity:'pub'}, createOptTags:['name','outdoor_seating','description'], showGoogle:true},
+    {id:"osm_brewery", names:'Craft Breweries', name:'Craft Brewery', enabled: false, image:'bike-brew.png', key:'craft', val:'brewery', showName:true, tags: ['name','outdoor_seating','description','phone','website','fixme'], title:'Craft Brewery', createTags:{craft:'brewery'}, createOptTags:['name','outdoor_seating','description'], showGoogle:true},
     {id:"osm_restaurants", names:'Restaurants', name:'Restaurant', enabled: false, image:'bike-restaurant.png', key:'amenity', val:'restaurant', showName:true, tags: ['amenity','name','cuisine','takeaway','outdoor_seating','description','phone','website','fixme'], title:'Restaurant', createTags:{amenity:'restaurant'}, createOptTags:['name','cuisine','outdoor_seating','description'], showGoogle:true},
     {id:"osm_fastfood", names:'Fast Food', name:'Fast Food Place', enabled: false, image:'bike-fastfood.png', key:'amenity', val:'fast_food', showName:true, tags: ['amenity','name','cuisine','outdoor_seating','description','phone','website','fixme'], title:'Fast food place', createTags:{amenity:'fast_food'}, createOptTags:['name','cuisine','outdoor_seating','description'], showGoogle:true},
     {id:"osm_cafes", names:'Cafes', name:'Cafe', enabled: false, image:'bike-cafe.png', key:'amenity', val:'cafe', showName:true, tags: ['amenity','name','cuisine','outdoor_seating','description','phone','website','fixme'], title:'Cafe', createTags:{amenity:'cafe'}, createOptTags:['name','outdoor_seating','description'], showGoogle:true},
@@ -338,11 +339,16 @@ map.on('style.load', function () {
 });
 
 const form = document.getElementById("layers");
+const url = parseUrl(window.location.search.substr(1).split('&'));
+const enabled = url['layers'] ? url['layers'].split(';') : [];
+
 g_layers.forEach(l => {
   const input = document.createElement("input");
   input.setAttribute('type', 'checkbox')
   input.setAttribute('id',l.id)
-  if(l.enabled){ input.setAttribute('checked','checked')}
+  if(l.enabled || enabled.includes(l.id)){
+    input.setAttribute('checked','checked')
+  }
   input.onclick = toggleFilter
   form.appendChild(input);
   const label = document.createElement('label')
@@ -376,6 +382,7 @@ buttons.appendChild(bottom);
 
 function toggleFilter(event) {
   map.setLayoutProperty(event.target.id, 'visibility', document.getElementById(event.target.id).checked?'visible':'none')
+  buildUrl()
 }
 
 let g_newPlaceType = ''
@@ -439,6 +446,20 @@ function chooseNewPlace(event) {
 
 }
 
+function buildUrl(id=''){
+  let layers='';
+  for (let layer of g_layers){
+    layers += document.getElementById(layer.id).checked ? layer.id+';' : '';
+  }
+  window.history.replaceState(null, null, window.location.pathname
+    +'?&lat='+map.getCenter().lat
+    +'&lng='+map.getCenter().lng
+    +'&zoom='+map.getZoom()
+    +(layers==''?'':('&layers='+layers))
+    +(id==''?'':('&id='+id)));
+
+}
+
 function newPlaceParamsSubmit() {
   document.getElementById("newPlaceParams").classList.add('hidden')
   document.getElementById('success').classList.add('hidden');
@@ -490,7 +511,7 @@ function newPlaceParamsSubmit() {
 map.on('moveend', function(e) {
   document.getElementById('success').classList.add('hidden');
   document.getElementById('error').classList.add('hidden');
-  window.history.replaceState(null, null, window.location.pathname+'?&lat='+map.getCenter().lat+'&lng='+map.getCenter().lng+'&zoom='+map.getZoom());
+  buildUrl();
 });
 
 map.on('click', function(e) {
@@ -524,7 +545,8 @@ map.on('click', function(e) {
     displayOsmElementInfo(feature.properties.id, e.lngLat,['name','description','fixme'], 'Bicycle amenities based on mapillary and local knowledge - https://maps.bikeottawa.ca/amenities', '', true);
   }
 
-  window.history.replaceState(null, null, window.location.pathname+'?&lat='+e.lngLat.lat+'&lng='+e.lngLat.lng+'&zoom='+map.getZoom()+'&id='+feature.properties.id);
+  buildUrl(feature.properties.id);
+  //window.history.replaceState(null, null, window.location.pathname+'?&lat='+e.lngLat.lat+'&lng='+e.lngLat.lng+'&zoom='+map.getZoom()+'&id='+feature.properties.id+'&layers='+getCheckedLayers());
 });
 
 map.on('mousemove', function(e) {
@@ -537,7 +559,7 @@ map.on('mousemove', function(e) {
 map.on('load', function(e) {
     addUpdatedDate('bikeottawa.6e5700mn')
     document.getElementById("loader").style.visibility = "hidden";
-    url = parseUrl(window.location.search.substr(1).split('&'));
+    const url = parseUrl(window.location.search.substr(1).split('&'));
     const lat = url['lat']
     const lng = url['lng']
     let z = url['zoom']
