@@ -152,7 +152,7 @@ displayOsmElementInfo = function (element, lngLat, showTags, changesetComment, t
           if(showTags.length>0 && !showTags.includes(key.tag)) continue;
           if(!Array.isArray(key.options)) continue;
 
-          popup += `<div id="${key.tag}-div" style="max-width:200px"><li style="margin:4px 0 4px 0"><div class="tooltip">${key.name}:&nbsp;&nbsp;`;
+          popup += `<div id="${key.tag}-div" style="max-width:300px"><li style="white-space:nowrap;margin:4px 0 4px 0"><div class="tooltip">${key.name}:&nbsp;&nbsp;`;
 
           if(key.options[0] == 'text'){
             popup += `</div><div class="inline" id="text-${key.tag}"><strong>${tag}</strong></div>`;
