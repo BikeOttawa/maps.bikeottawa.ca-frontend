@@ -85,16 +85,17 @@
   <div id='newPlaceParamsContent' class='pad1 dark'></div>
   <div id='newPlaceParamsBtn' class='margin4 width8 fill-darken2 button space-bottom' onclick="newPlaceParamsSubmit()">Submit</div>
 </div>
-<div id='bikeParkingHint' class='centered fill-darken3 width28 round hidden' >
+<div id='bikeParkingHint' class='centered fill-darken3 width36 round hidden1' >
   <div id='bikeParkingHintTitle' class='pad1 dark inline'>
     <h3>Bicycle parking</h3>
   </div>
   <div class='fill-darken1 icon close button fr' onclick="document.getElementById('bikeParkingHint').classList.add('hidden');"></div>
-  <div id='bikeParkingHintContent' class='pad1 dark center'>
-    <div class='width13 pad0'><img src='../img/amenities/parking_bollard.jpg'>Bollard</div>
-    <div class='width13 pad0'><img src='../img/amenities/parking_rack.jpg'>Rack</div>
-    <div class='width13 pad0'><img src='../img/amenities/parking_loops.jpg'>Loops</div>
-    <div class='width13 pad0'><img src='../img/amenities/parking_stands.jpg'>Stands</div>
+  <div id='bikeParkingHintContent' class='pad1 dark'>
+  <div class='small'>If there are multiple bike racks next to each other, map one rack on the map and assign combined capacity.</div>
+    <div class='width16 pad0 center'><img src='../img/amenities/parking_bollard.jpg'>Bollard</div>
+    <div class='width16 pad0 center'><img src='../img/amenities/parking_rack.jpg'>Rack</div>
+    <div class='width16 pad0 center'><img src='../img/amenities/parking_loops.jpg'>Loops</div>
+    <div class='width16 pad0 center'><img src='../img/amenities/parking_stands.jpg'>Stands</div>
   </div>
 </div>
 <div class="loading" title="loading..." id="loader"></div>
