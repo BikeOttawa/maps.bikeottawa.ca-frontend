@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset='utf-8' />
-    <title>The Utlimate Ottawa Pathway Map</title>
+    <title>Ottawa Pathways Map</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js'></script>
     <script  data-cfasync="false" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
@@ -22,9 +22,9 @@
 <div id='app' class='col12 contain clip'>
 <div id='map'></div>
 <div id='menu'>
-  <input id='dark-v10' type='radio' name='rtoggle' value='dark' checked='checked'>
+  <input id='dark-v10' type='radio' name='rtoggle' value='dark' >
   <label for='dark-v10'>dark</label>
-  <input id='light-v10' type='radio' name='rtoggle' value='light' >
+  <input id='light-v10' type='radio' name='rtoggle' value='light' checked='checked'>
   <label for='light-v10'>light</label>
   <input id='bright-v9' type='radio' name='rtoggle' value='bright'>
   <label for='bright-v9'>bright</label>
@@ -80,9 +80,10 @@
       </form>
       <div class='clearfix'></div>
       <div class='hide-mobile pad1 small'>
-        <p>This is the ultimate map of pathways in Ottawa.<br>
+        <p>This map shows pathways in Ottawa.<br>
         The map is maintained by Bike Ottawa volunteers like you and our goal is to put on the map as much information about our pathway network as possible.<br>
-        If you are familiar with a pathway near you, click on the path and add missing properties. It's that easy!</p>
+        If you are familiar with a pathway near you, click on the path and add missing properties. It's that easy!<br>
+        <i>Note: sidewalks are not shown.</i></p>
       </div>
       <div class='hide-mobile center pad1'>
       	<a href='https://bikeottawa.ca' target="_blank"><img src="../img/logos/bikeottawa.png" style="width:32px; height:32px;"></a>
@@ -320,24 +321,28 @@ function init() {
         }
     });
 
+    toggleSurfaces()
+    toggleMapillary()
+    toggleUnknown()
+
 }
 
 map.on('style.load', function () {
     init()
 });
 
-function toggleUnknown(checkbox) {
+function toggleUnknown(checkbox='') {
   const filter = map.getFilter(Mapbox.layerName);
   filter[1][1][0]=(document.getElementById('unknown_width').checked)?'==':'<';
   map.setFilter(Mapbox.layerName, filter);
 }
 
-function toggleMapillary(checkbox) {
-  map.setLayoutProperty('mapillary', 'visibility', checkbox.currentTarget.checked?'visible':'none');
+function toggleMapillary(checkbox='') {
+  map.setLayoutProperty('mapillary', 'visibility', document.getElementById('mapillary_tracks').checked?'visible':'none');
 }
 
 
-function toggleSurfaces(checkbox) {
+function toggleSurfaces(checkbox='') {
   const filter = map.getFilter(Mapbox.layerName);
   const surfacesOn = Array.from(
     document.querySelector('.surfaces').querySelectorAll('input:checked')
