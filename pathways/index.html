@@ -48,6 +48,8 @@
       <fieldset class='checkbox-pill clearfix pad1'>
         <input type='checkbox' id='unknown_width' checked='checked'>
         <label for='unknown_width' id='unknown_width-label' class='short button icon check quiet col12' style='text-align:left;'><span style='display: inline-block;width:50px;height:8px;background-color:#F0C808'></span>&nbsp;&nbsp;Unknown width</label>
+        <input type='checkbox' id='sidewalks'>
+        <label for='sidewalks' id='sidewalks-label' class='short button icon check quiet col12' style='text-align:left;'><span style='display: inline-block;width:50px;height:8px;background-color:#7493B0'></span>&nbsp;&nbsp;Sidewalks</label>
       </fieldset>
       <h3>Pathway surface</h3><br>
       <fieldset class='mobile-cols surfaces checkbox-pill clearfix '>
@@ -124,8 +126,8 @@ const layers = [
     {id:"unknown", name:'Unknown width', color:'#F0C808', opacity:0.9, filter:['==',['to-number',['get', 'width']], 0]/*["==", ["get", "width"], null]*/}
 ];
 const Mapbox = {
-    url: 'bikeottawa.6wnvt0cx',
-    layer: '6wnvt0cx',
+    url: 'bikeottawa.1bli4ynb',
+    layer: '1bli4ynb',
     layerName: 'pathways'
 };
 /*const ChartBackgroundColors = [
@@ -176,6 +178,7 @@ map.addControl(new mapboxgl.GeolocateControl({
 addStyleSwitcher();
 
 document.getElementById('unknown_width').onclick = toggleUnknown;
+document.getElementById('sidewalks').onclick = toggleSidewalks;
 document.getElementById('mapillary_tracks').onclick = toggleMapillary;
 
 if (!/Mobi/.test(navigator.userAgent)) {
@@ -278,7 +281,8 @@ function init() {
                     ['==', ['get', 'surface'], 'wood'],
                     ['==', ['get', 'surface'], 'sand'],
                     ['==', ['get', 'surface'], null],
-                ]
+                  ],
+                  ['!=',['get', 'footway'], 'sidewalk']
               ]
 
     });
@@ -324,6 +328,7 @@ function init() {
     toggleSurfaces()
     toggleMapillary()
     toggleUnknown()
+    toggleSidewalks()
 
 }
 
@@ -334,6 +339,17 @@ map.on('style.load', function () {
 function toggleUnknown(checkbox='') {
   const filter = map.getFilter(Mapbox.layerName);
   filter[1][1][0]=(document.getElementById('unknown_width').checked)?'==':'<';
+  map.setFilter(Mapbox.layerName, filter);
+}
+
+function toggleSidewalks(checkbox='') {
+  const filter = map.getFilter(Mapbox.layerName);
+  if(document.getElementById('sidewalks').checked){
+    filter.length=3;
+  }
+  else{
+    filter[3]=['!=',['get', 'footway'], 'sidewalk'];
+  }
   map.setFilter(Mapbox.layerName, filter);
 }
 
