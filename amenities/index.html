@@ -685,7 +685,7 @@
 
             map.addSource('bike_amenities', {
                 type: 'vector',
-                url: 'mapbox://bikeottawa.6e5700mn',
+                url: 'mapbox://bikeottawa.6e5700mn?fresh=true',
             });
             g_layers.forEach(layer => {
                 map.loadImage('../img/amenities/' + layer.image, function(error, image) {
