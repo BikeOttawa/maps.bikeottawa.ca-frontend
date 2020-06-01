@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Bike Thefts in Ottawa</title>
+<script src="https://api.mapbox.com/mapbox-gl-js/v1.10.1/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v1.10.1/mapbox-gl.css" rel="stylesheet" />
+<link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
+<style>
+	body { margin:0; padding:0; }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+        .loader {
+            margin: 0 0 0 0 ;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+        }
+        svg path,
+        svg rect {
+            fill: #FF0000;
+        }
+        /* Dark attribution */
+        .mapboxgl-ctrl.mapboxgl-ctrl-attrib {
+           background: rgba(0, 0, 0, .8);
+        }
+
+        .mapboxgl-ctrl.mapboxgl-ctrl-attrib a {
+           color: #fff;
+        }
+        ::-webkit-scrollbar {
+          width: 10px;
+        }
+
+        /* Track */
+        ::-webkit-scrollbar-track {
+          background: #f1f1f1;
+        }
+
+        /* Handle */
+        ::-webkit-scrollbar-thumb {
+          background: #888;
+        }
+        ul{
+          list-style-type: circle; 
+          list-style-position: inside;
+        }
+
+        .mapboxgl-popup-content {
+            overflow-y: scroll;
+            width: 250px;
+            max-height: 400px;
+            font: 12px/20px 'Open Sans', sans-serif;
+            border-radius: 5px;
+            background-color: #666;
+            color: #fff;
+            margin-left: 15px;
+            margin-top: 2px;
+            margin-bottom: 2px;
+            margin-right: 5px;
+            z-index: 1000;
+        }
+</style>
+</head>
+<body>
+
+  
+<div id="map"></div>
+<div class = 'fill-lighten3 col4 hidden row7 rounded-toggle pin-right' id='listings'>
+  <!-- <form>
+    <h5>Year</h5>
+    <div class='rounded-toggle inline'>
+      <input type='radio' name='year' id='yearAll' value='yearAll' checked='checked'>
+      <label for='yearAll' >All</label>
+      <input type='radio' name='year' id='year2015' value='year2015'>
+      <label for='year2015' >2015</label>
+      <input type='radio' name='year' id='year2016' value='year2016'>
+      <label for='year2016' >2016</label>
+      <input type='radio' name='year' id='year2017' value='year2017'>
+      <label for='year2017' >2017</label>
+      <input type='radio' name='year' id='year2018' value='year2018'>
+      <label for='year2018' >2018</label>
+      <input type='radio' name='year' id='year2019' value='year2019'>
+      <label for='year2019' >2019</label>
+    </div>
+    <h5>Most expensive</h5>
+    <div class='rounded-toggle inline' style='height:33px'>
+      <div id='min_cols' style='width: 20px'>1</div>
+      <fieldset>
+        <input id='min_col_slider' type='range' value='1' min='1' max='7' step='1'>
+      </fieldset>
+      <div id='max_cols'>10000</div>
+    </div> -->
+    <div class='center pad2'>
+    	<a href='https://bikeottawa.ca' target="_blank"><img src="../img/logos/bikeottawa.png" style="width:32px; height:32px;"></a>
+      <a href='https://github.com/BikeOttawa/maps.bikeottawa.ca-frontend' target="_blank"><img src="../img/logos/github.png" style="width:32px; height:32px;"></a>
+      <a href='https://twitter.com/BikeOttawa' target="_blank"><img src="../img/logos/twitter.png" style="width:32px; height:32px;"></a>
+    </div>
+</div>
+<div class="loader loader--style1" title="0" id="loader">
+  <svg version="1.1" id="loader-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="40px" height="40px" viewBox="0 0 40 40" enable-background="new 0 0 40 40" xml:space="preserve">
+      <path opacity="0.2" fill="#000" d="M20.201,5.169c-8.254,0-14.946,6.692-14.946,14.946c0,8.255,6.692,14.946,14.946,14.946
+s14.946-6.691,14.946-14.946C35.146,11.861,28.455,5.169,20.201,5.169z M20.201,31.749c-6.425,0-11.634-5.208-11.634-11.634
+c0-6.425,5.209-11.634,11.634-11.634c6.425,0,11.633,5.209,11.633,11.634C31.834,26.541,26.626,31.749,20.201,31.749z" />
+      <path fill="#000" d="M26.013,10.047l1.654-2.866c-2.198-1.272-4.743-2.012-7.466-2.012h0v3.312h0
+C22.32,8.481,24.301,9.057,26.013,10.047z">
+          <animateTransform attributeType="xml" attributeName="transform" type="rotate" from="0 20 20" to="360 20 20" dur="0.5s" repeatCount="indefinite" />
+      </path>
+  </svg>
+</div>
+
+<script>
+  
+  function showThefts(features){  //features - array of geojson features to show on the right
+
+    features.sort(function(a,b){
+                                      if(!b.properties['bike_value']) return -100000;
+                                      if(!a.properties['bike_value']) return 100000;
+                                      return parseInt(b.properties['bike_value']) - parseInt(a.properties['bike_value'])})
+
+    var text = '<strong>Bike Thefts: ' + features.length + '</strong><br><hr><ul>';
+    for(let feature of features){
+        text += '<li><strong>'+(feature.properties['bike_make'] ? feature.properties['bike_make'] : 'Unknown') + '</strong>';
+        text += (feature.properties['bike_value']) ? (' ($'+feature.properties['bike_value']+')') : '';
+        text += ' in '+feature.properties['case_year']+'</li>\n';
+    }
+    text+='</ul>';
+    var coordinates = features[0].geometry.coordinates.slice();
+    new mapboxgl.Popup()
+                  .setLngLat(coordinates)
+                  .setHTML(text)
+                  .addTo(map);
+
+  }
+
+	mapboxgl.accessToken = 'pk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdqaWxrN3gwZXQ4MnFxbjAwZXRpbG8zIn0.XhAdk2ASwdipubccCWTfoQ';
+    var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/dark-v10',
+        center: [-75.697927, 45.417431],
+        zoom: 12,
+        minZoom: 8,
+        maxZoom: 17,
+        maxBounds: [
+            [-76.385193, 44.963826],
+            [-75.011902, 45.614998]
+        ]
+    });
+
+    map.on('load', function() {
+         map.addSource('thefts', {
+            type: 'geojson',
+            data: 'bike-thefts.geojson',
+            //type: 'vector',
+            //url: 'mapbox://bikeottawa.9hvb3t9r',  //clustering for vector tiles is not supported by mapbox at this time
+            cluster: true,
+            clusterMaxZoom: 17, // Max zoom to cluster points on
+            clusterRadius: 30 // Radius of each cluster when clustering points (defaults to 50)
+        });
+
+        map.addLayer({
+            id: 'clusters',
+            type: 'circle',
+            'source': 'thefts',
+            //'source-layer':  'bike-thefts-bj12rb',
+            paint: {
+                      "circle-color": [
+                      "interpolate",
+                      ["linear"],
+                      ["get", "point_count"],
+                      1, "yellow",
+                      100, "red"
+                  ],
+                  'circle-radius': [
+                    "interpolate",
+                    ["linear"],
+                    ["zoom"],
+                    10, [                     //at min zoom
+                        "interpolate",
+                        ["exponential", 0.9],
+                        ["get", "point_count"],
+                        1, 1,                 //1 theft = 1 pixel
+                        100, 20                 //30 thefts = 20 pixels
+                    ],
+                    17, [                     //at max zoom
+                        "interpolate",
+                        ["exponential", 0.9],
+                        ["get", "point_count"],
+                        1, 8,                  //1 theft = 8 pixels
+                        300, 50                 //30 thefts = 50 pixels
+                    ]
+                  ],
+                  'circle-opacity': 0.7,
+               
+            },
+            filter: ['has', 'point_count'],
+            //filter: ['>', ['get', 'case_year'], 2014] 
+        });
+
+        map.addLayer({
+            id: 'cluster-count',
+            type: 'symbol',
+            //'source-layer':  'bike-thefts-bj12rb',
+            source: 'thefts',
+            layout: {
+                'text-field': '{point_count_abbreviated}',
+                'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+                'text-size': 12
+            },
+            filter: ['has', 'point_count'],
+        });
+
+        map.addLayer({
+            id: 'unclustered-point',
+            type: 'circle',
+            //'source-layer':  'bike-thefts-bj12rb',
+            source: 'thefts',
+            paint: {
+                  "circle-color":  "yellow",
+                  'circle-opacity': 0.7,
+                  'circle-stroke-width': 1,
+                  'circle-stroke-color': '#fff',
+                  'circle-radius': [
+                    "interpolate",
+                    ["linear"],
+                    ["zoom"],
+                    10, 1,                 //1 theft = 1 pixel
+                    17, 8                  //1 theft = 8 pixels
+                  ],
+               
+            },
+            filter: ['!', ['has', 'point_count']],
+        });
+
+        
+        document.getElementById("loader").style.visibility = "hidden";
+
+        // inspect a cluster on click
+        map.on('click', 'clusters', function(e) {
+            var features = map.queryRenderedFeatures(e.point, {
+                layers: ['clusters']
+            });
+            var clusterId = features[0].properties.cluster_id;
+            map.getSource('thefts').getClusterExpansionZoom(
+                clusterId,
+                function(err, zoom) {
+                    if (err) return;
+                    
+                    
+                    if(zoom==18){
+                      
+                      var clusterId = features[0].properties.cluster_id;
+                      var pointCount = features[0].properties.point_count;
+                      var clusterSource = map.getSource('thefts');
+
+                      clusterSource.getClusterLeaves(clusterId, pointCount, 0, function(error, features) {
+                        showThefts(features);
+                      })
+                     
+                    }
+                    else{
+
+                      var clusterId = features[0].properties.cluster_id;
+                      var pointCount = features[0].properties.point_count;
+                      var clusterSource = map.getSource('thefts');
+                      clusterSource.getClusterLeaves(clusterId, pointCount, 0, function(error, features) {
+                        showThefts(features);
+                      })
+
+                      // map.easeTo({
+                      //     center: features[0].geometry.coordinates,
+                      //     zoom: zoom
+                      // });
+                    }
+                }
+            );
+        });
+
+        // When a click event occurs on a feature in
+        // the unclustered-point layer, open a popup at
+        // the location of the feature, with
+        // description HTML from its properties.
+        map.on('click', 'unclustered-point', function(e) {
+            var coordinates = e.features[0].geometry.coordinates.slice();
+             
+
+            // Ensure that if the map is zoomed out such that
+            // multiple copies of the feature are visible, the
+            // popup appears over the copy being pointed to.
+            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+            }
+
+            showThefts(e.features);
+            // new mapboxgl.Popup()
+            //     .setLngLat(coordinates)
+            //     .setHTML(
+            //         'Thefts: ' + 1 + '<br>'
+            //     )
+            //     .addTo(map);
+        });
+
+        map.on('mouseenter', 'clusters', function() {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+        map.on('mouseleave', 'clusters', function() {
+            map.getCanvas().style.cursor = '';
+        });
+        map.on('mouseenter', 'unclustered-point', function() {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+        map.on('mouseleave', 'unclustered-point', function() {
+            map.getCanvas().style.cursor = '';
+        });
+
+
+        // function toggleYear (checkbox) {
+          
+        // }
+
+        // document.getElementById('year2015').onclick = toggleYear
+        // document.getElementById('year2016').onclick = toggleYear
+        // document.getElementById('year2017').onclick = toggleYear
+        // document.getElementById('year2018').onclick = toggleYear
+        // document.getElementById('year2019').onclick = toggleYear
+        // document.getElementById('yearAll').onclick = toggleYear
+    });
+</script>
+
+</body>
+</html>
