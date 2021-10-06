@@ -181,8 +181,8 @@ map.once('style.load', function () {
         }
         var props = features[0].properties;
         let popup = '<h3>Collisions</h3><hr>';
-        popup += 'Cyclists: ' + props[collisions[1].column] + '<br>';
-        popup += 'Pedestrians: ' + props[collisions[0].column] + '<br>';
+        popup += 'Cyclists: ' + props[collisions[0].column] + '<br>';
+        popup += 'Pedestrians: ' + props[collisions[1].column] + '<br>';
         popup += 'All Modes: ' + props[collisions[2].column] + '<br>';
         gPopup = new mapboxgl.Popup()
             .setLngLat(e.lngLat)
