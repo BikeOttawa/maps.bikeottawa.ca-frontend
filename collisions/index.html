@@ -97,10 +97,16 @@ svg path, svg rect {
 
 // data sets and filters
 const years = [
-    { id: "yearAll", url: 'data/collisionsbylocationTotals.geojson', year: -1, label: "All" },
-    { id: "year2014", url: 'data/collisionsbylocation2014.geojson', year: 2014, label: "2014" },
-    { id: "year2015", url: 'data/collisionsbylocation2015.geojson', year: 2015, label: "2015" },
-    { id: "year2016", url: 'data/collisionsbylocation2016.geojson', year: 2016, label: "2016" }
+    // { id: "yearAll", url: 'data/collisionsbylocationTotals.geojson', year: -1, label: "All" },
+    // { id: "year2014", url: 'data/collisionsbylocation2014.geojson', year: 2014, label: "2014" },
+    // { id: "year2015", url: 'data/collisionsbylocation2015.geojson', year: 2015, label: "2015" },
+    // { id: "year2016", url: 'data/collisionsbylocation2016.geojson', year: 2016, label: "2016" }
+    { id: "yearAll", url: 'data/Traffic_Collisions_by_Location_2015_to_2019.geojson', year: -1, label: "All" },
+    { id: "year2015", url: 'data/Traffic_Collisions_by_Location_2015.geojson', year: 2015, label: "2015" },
+    { id: "year2016", url: 'data/Traffic_Collisions_by_Location_2016.geojson', year: 2016, label: "2016" },
+    { id: "year2017", url: 'data/Traffic_Collisions_by_Location_2017.geojson', year: 2017, label: "2017" },
+    { id: "year2018", url: 'data/Traffic_Collisions_by_Location_2018.geojson', year: 2018, label: "2018" },
+    { id: "year2019", url: 'data/Traffic_Collisions_by_Location_2019.geojson', year: 2019, label: "2019" }
 ];
 let activeLayer = 0;
 years.forEach(function (layer, i) {
@@ -119,9 +125,12 @@ years.forEach(function (layer, i) {
 });
 
 const collisions = [
-    { id: "col_bikes", column: "col_bikes", label: "Cyclists" },
-    { id: "col_peds", column: "col_peds", label: "Pedestrians" },
-    { id: "col_total", column: "col_total", label: "All Modes" }
+    // { id: "col_bikes", column: "col_bikes", label: "Cyclists" },
+    // { id: "col_peds", column: "col_peds", label: "Pedestrians" },
+    // { id: "col_total", column: "col_total", label: "All Modes" }
+    { id: "col_bikes", column: "CYCLIST_COLLISIONS", label: "Cyclists" },
+    { id: "col_peds", column: "PEDESTRIAN_COLLISIONS", label: "Pedestrians" },
+    { id: "col_total", column: "TOTAL_COLLISIONS", label: "All Modes" }
 ];
 collisions.forEach(function (filter, i) {
     let radio = document.createElement("input");
