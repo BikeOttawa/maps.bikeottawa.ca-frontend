@@ -1,216 +1,252 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset='utf-8' />
-    <title>Ottawa Collision Map</title>
-    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js'></script>
-    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css' rel='stylesheet' />
-    <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
-    <style>
-        body { margin:0; padding:0; }
-        #map { position:absolute; top:0; bottom:0; width:100%; }
-        .loader {
-            margin: 0 0 0 0 ;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-        }
-        svg path,
-        svg rect {
-            fill: #FF0000;
-        }
-        /* Dark attribution */
 
-        .mapboxgl-ctrl.mapboxgl-ctrl-attrib {
-           background: rgba(0, 0, 0, .8);
-        }
+    <head>
+        <meta charset='utf-8' />
+        <title>Ottawa Collision Map</title>
+        <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js'></script>
+        <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css' rel='stylesheet' />
+        <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
 
-        .mapboxgl-ctrl.mapboxgl-ctrl-attrib a {
-           color: #fff;
-        }
-        /* Dark popup */
+        <style>
 
-        .mapboxgl-popup-content {
-           background-color: #444;
-           color: #fff;
-           margin-left: 5px;
-           margin-top: 2px;
-           margin-bottom: 2px;
-           margin-right: 5px;
-           z-index: 1000;
-        }
+body {
+    margin: 0;
+    padding: 0;
+}
+#map {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+}
+.loader {
+    margin: 0;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+}
+svg path, svg rect {
+    fill: #FF0000;
+}
 
-    </style>
-</head>
-<body>
-<div id='map'></div>
-<div class = 'fill-lighten3 col3 pad2x row7 rounded-toggle pin-right'>
-  <form>
-    <h5>Year</h5>
-    <div class='rounded-toggle inline'>
-      <input type='radio' name='year' id='yearAll' value='yearAll' checked='checked'>
-      <label for='yearAll' >All</label>
-      <input type='radio' name='year' id='year2014' value='year2014' >
-      <label for='year2014' >2014</label>
-      <input type='radio' name='year' id='year2015' value='year2015'>
-      <label for='year2015' >2015</label>
-      <input type='radio' name='year' id='year2016' value='year2016'>
-      <label for='year2016' >2016</label>
-    </div>
-    <h5>Collisions involving</h5>
-    <div class='rounded-toggle inline'>
-      <input type='radio' name='collisions' id='col_peds' value='col_peds' checked='checked'>
-      <label for='col_peds' >Pedestrians</label>
-      <input type='radio' name='collisions' id='col_bikes' value='col_bikes'>
-      <label for='col_bikes' >Cyclists</label>
-      <input type='radio' name='collisions' id='col_total' value='col_total'>
-      <label for='col_total' >Drivers</label>
-    </div>
-    <h5>Most dangerous</h5>
-    <div class='rounded-toggle inline' style='height:33px'>
-      <div id='min_cols' style='width: 20px'>1</div>
-      <fieldset>
-        <input id='min_col_slider' type='range' value='1' min='1' max='7' step='1'>
-      </fieldset>
-      <div id='max_cols'>7</div>
-    </div>
-    <div class='center pad2'>
-    	<a href='https://bikeottawa.ca' target="_blank"><img src="../img/logos/bikeottawa.png" style="width:32px; height:32px;"></a>
-      <a href='https://github.com/BikeOttawa/maps.bikeottawa.ca-frontend' target="_blank"><img src="../img/logos/github.png" style="width:32px; height:32px;"></a>
-      <a href='https://twitter.com/BikeOttawa' target="_blank"><img src="../img/logos/twitter.png" style="width:32px; height:32px;"></a>
-    </div>
-</div>
-<div class="loader loader--style1" title="0" id="loader">
-        <svg version="1.1" id="loader-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="40px" height="40px" viewBox="0 0 40 40" enable-background="new 0 0 40 40" xml:space="preserve">
-            <path opacity="0.2" fill="#000" d="M20.201,5.169c-8.254,0-14.946,6.692-14.946,14.946c0,8.255,6.692,14.946,14.946,14.946
-    s14.946-6.691,14.946-14.946C35.146,11.861,28.455,5.169,20.201,5.169z M20.201,31.749c-6.425,0-11.634-5.208-11.634-11.634
-    c0-6.425,5.209-11.634,11.634-11.634c6.425,0,11.633,5.209,11.633,11.634C31.834,26.541,26.626,31.749,20.201,31.749z" />
-            <path fill="#000" d="M26.013,10.047l1.654-2.866c-2.198-1.272-4.743-2.012-7.466-2.012h0v3.312h0
-    C22.32,8.481,24.301,9.057,26.013,10.047z">
-                <animateTransform attributeType="xml" attributeName="transform" type="rotate" from="0 20 20" to="360 20 20" dur="0.5s" repeatCount="indefinite" />
-            </path>
-        </svg>
-    </div>
-</div>
+/* Dark attribution */
+.mapboxgl-ctrl.mapboxgl-ctrl-attrib {
+    background: rgba(0, 0, 0, .8);
+}
+.mapboxgl-ctrl.mapboxgl-ctrl-attrib a {
+    color: #fff;
+}
+/* Dark popup */
+.mapboxgl-popup-content {
+    background-color: #444;
+    color: #fff;
+    margin-left: 5px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    margin-right: 5px;
+    z-index: 1000;
+}
 
-<script>
+        </style>
+    </head>
+
+    <body>
+        <div id='map'></div>
+
+        <!-- controls -->
+        <div class = 'fill-lighten3 col4 pad2x row7 rounded-toggle pin-right'>
+            <form>
+                <h5>Year</h5>
+                <div id="yearRadio" class='rounded-toggle inline'>
+                    <!-- buttons added programatically -->
+                </div>
+                <h5>Collisions involving</h5>
+                <div id="collisionsRadio" class='rounded-toggle inline'>
+                    <!-- buttons added programatically -->
+                </div>
+                <h5>Most dangerous</h5>
+                <div class='rounded-toggle inline' style='height:33px'>
+                    <div id='min_cols' style='width: 20px'>1</div>
+                    <fieldset>
+                        <input id='min_col_slider' type='range' value='1' min='1' max='7' step='1'>
+                    </fieldset>
+                    <div id='max_cols'>7</div>
+                </div>
+            </form>
+            <div class='center pad2'>
+                <a href='https://bikeottawa.ca' target="_blank"><img src="../img/logos/bikeottawa.png" style="width:32px; height:32px;"></a>
+                <a href='https://github.com/BikeOttawa/maps.bikeottawa.ca-frontend' target="_blank"><img src="../img/logos/github.png" style="width:32px; height:32px;"></a>
+                <a href='https://twitter.com/BikeOttawa' target="_blank"><img src="../img/logos/twitter.png" style="width:32px; height:32px;"></a>
+            </div>
+        </div>
+
+        <!-- loading animation -->
+        <div class="loader loader--style1" title="0" id="loader">
+            <svg version="1.1" id="loader-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="40px" height="40px" viewBox="0 0 40 40" enable-background="new 0 0 40 40" xml:space="preserve">
+                <path opacity="0.2" fill="#000" d="M20.201,5.169c-8.254,0-14.946,6.692-14.946,14.946c0,8.255,6.692,14.946,14.946,14.946,s14.946-6.691,14.946-14.946C35.146,11.861,28.455,5.169,20.201,5.169z M20.201,31.749c-6.425,0-11.634-5.208-11.634-11.634,c0-6.425,5.209-11.634,11.634-11.634c6.425,0,11.633,5.209,11.633,11.634C31.834,26.541,26.626,31.749,20.201,31.749z" />
+                <path fill="#000" d="M26.013,10.047l1.654-2.866c-2.198-1.272-4.743-2.012-7.466-2.012h0v3.312h0,C22.32,8.481,24.301,9.057,26.013,10.047z">
+                    <animateTransform attributeType="xml" attributeName="transform" type="rotate" from="0 20 20" to="360 20 20" dur="0.5s" repeatCount="indefinite" />
+                </path>
+            </svg>
+        </div>
+    </div>
+
+    <script>
+
+// data sets and filters
 const years = [
-    {id:"yearAll", url: 'data/collisionsbylocationTotals.geojson', year:-1},
-    {id:"year2014", url: 'data/collisionsbylocation2014.geojson', year:2014},
-    {id:"year2015", url: 'data/collisionsbylocation2015.geojson', year:2015},
-    {id:"year2016", url: 'data/collisionsbylocation2016.geojson', year:2016},
-  ];
+    // { id: "yearAll", url: 'data/collisionsbylocationTotals.geojson', year: -1, label: "All" },
+    // { id: "year2014", url: 'data/collisionsbylocation2014.geojson', year: 2014, label: "2014" },
+    // { id: "year2015", url: 'data/collisionsbylocation2015.geojson', year: 2015, label: "2015" },
+    // { id: "year2016", url: 'data/collisionsbylocation2016.geojson', year: 2016, label: "2016" }
+    { id: "yearAll", url: 'data/Traffic_Collisions_by_Location_2015_to_2019.geojson', year: -1, label: "All" },
+    { id: "year2015", url: 'data/Traffic_Collisions_by_Location_2015.geojson', year: 2015, label: "2015" },
+    { id: "year2016", url: 'data/Traffic_Collisions_by_Location_2016.geojson', year: 2016, label: "2016" },
+    { id: "year2017", url: 'data/Traffic_Collisions_by_Location_2017.geojson', year: 2017, label: "2017" },
+    { id: "year2018", url: 'data/Traffic_Collisions_by_Location_2018.geojson', year: 2018, label: "2018" },
+    { id: "year2019", url: 'data/Traffic_Collisions_by_Location_2019.geojson', year: 2019, label: "2019" }
+];
+let activeLayer = 0;
+years.forEach(function (layer, i) {
+    let radio = document.createElement("input");
+    radio.type = "radio";
+    radio.name = "year";
+    radio.id = layer.id;
+    radio.value = layer.id;
+    radio.checked = i == activeLayer;
+    radio.onclick = toggleLayer;
+    let label = document.createElement("label");
+    label.htmlFor = layer.id;
+    label.innerHTML = layer.label;
+    document.getElementById("yearRadio").appendChild(radio);
+    document.getElementById("yearRadio").appendChild(label);
+});
 
-let activeLayer = 0
+const collisions = [
+    // { id: "col_bikes", column: "col_bikes", label: "Cyclists" },
+    // { id: "col_peds", column: "col_peds", label: "Pedestrians" },
+    // { id: "col_total", column: "col_total", label: "All Modes" }
+    { id: "col_bikes", column: "CYCLIST_COLLISIONS", label: "Cyclists" },
+    { id: "col_peds", column: "PEDESTRIAN_COLLISIONS", label: "Pedestrians" },
+    { id: "col_total", column: "TOTAL_COLLISIONS", label: "All Modes" }
+];
+collisions.forEach(function (filter, i) {
+    let radio = document.createElement("input");
+    radio.type = "radio";
+    radio.name = "collisions";
+    radio.id = filter.id;
+    radio.value = filter.column;
+    radio.checked = i == 0;
+    radio.onclick = toggleFilters;
+    let label = document.createElement("label");
+    label.htmlFor = filter.id;
+    label.innerHTML = filter.label;
+    document.getElementById("collisionsRadio").appendChild(radio);
+    document.getElementById("collisionsRadio").appendChild(label);
+});
 
+// mapbox
 mapboxgl.accessToken = 'pk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdqaWxrN3gwZXQ4MnFxbjAwZXRpbG8zIn0.XhAdk2ASwdipubccCWTfoQ';
 const map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/dark-v10',
-    center: [-75.697927,45.417431],
+    center: [-75.697927, 45.417431],
     zoom: 13,
-    //pitch: 40,
+    // pitch: 40,
     minZoom: 10,
     maxZoom: 17,
-    maxBounds: [[-76.385193,44.963826],[-75.011902,45.614998]],
+    maxBounds: [[-76.385193, 44.963826], [-75.011902,45.614998]],
     attributionControl: false
 });
 
 let gPopup;
 map.once('style.load', function () {
-
     init()
-    map.addControl(new mapboxgl.NavigationControl(),'bottom-right');
-    map.addControl(new mapboxgl.AttributionControl({compact: true }), 'bottom-right');
+    map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+    map.addControl(new mapboxgl.AttributionControl({ compact: true }), 'bottom-right');
 
     map.on('mousemove', function(e) {
         var features = map.queryRenderedFeatures(e.point, {
-                    layers: years.map(y=>y.id)
-                });
+            layers: years.map(y=>y.id)
+        });
         map.getCanvas().style.cursor = (features.length) ? 'pointer' : '';
     });
-
     map.on('click', function(e) {
-      var features = map.queryRenderedFeatures(e.point, {
-                  layers: years.map(y=>y.id)
-              });
-      if (!features.length) {
-          return;
-      }
-      var props = features[0].properties;
-      let popup ='<h3>Collisions</h3><hr>'
-      //let popup ='<h3>'+props.location+'</h3><hr>'
-      popup+='Drivers: '+props.col_total+'<br>'
-      popup+='Pedestrians: '+props.col_peds+'<br>'
-      popup+='Cyclists: '+props.col_bikes+'<br>'
-
-      gPopup = new mapboxgl.Popup()
-      .setLngLat(e.lngLat)
-      .setHTML(popup)
-      .addTo(map)
+        var features = map.queryRenderedFeatures(e.point, {
+            layers: years.map(y => y.id)
+        });
+        if (!features.length) {
+            return;
+        }
+        var props = features[0].properties;
+        let popup = '<h3>Collisions</h3><hr>';
+        popup += 'Cyclists: ' + props[collisions[0].column] + '<br>';
+        popup += 'Pedestrians: ' + props[collisions[1].column] + '<br>';
+        popup += 'All Modes: ' + props[collisions[2].column] + '<br>';
+        gPopup = new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML(popup)
+            .addTo(map)
     });
-
 });
 
+// create map
 function init() {
-
-  years.forEach(function (layer, i) {
-
-    map.addSource(layer.id, {
-        type: 'geojson',
-        data: layer.url
+    years.forEach(function (layer, i) {
+        map.addSource(layer.id, {
+            type: 'geojson',
+            data: layer.url
+        });
+        map.addLayer({
+            'id': layer.id,
+            'type': 'circle',
+            'source': layer.id,
+            'paint': {
+                "circle-color": [
+                    "interpolate",
+                    ["linear"],
+                    ["get", collisions[0].column],
+                    1, "yellow",
+                    6, "red"
+                ],
+                'circle-radius': [
+                    "interpolate",
+                    ["linear"],
+                    ["zoom"],
+                    10, [                     //at min zoom
+                        "interpolate",
+                        ["exponential", 0.8],
+                        ["get", collisions[0].column],
+                        1, 1,                 //1 collision = 1 pixel
+                        30, 5                 //30 collisions = 5 pixels
+                    ],
+                    17, [                     //at max zoom
+                        "interpolate",
+                        ["exponential", 0.8],
+                        ["get", collisions[0].column],
+                        1, 8,                  //1 collision = 5 pixels
+                        30, 40                 //30 collisions = 40 pixels
+                    ]
+                ],
+                'circle-opacity': 0.8,
+                'circle-blur': 0.4
+            },
+            'filter': ['>=', collisions[0].column, 1]
+        });
     });
-
-    map.addLayer({
-       'id': layer.id,
-       'type': 'circle',
-       'source': layer.id,
-       'paint': {
-          "circle-color": [
-              "interpolate",
-              ["linear"],
-              ["get", "col_peds"],
-              1, "yellow",
-              6, "red"
-          ],
-          'circle-radius': [
-            "interpolate",
-            ["linear"],
-            ["zoom"],
-            10, [                     //at min zoom
-                "interpolate",
-                ["exponential", 0.8],
-                ["get", "col_peds"],
-                1, 1,                 //1 collision = 1 pixel
-                30, 5                 //30 collisions = 5 pixels
-            ],
-            17, [                     //at max zoom
-                "interpolate",
-                ["exponential", 0.8],
-                ["get", "col_peds"],
-                1, 8,                  //1 collision = 5 pixels
-                30, 40                 //30 collisions = 40 pixels
-            ]
-          ],
-          'circle-opacity': 0.8,
-          'circle-blur': 0.4,
-
-       },
-       'filter': ['>=', 'col_peds', 1]
-    });
-  })
 }
 
-function updateSlider(){
-  const type = map.getFilter(years[activeLayer].id)[1]
-  const max = years[activeLayer][type]
-  document.getElementById('min_col_slider').setAttribute("max", max);
-  document.getElementById('max_cols').innerHTML = max;
-  const min = document.getElementById('min_cols').textContent
-  if(min>max) {
-    setMinColFilter(max)
-    document.getElementById('min_col_slider').setAttribute("value", max);
-  }
+function updateSlider() {
+    const type = map.getFilter(years[activeLayer].id)[1];
+    const max = years[activeLayer][type];
+    document.getElementById('min_col_slider').setAttribute("max", max);
+    document.getElementById('max_cols').innerHTML = max;
+    const min = document.getElementById('min_cols').textContent
+    if(min > max) {
+        setMinColFilter(max)
+        document.getElementById('min_col_slider').setAttribute("value", max);
+    }
 }
 
 function showLayer(layerName){
@@ -227,69 +263,61 @@ function showLayer(layerName){
 }
 
 function toggleLayer (checkbox) {
-  showLayer(checkbox.currentTarget.id);
-  if(typeof gPopup != 'undefined') gPopup.remove()
+    showLayer(checkbox.currentTarget.id);
+    if(typeof gPopup != 'undefined') {
+        gPopup.remove();
+    }
 }
 
 function toggleFilters (checkbox) {
-  years.forEach(function (layer, i) {
-    const filter = map.getFilter(layer.id)
-    if(filter.length) filter[1]=checkbox.currentTarget.id
-    map.setFilter(layer.id, filter)
+    years.forEach(function (layer, i) {
+        const filter = map.getFilter(layer.id);
+        if(filter.length) {
+            filter[1] = checkbox.currentTarget.value;
+        }
+        map.setFilter(layer.id, filter);
 
-    const color = map.getPaintProperty(layer.id, 'circle-color')
-    color[2][1] = checkbox.currentTarget.id
-    map.setPaintProperty(layer.id, 'circle-color', color)
+        const color = map.getPaintProperty(layer.id, 'circle-color');
+        color[2][1] = checkbox.currentTarget.value;
+        map.setPaintProperty(layer.id, 'circle-color', color);
 
-    const radius = map.getPaintProperty(layer.id, 'circle-radius')
-    radius[4][2][1] = checkbox.currentTarget.id
-    radius[6][2][1] = checkbox.currentTarget.id
-    map.setPaintProperty(layer.id, 'circle-radius', radius)
-  });
-  updateSlider()
-  if(typeof gPopup != 'undefined') gPopup.remove()
+        const radius = map.getPaintProperty(layer.id, 'circle-radius');
+        radius[4][2][1] = checkbox.currentTarget.value;
+        radius[6][2][1] = checkbox.currentTarget.value;
+        map.setPaintProperty(layer.id, 'circle-radius', radius);
+    });
+    updateSlider();
+    if(typeof gPopup != 'undefined') {
+        gPopup.remove();
+    }
 }
 
-function setMinColFilter(min)
-{
-  years.forEach(function (layer, i) {
-    const filter = map.getFilter(layer.id)
-    filter[2] = min
-    map.setFilter(layer.id, filter)
-  })
-  document.getElementById('min_cols').innerHTML = min;
+function setMinColFilter (min) {
+    years.forEach(function (layer, i) {
+        const filter = map.getFilter(layer.id);
+        filter[2] = min;
+        map.setFilter(layer.id, filter);
+    });
+    document.getElementById('min_cols').innerHTML = min;
 }
-
-document.getElementById('year2014').onclick = toggleLayer
-document.getElementById('year2015').onclick = toggleLayer
-document.getElementById('year2016').onclick = toggleLayer
-document.getElementById('yearAll').onclick = toggleLayer
-
-document.getElementById('col_peds').onclick = toggleFilters
-document.getElementById('col_total').onclick = toggleFilters
-document.getElementById('col_bikes').onclick = toggleFilters
-
-document.getElementById('min_col_slider').addEventListener('input', function(e) {
+document.getElementById('min_col_slider').addEventListener('input', function (e) {
     const min = parseInt(e.target.value, 10);
-    setMinColFilter(min)
+    setMinColFilter(min);
 });
 
 map.on('load', function(e) {
+    years.forEach(function (layer, i) {
+        const features = map.querySourceFeatures(layer.id);
+        layer[collisions[0].column] = Math.max.apply(Math,features.map(function (o) { return o.properties[collisions[0].column]; }));
+        layer[collisions[1].column] = Math.max.apply(Math,features.map(function (o) { return o.properties[collisions[1].column]; }));
+        layer[collisions[2].column] = Math.max.apply(Math,features.map(function (o) { return o.properties[collisions[2].column]; }));
+    })
+    document.getElementById("loader").style.visibility = "hidden";
+    showLayer(years[0].id);
+});
 
-  years.forEach(function (layer, i) {
-    const features = map.querySourceFeatures(layer.id)
-    layer.col_peds = Math.max.apply(Math,features.map(function(o){return o.properties.col_peds;}))
-    layer.col_bikes = Math.max.apply(Math,features.map(function(o){return o.properties.col_bikes;}))
-    layer.col_total = Math.max.apply(Math,features.map(function(o){return o.properties.col_total;}))
+        </script>
 
-  })
-  document.getElementById("loader").style.visibility = "hidden";
-  showLayer(years[0].id)
+    </body>
 
-})
-
-
-</script>
-
-</body>
 </html>
