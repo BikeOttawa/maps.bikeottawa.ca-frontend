@@ -81,7 +81,7 @@ a:focus {
 
 .btn-green {
     color: #fff;
-    background: #f5b76a;
+    background: #2bb673;
 }
 
 .btn-green:hover,
@@ -125,7 +125,7 @@ a:focus {
     height: 2px;
     margin-left: auto;
     margin-right: auto;
-    background: #f5b76a;
+    background: #2bb673;
 }
 
 .page.overlay:after {
@@ -167,7 +167,7 @@ a:focus {
 }
 
 #services .service:hover i {
-    color: #f5b76a;
+    color: #2bb673;
 }
 
 #work .heading p {
@@ -193,6 +193,8 @@ a:focus {
     -ms-transition: all .4s ease;
     -o-transition: all .4s ease;
     transition: all .4s ease;
+
+    filter: grayscale(1);
 }
 
 #about .teammate:hover .profile-photo img,
@@ -202,6 +204,8 @@ a:focus {
     -ms-transform: scale(1.1);
     -o-transform: scale(1.1);
     transform: scale(1.1);
+
+    filter: grayscale(0);
 }
 
 #about .teammate .bio .border {
