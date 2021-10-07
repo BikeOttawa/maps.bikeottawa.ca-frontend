@@ -1,89 +1,92 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset='utf-8' />
-    <title>Ottawa cycling directions</title>
-    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
-    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js'></script>
-    <script  data-cfasync="false" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css' rel='stylesheet' />
-    <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
-    <style>
-        body { margin:0; padding:0; }
-        #app { position:absolute; top:0; right:0; bottom:0; left:0; }
-        #map { position:absolute; top:0; bottom:0; width:100%; }
-    </style>
-</head>
-<body>
 
-<script src = 'mapbox-gl-directions.min.js'></script>
-<!--<script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v3.1.1/mapbox-gl-directions.js'></script>-->
-<link rel='stylesheet' href='mapbox-gl-directions.css' type='text/css' />
-<div id='app' class='col12 contain clip'>
-<div id='map'></div>
-<div class='col4 pad1  scroll-styled pin-topright dark '>
-  <div id='legendbtn' class='fill-darken2 pad1 icon menu button fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
-  <div id='legend' class='fill-darken1 hidden round'>
-    <div id='closebtn' class='fill-darken2 pad1 icon close button fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
-    <div class='clearfix'></div>
-    <div class='pad1'>
-      <h5>Levels of Stress</h5>
-      <form>
-        <fieldset class='checkbox-pill clearfix fill-darken2'>
-          <input type='checkbox' id='legend-lts1'>
-          <label for='legend-lts1' id='legend-lts1-label' class='button icon check quiet col12' style="text-align:left;">LTS-1</label>
-          <input type='checkbox' id='legend-lts2'>
-          <label for='legend-lts2' id='legend-lts2-label' class='button icon check quiet col12' style="text-align:left;">LTS-2</label>
-          <input type='checkbox' id='legend-lts3'>
-          <label for='legend-lts3' id='legend-lts3-label' class='button icon check quiet col12' style="text-align:left;">LTS-3</label>
-          <input type='checkbox' id='legend-lts4'>
-          <label for='legend-lts4' id='legend-lts4-label' class='button icon check quiet col12' style="text-align:left;">LTS-4</label>
-        </fieldset>
-      </form>
-      <div class='center pad2'>
-      	<a href='https://bikeottawa.ca' target="_blank"><img src="../img/logos/bikeottawa.png" style="width:32px; height:32px;"></a>
-        <a href='https://github.com/BikeOttawa/maps.bikeottawa.ca-frontend' target="_blank"><img src="../img/logos/github.png" style="width:32px; height:32px;"></a>
-        <a href='https://twitter.com/BikeOttawa' target="_blank"><img src="../img/logos/twitter.png" style="width:32px; height:32px;"></a>
-      </div>
-    </div>
-  </div>
-</div>
-<div class="loading" title="loading..." id="loader"></div>
+    <head>
+        <meta charset='utf-8' />
+        <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+        <title>Ottawa cycling directions</title>
+        <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js'></script>
+        <script  data-cfasync="false" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css' rel='stylesheet' />
+        <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
 
-<script>
+        <style>
+
+body { margin:0; padding:0; }
+#app { position:absolute; top:0; right:0; bottom:0; left:0; }
+#map { position:absolute; top:0; bottom:0; width:100%; }
+
+        </style>
+
+        <script src = 'mapbox-gl-directions.min.js'></script>
+        <!--<script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v3.1.1/mapbox-gl-directions.js'></script>-->
+        <link rel='stylesheet' href='mapbox-gl-directions.css' type='text/css' />
+    </head>
+
+    <body>
+        <div id='app' class='col12 contain clip'>
+            <div id='map'></div>
+
+            <!-- controls -->
+            <div class='col4 pad1  scroll-styled pin-topright dark '>
+                <div id='legendbtn' class='fill-darken2 pad1 icon menu button fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
+                <div id='legend' class='fill-darken1 hidden round'>
+                    <div id='closebtn' class='fill-darken2 pad1 icon close button fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
+                    <div class='clearfix'></div>
+                    <div class='pad1'>
+                        <h5>Levels of Stress</h5>
+                        <form>
+                            <fieldset class='checkbox-pill clearfix fill-darken2'>
+                                <input type='checkbox' id='legend-lts1'>
+                                <label for='legend-lts1' id='legend-lts1-label' class='button icon check quiet col12' style="text-align:left;">LTS-1</label>
+                                <input type='checkbox' id='legend-lts2'>
+                                <label for='legend-lts2' id='legend-lts2-label' class='button icon check quiet col12' style="text-align:left;">LTS-2</label>
+                                <input type='checkbox' id='legend-lts3'>
+                                <label for='legend-lts3' id='legend-lts3-label' class='button icon check quiet col12' style="text-align:left;">LTS-3</label>
+                                <input type='checkbox' id='legend-lts4'>
+                                <label for='legend-lts4' id='legend-lts4-label' class='button icon check quiet col12' style="text-align:left;">LTS-4</label>
+                            </fieldset>
+                        </form>
+                        <div class='center pad2'>
+      	                     <a href='https://bikeottawa.ca' target="_blank"><img src="../img/logos/bikeottawa.png" style="width:32px; height:32px;"></a>
+                             <a href='https://github.com/BikeOttawa/maps.bikeottawa.ca-frontend' target="_blank"><img src="../img/logos/github.png" style="width:32px; height:32px;"></a>
+                             <a href='https://twitter.com/BikeOttawa' target="_blank"><img src="../img/logos/twitter.png" style="width:32px; height:32px;"></a>
+                        </div>
+                        <a class='fr fill-darken2 pad1 rounded-toggle short icon button bike' onclick="$('#about').toggle()"></a>
+                        <div class='fr pad1 small dark'>Last update: <span id='dateUpdated'>[...]</span></div>
+                        <div class='clearfix'></div>
+                        <div id='about' class='center small hidden dark'>
+                            Made possible with City of Ottawa Open Data, funding from Councilor Jeff Leiper, and the help of OpenStreetMap Canada and Bike Ottawa volunteers. Main contributors: Heather Shearer, Yaro Shkvorets, Rob McCrae, Alex deVries, Matthew Darwin, JP Torunski, Shawn Gettler and others
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="loading" title="loading..." id="loader"></div>
+        </div>
+
+        <script src='../js/maps.js'></script>
+
+        <script>
+
+// level of stress
 var ltsLayers = [
-    {id:"legend-lts1", name:'LTS 1 - Suitable for children', color:'#0099cc', opacity:1, tileset:'mapbox://bikeottawa.7gev94ax', layer:'7gev94ax'},
-    {id:"legend-lts2", name:'LTS-2 - Low stress', color:'#1C7C54', opacity:1, tileset:'mapbox://bikeottawa.2p4cgvm3', layer:'2p4cgvm3'},
-    {id:"legend-lts3", name:'LTS-3 - Medium stress', color:'#F0C808', opacity:1, tileset:'mapbox://bikeottawa.42dlr9v2', layer:'42dlr9v2'},
-    {id:"legend-lts4", name:'LTS-4 - High stress', color:'#DD5454', opacity:1, tileset:'mapbox://bikeottawa.0ne8pnv3', layer:'0ne8pnv3'}
-  ];
+    { id: "legend-lts1", color: '#0099cc', name: 'LTS 1 - Suitable for children', opacity: 0.9, tileset: 'mapbox://bikeottawa.7gev94ax', layer: '7gev94ax' },
+    { id: "legend-lts2", color: '#1C7C54', name: 'LTS 2 - Low stress', opacity: 0.9, tileset: 'mapbox://bikeottawa.2p4cgvm3', layer: '2p4cgvm3' },
+    { id: "legend-lts3", color: '#F0C808', name: 'LTS 3 - Medium stress', opacity: 0.9, tileset: 'mapbox://bikeottawa.42dlr9v2', layer: '42dlr9v2' },
+    { id: "legend-lts4", color: '#DD5454', name: 'LTS 4 - High stress', opacity: 0.9, tileset: 'mapbox://bikeottawa.0ne8pnv3', layer: '0ne8pnv3' }
+];
 
+// mapbox
 mapboxgl.accessToken = 'pk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdqaWxrN3gwZXQ4MnFxbjAwZXRpbG8zIn0.XhAdk2ASwdipubccCWTfoQ';
 var map = new mapboxgl.Map({
     container: 'map',
-    style: 'mapbox://styles/mapbox/outdoors-v9',
-    /*style: {
-       "version": 8,
-       "sources": {
-           "raster-tiles": {
-               "type": "raster",
-               "url": "mapbox://bikeottawa.satellite",
-               "tileSize": 256
-           }
-       },
-       "layers": [{
-           "id": "simple-tiles",
-           "type": "raster",
-           "source": "raster-tiles",
-           "minzoom": 10,
-           "maxzoom": 22
-       }]
-    },*/
+    style: 'mapbox://styles/mapbox/light-v10',
     center: [-75.697927,45.417431],
     zoom: 13,
     minZoom: 10,
     maxZoom: 22,
-maxBounds: [[-76.385193,44.963826],[-75.011902,45.614998]]
+    maxBounds: [[-76.385193,44.963826],[-75.011902,45.614998]]
 });
 
 map.addControl(new mapboxgl.GeolocateControl({
@@ -91,11 +94,9 @@ map.addControl(new mapboxgl.GeolocateControl({
         enableHighAccuracy: true
     }
 }), 'bottom-right');
-
 map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
-
 map.addControl(new mapboxgl.ScaleControl(), 'bottom-left');
-map.addControl(new mapboxgl.AttributionControl({compact: true }), 'bottom-right');
+map.addControl(new mapboxgl.AttributionControl({ compact: true }), 'bottom-right');
 
 map.addControl(new MapboxDirections({
     accessToken: mapboxgl.accessToken,
@@ -107,63 +108,51 @@ map.addControl(new MapboxDirections({
     geocoder: {limit:10}
 }), 'top-left');
 
-function toggleLayer (checkbox) {
-    map.setLayoutProperty(checkbox.currentTarget.id, 'visibility', checkbox.currentTarget.checked?'visible':'none');
-  }
-
-function addDateToAttribution(){
-  const request = new XMLHttpRequest()
-  request.open('GET','https://api.mapbox.com/tilesets/v1/bikeottawa?access_token=sk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdyYTJmN2EwMmtoMzJwc3JxM2hoZ3ozIn0.YB1JNmncsPvktmgGU_zK8A')
-  request.onload = function () {
-    if (request.status >= 200 && request.status < 400) {
-      var data = JSON.parse(request.responseText);
-      if(data && data instanceof Array){
-        const date = new Date(data.find(x => x.id === 'bikeottawa.7gev94ax').modified)
-        document.querySelector('.mapboxgl-ctrl-attrib').innerHTML = '<a href="https://bikeottawa.ca">© BikeOttawa</a> <a href="https://www.mapbox.com/about/maps/" target="_blank">© Mapbox</a> <a href="http://www.openstreetmap.org/about/" target="_blank">© OpenStreetMap</a>'+' ['+date.toLocaleString()+']';
-      }
-    }
-  }
-  request.send()
+// create map
+function init() {
+    ltsLayers.forEach(function (layer, i) {
+        map.addLayer({
+            "id": layer.id,
+            "type": "line",
+            "source": {
+                type: 'vector',
+                url: layer.tileset,
+            },
+            "source-layer": layer.layer,
+            "layout": {
+                "line-join": "round",
+                "line-cap": "round"
+            },
+            "paint": {
+                "line-color": layer.color,
+                "line-width": 2,
+                "line-opacity": layer.opacity
+            }
+        });
+        map.setLayoutProperty(layer.id, 'visibility', 'none');
+        document.getElementById(layer.id+'-label').innerHTML = '<span style="display: inline-block;width:50px; height:8px;background-color: '+layer.color+'"></span>&nbsp;'+layer.name;
+    });
 }
 
-document.getElementById('legend-lts1').onclick = toggleLayer
-document.getElementById('legend-lts2').onclick = toggleLayer
-document.getElementById('legend-lts3').onclick = toggleLayer
-document.getElementById('legend-lts4').onclick = toggleLayer
+function toggleLayer (checkbox) {
+    map.setLayoutProperty(checkbox.currentTarget.id, 'visibility', checkbox.currentTarget.checked?'visible':'none');
+}
 
-map.on('load', function(e) {
-    addDateToAttribution()
-    document.getElementById("loader").style.visibility = "hidden";
-  });
+document.getElementById('legend-lts1').onclick = toggleLayer;
+document.getElementById('legend-lts2').onclick = toggleLayer;
+document.getElementById('legend-lts3').onclick = toggleLayer;
+document.getElementById('legend-lts4').onclick = toggleLayer;
 
 map.on('style.load', function () {
-
-  ltsLayers.forEach(function (layer, i) {
-
-    map.addLayer({
-      "id": layer.id,
-      "type": "line",
-      "source": {
-          type: 'vector',
-          url: layer.tileset,
-      },
-      "source-layer": layer.layer,
-      "layout": {
-          "line-join": "round",
-          "line-cap": "round"
-      },
-      "paint": {
-          "line-color": layer.color,
-          "line-width": 2,
-          "line-opacity": layer.opacity
-      }
-    });
-    map.setLayoutProperty(layer.id, 'visibility', 'none');
-    document.getElementById(layer.id+'-label').innerHTML = '<span style="display: inline-block;width:50px; height:8px;background-color: '+layer.color+'"></span>&nbsp;'+layer.name;
-  });
-
+    init();
 });
-</script>
 
-</body>
+map.on('load', function(e) {
+    addUpdatedDate('bikeottawa.1bli4ynb');
+    document.getElementById("loader").style.visibility = "hidden";
+});
+
+        </script>
+    </body>
+
 </html>
