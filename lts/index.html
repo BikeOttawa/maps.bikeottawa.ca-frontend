@@ -201,7 +201,7 @@ map.on('click', function(e) {
         return;
     }
     var feature = features[0];
-    displayOsmElementInfo(feature.properties.id, e.lngLat, ['name','highway','surface','lit','maxspeed','lanes','fixme'], 'Road details based on mapillary and local knowledge - https://maps.bikeottawa.ca/lts-map');
+    displayOsmElementInfo(feature.properties.id, e.lngLat, ['name','highway','surface','lit','maxspeed','lanes','fixme'], 'Road details based on mapillary and local knowledge - https://maps.bikeottawa.ca/lts');
     window.history.replaceState(null, null, window.location.pathname+'?&lat='+e.lngLat.lat+'&lng='+e.lngLat.lng+'&zoom='+map.getZoom()+'&id='+feature.properties.id);  //TODO: highlight using filters
     map.getSource('highlight').setData(feature);
 });
