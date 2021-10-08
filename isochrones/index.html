@@ -18,11 +18,6 @@
         #bottom { font-weight: 300; font-size: 13px; z-index: 300; padding: 10px; position: absolute; text-align: center; color: #222; bottom: 20px; left: 50%; margin-left: -120px; width: 320px; background: rgba(255,255,255,0.75); }
         .bottom-caption { display: inline-block; }
         .bottom-item { display: inline-block; width: 30px; text-align: center; font-size: 12px; }
-        #m3 { background: #0055DB; }
-        #m6 { background: #3276DE; }
-        #m9 { background: #6497E2; }
-        #m12 { background: #96B8E6; }
-        #m15 { background: #C8D9EA; }
         .mapboxgl-popup-content { color:#000 }
 
         </style>
@@ -336,6 +331,9 @@ function init() {
                     ['<=', 'time', layer.time]
                 ]
             }, 'road-path');
+        }
+        if(layer.time != 0) {
+            document.getElementById("m"+layer.time).style.backgroundColor = layer.color;
         }
     });
 
