@@ -4,7 +4,7 @@
     <head>
         <meta charset='utf-8' />
         <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
-        <title>Ottawa cycling directions</title>
+        <title>Ottawa Cycling LTS Directions</title>
         <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js'></script>
         <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css' rel='stylesheet' />
         <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
@@ -29,11 +29,11 @@ body { margin:0; padding:0; }
             <!-- controls -->
             <div class='col4 pad1  scroll-styled pin-topright dark '>
                 <div id='legendbtn' class='fill-darken2 pad1 icon menu button fr hidden' onclick="toggle('legendbtn');toggle('legend');"></div>
-                <div id='legend' class='fill-darken1 round'>
+                <div id='legend' class='fill-darken2 round'>
                     <div id='closebtn' class='fill-darken2 pad1 icon close button fr' onclick="toggle('legendbtn');toggle('legend');"></div>
                     <div class='clearfix'></div>
                     <div class='pad1'>
-                        <h5>Levels of Stress</h5>
+                        <h5 class="dark">Cycling Level of Traffic Stress</h5>
                         <form>
                             <fieldset class='checkbox-pill clearfix fill-darken2'>
                                 <input type='checkbox' id='legend-lts1'>
@@ -55,7 +55,7 @@ body { margin:0; padding:0; }
                         <div class='fr pad1 small dark'>Last update: <span id='dateUpdated'>[...]</span></div>
                         <div class='clearfix'></div>
                         <div id='about' class='center small hidden dark'>
-                            Made possible with City of Ottawa Open Data, funding from Councilor Jeff Leiper, and the help of OpenStreetMap Canada and Bike Ottawa volunteers. Main contributors: Heather Shearer, Yaro Shkvorets, Rob McCrae, Alex deVries, Matthew Darwin, JP Torunski, Shawn Gettler and others
+                            Made possible with City of Ottawa Open Data, funding from Councilor Jeff Leiper, and the help of OpenStreetMap Canada and Bike Ottawa volunteers. Main contributors: Heather Shearer, Yaro Shkvorets, Rob McCrae, Alex deVries, Matthew Darwin, JP Torunski, Shawn Gettler and others.
                         </div>
                     </div>
                 </div>
