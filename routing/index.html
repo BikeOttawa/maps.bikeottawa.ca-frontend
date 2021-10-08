@@ -6,7 +6,6 @@
         <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
         <title>Ottawa cycling directions</title>
         <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js'></script>
-        <script  data-cfasync="false" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
         <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css' rel='stylesheet' />
         <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
 
@@ -29,9 +28,9 @@ body { margin:0; padding:0; }
 
             <!-- controls -->
             <div class='col4 pad1  scroll-styled pin-topright dark '>
-                <div id='legendbtn' class='fill-darken2 pad1 icon menu button fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
-                <div id='legend' class='fill-darken1 hidden round'>
-                    <div id='closebtn' class='fill-darken2 pad1 icon close button fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
+                <div id='legendbtn' class='fill-darken2 pad1 icon menu button fr hidden' onclick="toggle('legendbtn');toggle('legend');"></div>
+                <div id='legend' class='fill-darken1 round'>
+                    <div id='closebtn' class='fill-darken2 pad1 icon close button fr' onclick="toggle('legendbtn');toggle('legend');"></div>
                     <div class='clearfix'></div>
                     <div class='pad1'>
                         <h5>Levels of Stress</h5>
@@ -52,7 +51,7 @@ body { margin:0; padding:0; }
                              <a href='https://github.com/BikeOttawa/maps.bikeottawa.ca-frontend' target="_blank"><img src="../img/logos/github.png" style="width:32px; height:32px;"></a>
                              <a href='https://twitter.com/BikeOttawa' target="_blank"><img src="../img/logos/twitter.png" style="width:32px; height:32px;"></a>
                         </div>
-                        <a class='fr fill-darken2 pad1 rounded-toggle short icon button bike' onclick="$('#about').toggle()"></a>
+                        <a class='fr fill-darken2 pad1 rounded-toggle short icon button bike' onclick="toggle('about');"></a>
                         <div class='fr pad1 small dark'>Last update: <span id='dateUpdated'>[...]</span></div>
                         <div class='clearfix'></div>
                         <div id='about' class='center small hidden dark'>
@@ -68,6 +67,9 @@ body { margin:0; padding:0; }
         <script src='../js/maps.js'></script>
 
         <script>
+
+// show/hide
+function toggle(id) { document.getElementById(id).classList.toggle("hidden"); }
 
 // level of stress
 var ltsLayers = [

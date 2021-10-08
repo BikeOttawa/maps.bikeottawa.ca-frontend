@@ -5,7 +5,6 @@
         <meta charset='utf-8' />
         <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
         <title>Ottawa Cycling Isochrones</title>
-        <script  data-cfasync="false" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
         <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js'></script>
         <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css' rel='stylesheet' />
         <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
@@ -13,12 +12,12 @@
 
         <style>
 
-        #app { position:absolute; top:0; right:0; bottom:0; left:0; }
-        #map { position:absolute; top:0; right:0; bottom:0; left:0; }
-        #bottom { font-weight: 300; font-size: 13px; z-index: 300; padding: 10px; position: absolute; text-align: center; color: #222; bottom: 20px; left: 50%; margin-left: -120px; width: 320px; background: rgba(255,255,255,0.75); }
-        .bottom-caption { display: inline-block; }
-        .bottom-item { display: inline-block; width: 30px; text-align: center; font-size: 12px; }
-        .mapboxgl-popup-content { color:#000 }
+#app { position:absolute; top:0; right:0; bottom:0; left:0; }
+#map { position:absolute; top:0; right:0; bottom:0; left:0; }
+#bottom { font-weight: 300; font-size: 13px; z-index: 300; padding: 10px; position: absolute; text-align: center; color: #222; bottom: 20px; left: 50%; margin-left: -120px; width: 320px; background: rgba(255,255,255,0.75); }
+.bottom-caption { display: inline-block; }
+.bottom-item { display: inline-block; width: 30px; text-align: center; font-size: 12px; }
+.mapboxgl-popup-content { color:#000 }
 
         </style>
 
@@ -54,9 +53,9 @@
 
             <!-- controls -->
             <div class='col4 pad1 scroll-styled pin-topright '>
-                <div id='legendbtn' class='fill-darken2 pad1 icon book button fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
-                <div id='legend' class='fill-darken2 round hidden'>
-                    <div id='closebtn' class='fill-darken2 pad1 icon close button fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
+                <div id='legendbtn' class='fill-darken2 pad1 icon menu button fr hidden' onclick="toggle('legendbtn');toggle('legend');"></div>
+                <div id='legend' class='fill-darken2 round'>
+                    <div id='closebtn' class='fill-darken2 pad1 icon close button fr' onclick="toggle('legendbtn');toggle('legend');"></div>
                     <div class='clearfix'></div>
                     <div class='pad1 '>
                         <form>
@@ -110,7 +109,7 @@
                             <a href='https://github.com/BikeOttawa/maps.bikeottawa.ca-frontend' target="_blank"><img src="../img/logos/github.png" style="width:32px; height:32px;"></a>
                             <a href='https://twitter.com/BikeOttawa' target="_blank"><img src="../img/logos/twitter.png" style="width:32px; height:32px;"></a>
                         </div>
-                        <a class='fr fill-darken3 pad1 rounded-toggle short icon button bike' onclick="$('#about').toggle()"></a>
+                        <a class='fr fill-darken3 pad1 rounded-toggle short icon button bike' onclick="toggle('about');"></a>
                         <div class='fr pad1 small dark'>Last update: <span id='dateUpdated'>[...]</span></div>
                         <div class='clearfix'></div>
                         <div id='about' class='center small hidden dark'>
@@ -132,6 +131,9 @@
         <script src='../js/maps.js'></script>
 
         <script>
+
+// show/hide
+function toggle(id) { document.getElementById(id).classList.toggle("hidden"); }
 
 // level of stress
 var ltsLayers = [
@@ -434,7 +436,7 @@ function buildTitle(duration, distance){
 
 function fetchIsochrones() {
     document.getElementById('error').style="display:hidden";
-    // document.getElementById('info').classList.add('hidden');
+    document.getElementById('info').classList.add('hidden');
     document.getElementById('map').classList.add('loading');
 
     let pLng = pointSource.features[0].geometry.coordinates[0];
