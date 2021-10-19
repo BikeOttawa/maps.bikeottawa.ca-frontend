@@ -4,10 +4,11 @@
     <head>
         <meta charset='utf-8' />
         <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
-        <title>Ottawa Cycling LTS Directions</title>
+        <title>Ottawa Cycling Level of Traffic Stress Map</title>
         <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js'></script>
         <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css' rel='stylesheet' />
         <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
+        <link href='../css/maps.css' rel='stylesheet' />
 
         <style>
 
@@ -15,41 +16,56 @@ body { margin:0; padding:0; }
 #app { position:absolute; top:0; right:0; bottom:0; left:0; }
 #map { position:absolute; top:0; bottom:0; width:100%; }
 
-        </style>
+/* #menu {
+    position: absolute;
+    background: #fff;
+    padding: 10px;
+    font-family: 'Open Sans', sans-serif;
+} */
 
-        <script src = 'mapbox-gl-directions.min.js'></script>
-        <!--<script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v3.1.1/mapbox-gl-directions.js'></script>-->
-        <link rel='stylesheet' href='mapbox-gl-directions.css' type='text/css' />
+        </style>
     </head>
 
     <body>
         <div id='app' class='col12 contain clip'>
             <div id='map'></div>
 
+            <!-- tileset selection -->
+            <!-- <div id='menu'>
+                <input id='dark-v10' type='radio' name='rtoggle' value='dark'>
+                <label for='dark-v10'>dark</label>
+                <input id='light-v10' type='radio' name='rtoggle' value='light' checked='checked'>
+                <label for='light-v10'>light</label>
+                <input id='bright-v9' type='radio' name='rtoggle' value='bright'>
+                <label for='bright-v9'>bright</label>
+                <input id='satellite-streets-v11' type='radio' name='rtoggle' value='satellite'>
+                <label for='satellite-streets-v11'>satellite</label>
+            </div> -->
+
             <!-- controls -->
-            <div class='col4 pad1  scroll-styled pin-topright dark '>
-                <div id='legendbtn' class='fill-darken2 pad1 icon menu button fr hidden' onclick="toggle('legendbtn');toggle('legend');"></div>
+            <div class='col4 pad1 scroll-styled pin-topright '>
+                <div id='legendbtn' class='fill-darken2 pad1 icon menu button hidden fr' onclick="toggle('legendbtn');toggle('legend');"></div>
                 <div id='legend' class='fill-darken2 round'>
                     <div id='closebtn' class='fill-darken2 pad1 icon close button fr' onclick="toggle('legendbtn');toggle('legend');"></div>
                     <div class='clearfix'></div>
                     <div class='pad1'>
-                        <h5 class="dark">Cycling Level of Traffic Stress</h5>
                         <form>
-                            <fieldset class='checkbox-pill clearfix fill-darken2'>
-                                <input type='checkbox' id='legend-lts1'>
+                            <h5 class='dark'>Cycling Level of Traffic Stress</h5>
+                            <fieldset class='checkbox-pill clearfix '>
+                                <input type='checkbox' id='legend-lts1' checked='checked'>
                                 <label for='legend-lts1' id='legend-lts1-label' class='button icon check quiet col12' style="text-align:left;">LTS-1</label>
-                                <input type='checkbox' id='legend-lts2'>
+                                <input type='checkbox' id='legend-lts2' checked='checked'>
                                 <label for='legend-lts2' id='legend-lts2-label' class='button icon check quiet col12' style="text-align:left;">LTS-2</label>
-                                <input type='checkbox' id='legend-lts3'>
+                                <input type='checkbox' id='legend-lts3' checked='checked'>
                                 <label for='legend-lts3' id='legend-lts3-label' class='button icon check quiet col12' style="text-align:left;">LTS-3</label>
-                                <input type='checkbox' id='legend-lts4'>
+                                <input type='checkbox' id='legend-lts4' checked='checked'>
                                 <label for='legend-lts4' id='legend-lts4-label' class='button icon check quiet col12' style="text-align:left;">LTS-4</label>
                             </fieldset>
                         </form>
                         <div class='center pad2'>
-      	                     <a href='https://bikeottawa.ca' target="_blank"><img src="../img/logos/bikeottawa.png" style="width:32px; height:32px;"></a>
-                             <a href='https://github.com/BikeOttawa/maps.bikeottawa.ca-frontend' target="_blank"><img src="../img/logos/github.png" style="width:32px; height:32px;"></a>
-                             <a href='https://twitter.com/BikeOttawa' target="_blank"><img src="../img/logos/twitter.png" style="width:32px; height:32px;"></a>
+                            <a href='https://bikeottawa.ca' target="_blank"><img src="../img/logos/bikeottawa.png" style="width:32px; height:32px;"></a>
+                            <a href='https://github.com/BikeOttawa/maps.bikeottawa.ca-frontend' target="_blank"><img src="../img/logos/github.png" style="width:32px; height:32px;"></a>
+                            <a href='https://twitter.com/BikeOttawa' target="_blank"><img src="../img/logos/twitter.png" style="width:32px; height:32px;"></a>
                         </div>
                         <a class='fr fill-darken2 pad1 rounded-toggle short icon button bike' onclick="toggle('about');"></a>
                         <div class='fr pad1 small dark'>Last update: <span id='dateUpdated'>[...]</span></div>
@@ -65,6 +81,7 @@ body { margin:0; padding:0; }
         </div>
 
         <script src='../js/maps.js'></script>
+        <script src='../js/osm-bundle.js'></script>
 
         <script>
 
@@ -87,28 +104,36 @@ var map = new mapboxgl.Map({
     center: [-75.697927,45.417431],
     zoom: 13,
     minZoom: 10,
-    maxZoom: 22,
-    maxBounds: [[-76.385193,44.963826],[-75.011902,45.614998]]
+    maxZoom: 17,
+    maxBounds: [[-76.385193,44.963826],[-75.011902,45.614998]],
+    attributionControl: false
 });
 
 map.addControl(new mapboxgl.GeolocateControl({
     positionOptions: {
         enableHighAccuracy: true
-    }
+    },
+    trackUserLocation: true
 }), 'bottom-right');
-map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+map.addControl(new mapboxgl.NavigationControl(),'bottom-right');
 map.addControl(new mapboxgl.ScaleControl(), 'bottom-left');
-map.addControl(new mapboxgl.AttributionControl({ compact: true }), 'bottom-right');
+map.addControl(new mapboxgl.AttributionControl({compact: true }), 'bottom-right');
 
-map.addControl(new MapboxDirections({
-    accessToken: mapboxgl.accessToken,
-    profile: 'lts4',
-    api: 'https://maps.bikeottawa.ca/route/v1',
-    alternatives: true,
-    unit: 'metric',
-    attributionControl: false,
-    geocoder: {limit:10}
-}), 'top-left');
+// addStyleSwitcher();
+
+// function addStyleSwitcher(){
+//     const layerList = document.getElementById('menu');
+//     const inputs = layerList.getElementsByTagName('input');
+//
+//     for (let i = 0; i < inputs.length; i++) {
+//         inputs[i].onclick = switchLayer;
+//     }
+// }
+//
+// function switchLayer(layer) {
+//     const layerId = layer.target.id;
+//     map.setStyle('mapbox://styles/mapbox/' + layerId);
+// }
 
 // create map
 function init() {
@@ -127,12 +152,31 @@ function init() {
             },
             "paint": {
                 "line-color": layer.color,
-                "line-width": 2,
+                "line-width": [
+                    'interpolate',
+                    ['exponential', 1.5],
+                    ['zoom'],
+                    10, 1,
+                    17, 8
+                ],
                 "line-opacity": layer.opacity
             }
         });
-        map.setLayoutProperty(layer.id, 'visibility', 'none');
         document.getElementById(layer.id+'-label').innerHTML = '<span style="display: inline-block;width:50px; height:8px;background-color: '+layer.color+'"></span>&nbsp;'+layer.name;
+    });
+    map.addSource('highlight', {
+        type: 'geojson',
+        data: null
+    });
+    map.addLayer({
+        "id": "highlight",
+        "type": "line",
+        "source": 'highlight',
+        "paint": {
+            "line-color": "#df42f4",
+            "line-width": 5,
+            "line-opacity": 0.5
+        }
     });
 }
 
@@ -145,13 +189,51 @@ document.getElementById('legend-lts2').onclick = toggleLayer;
 document.getElementById('legend-lts3').onclick = toggleLayer;
 document.getElementById('legend-lts4').onclick = toggleLayer;
 
+map.on('moveend', function(e) {
+    window.history.replaceState(null, null, window.location.pathname+'?&lat='+map.getCenter().lat+'&lng='+map.getCenter().lng+'&zoom='+map.getZoom());
+});
+
+map.on('click', function(e) {
+    var features = map.queryRenderedFeatures(e.point, {
+        layers: ltsLayers.map(l=>l.id)
+    });
+    if (!features.length) {
+        return;
+    }
+    var feature = features[0];
+    displayOsmElementInfo(feature.properties.id, e.lngLat, ['name','highway','surface','lit','maxspeed','lanes','fixme'], 'Road details based on mapillary and local knowledge - https://maps.bikeottawa.ca/lts');
+    window.history.replaceState(null, null, window.location.pathname+'?&lat='+e.lngLat.lat+'&lng='+e.lngLat.lng+'&zoom='+map.getZoom()+'&id='+feature.properties.id);  //TODO: highlight using filters
+    map.getSource('highlight').setData(feature);
+});
+
+map.on('mousemove', function(e) {
+    var features = map.queryRenderedFeatures(e.point, {
+        layers: ltsLayers.map(l => l.id)
+    });
+    map.getCanvas().style.cursor = (features.length) ? 'pointer' : '';
+});
+
 map.on('style.load', function () {
-    init();
+    init()
 });
 
 map.on('load', function(e) {
     addUpdatedDate('bikeottawa.1bli4ynb');
     document.getElementById("loader").style.visibility = "hidden";
+
+    url = parseUrl(window.location.search.substr(1).split('&'));
+    const lat = url['lat'];
+    const lng = url['lng'];
+    let z = url['zoom'];
+    if(lat && lng){
+        if(!z) {
+            z = 18;
+        }
+        map.flyTo({ center: [lng, lat], zoom: z })
+        map.once('moveend', function() {
+            map.fire("click", { point: map.project([lng, lat]), lngLat: { lng: lng, lat: lat } });
+        });
+    }
 });
 
         </script>
