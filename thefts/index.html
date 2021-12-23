@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <title>Bike Thefts in Ottawa</title>
+<script src="../js/tokens.js"></script>
 <script src="https://api.mapbox.com/mapbox-gl-js/v1.10.1/mapbox-gl.js"></script>
 <link href="https://api.mapbox.com/mapbox-gl-js/v1.10.1/mapbox-gl.css" rel="stylesheet" />
 <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
@@ -132,7 +133,7 @@ C22.32,8.481,24.301,9.057,26.013,10.047z">
 
   }
 
-	mapboxgl.accessToken = 'pk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdqaWxrN3gwZXQ4MnFxbjAwZXRpbG8zIn0.XhAdk2ASwdipubccCWTfoQ';
+	mapboxgl.accessToken = mapbox_token;
     var map = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/mapbox/dark-v10',
