@@ -54,7 +54,7 @@
 
 <script>
 var ltsLayers = [
-    {id:"desire", name:'Desire lanes', color:'#DD5454', opacity:0.9, width:4, tileset:'mapbox://bikeottawa.4hnbbuhd', layer:'4hnbbuhd'}
+    {id:"desire", name:'Desire lanes', color:'#DD5454', opacity:0.9, width:4, tileset:'mapbox://bikeottawa.desire', layer:'layer'}
     ];
 
 
@@ -191,7 +191,7 @@ function addDateToAttribution(){
     if (request.status >= 200 && request.status < 400) {
       var data = JSON.parse(request.responseText);
       if(data && data instanceof Array){
-        const date = new Date(data.find(x => x.id === 'bikeottawa.4hnbbuhd').modified)
+        const date = new Date(data.find(x => x.id === 'bikeottawa.desire').modified)
         document.querySelector('.mapboxgl-ctrl-attrib').innerHTML = '<a href="https://bikeottawa.ca">© BikeOttawa</a> <a href="https://www.mapbox.com/about/maps/" target="_blank">© Mapbox</a> <a href="http://www.openstreetmap.org/about/" target="_blank">© OpenStreetMap</a>'+' ['+date.toLocaleString()+']';
       }
     }

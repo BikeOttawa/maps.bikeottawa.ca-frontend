@@ -159,9 +159,9 @@ function init() {
     "type": "line",
     "source": {
         type: 'vector',
-        url: 'mapbox://bikeottawa.0lwwjb4e',
+        url: 'mapbox://bikeottawa.winter',
     },
-    "source-layer": '0lwwjb4e',
+    "source-layer": 'layer',
     "layout": {
         "line-join": "round",
         "line-cap": "round"
@@ -309,7 +309,7 @@ map.on('mousemove', function(e) {
 });
 
 map.on('load', function(e) {
-    addUpdatedDate('bikeottawa.0lwwjb4e')
+    addUpdatedDate('bikeottawa.winter')
     document.getElementById("loader").style.visibility = "hidden";
     url = parseUrl(window.location.search.substr(1).split('&'));
     const lat = url['lat']
