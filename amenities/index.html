@@ -5,6 +5,7 @@
     <meta charset='utf-8' />
     <title>Ottawa Bike Amenities Map</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src="../js/tokens.js"></script>
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js'></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.4.2/mapbox-gl-geocoder.min.js"></script>
     <script src='../js/maps.js'></script>
@@ -562,7 +563,7 @@
         }, ];
 
         let MapCursor = ''
-        mapboxgl.accessToken = 'pk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdqaWxrN3gwZXQ4MnFxbjAwZXRpbG8zIn0.XhAdk2ASwdipubccCWTfoQ';
+        mapboxgl.accessToken = mapbox_token;
         var map = new mapboxgl.Map({
             container: 'map',
             style: 'mapbox://styles/mapbox/' + document.querySelector('input[name="rtoggle"]:checked').id,
@@ -685,7 +686,7 @@
 
             map.addSource('bike_amenities', {
                 type: 'vector',
-                url: 'mapbox://bikeottawa.6e5700mn?fresh=true',
+                url: 'mapbox://' + mapbox_username + '.6e5700mn?fresh=true',
             });
             g_layers.forEach(layer => {
                 map.loadImage('../img/amenities/' + layer.image, function(error, image) {
@@ -959,7 +960,7 @@
         });
 
         map.on('load', function(e) {
-            addUpdatedDate('bikeottawa.6e5700mn')
+            addUpdatedDate(mapbox_username + '.6e5700mn')
             document.getElementById("loader").style.visibility = "hidden";
             const url = parseUrl(window.location.search.substr(1).split('&'));
             const lat = url['lat']
