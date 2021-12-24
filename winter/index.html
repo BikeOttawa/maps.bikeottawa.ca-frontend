@@ -160,7 +160,7 @@ function init() {
     "type": "line",
     "source": {
         type: 'vector',
-        url: 'mapbox://bikeottawa.0lwwjb4e',
+        url: 'mapbox://' + mapbox_username + '.0lwwjb4e',
     },
     "source-layer": '0lwwjb4e',
     "layout": {
@@ -188,7 +188,7 @@ function init() {
       "type": "line",
       "source": {
           type: 'vector',
-          url: 'mapbox://bikeottawa.5rnbt9k5',
+          url: 'mapbox://' + mapbox_username + '.5rnbt9k5',
       },
       "source-layer": 'city_plow_tracks-avcjvu',
       "layout": {
@@ -310,7 +310,7 @@ map.on('mousemove', function(e) {
 });
 
 map.on('load', function(e) {
-    addUpdatedDate('bikeottawa.0lwwjb4e')
+    addUpdatedDate(mapbox_username + '.0lwwjb4e')
     document.getElementById("loader").style.visibility = "hidden";
     url = parseUrl(window.location.search.substr(1).split('&'));
     const lat = url['lat']
