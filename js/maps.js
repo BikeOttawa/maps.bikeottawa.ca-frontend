@@ -139,7 +139,14 @@ displayOsmElementInfo = function (element, lngLat, showTags, changesetComment, t
           }
         }
         else{
-          popup+=`<li><div id="showMapillary"><a href="https://www.mapillary.com/app/?focus=photo&pKey=${mapval}" target="_blank"><img class="enlarge-onhover" src="https://d1cuyjsrcm0gby.cloudfront.net/${mapval}/thumb-640.jpg"></a></div></li>`
+          // mapval
+          const iframe = `<iframe
+            src="https://www.mapillary.com/embed?image_key=${mapval}&style=photo"
+            height="360"
+            width="480"
+            frameborder="0" class="enlarge-onhover">
+          </iframe>`
+          popup+=`<li><div id="showMapillary">${iframe}</div></li>`
         }
 
         if(title!=''){
