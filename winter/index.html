@@ -160,9 +160,9 @@ function init() {
     "type": "line",
     "source": {
         type: 'vector',
-        url: 'mapbox://' + mapbox_username + '.0lwwjb4e',
+        url: 'mapbox://' + mapbox_username + '.winter',
     },
-    "source-layer": '0lwwjb4e',
+    "source-layer": 'layer',
     "layout": {
         "line-join": "round",
         "line-cap": "round"
@@ -310,7 +310,7 @@ map.on('mousemove', function(e) {
 });
 
 map.on('load', function(e) {
-    addUpdatedDate(mapbox_username + '.0lwwjb4e')
+    addUpdatedDate(mapbox_username + '.winter')
     document.getElementById("loader").style.visibility = "hidden";
     url = parseUrl(window.location.search.substr(1).split('&'));
     const lat = url['lat']

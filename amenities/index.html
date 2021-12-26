@@ -686,7 +686,7 @@
 
             map.addSource('bike_amenities', {
                 type: 'vector',
-                url: 'mapbox://' + mapbox_username + '.6e5700mn?fresh=true',
+                url: 'mapbox://' + mapbox_username + '.amenities?fresh=true',
             });
             g_layers.forEach(layer => {
                 map.loadImage('../img/amenities/' + layer.image, function(error, image) {
@@ -696,7 +696,7 @@
                         "id": layer.id,
                         "type": "symbol",
                         "source": 'bike_amenities',
-                        "source-layer": '6e5700mn',
+                        "source-layer": 'layer',
                         "filter": ['==', layer.key, layer.val],
                         "layout": {
                             'visibility': document.getElementById(layer.id).checked ? 'visible' : 'none',
@@ -960,7 +960,7 @@
         });
 
         map.on('load', function(e) {
-            addUpdatedDate(mapbox_username + '.6e5700mn')
+            addUpdatedDate(mapbox_username + '.amenities')
             document.getElementById("loader").style.visibility = "hidden";
             const url = parseUrl(window.location.search.substr(1).split('&'));
             const lat = url['lat']
