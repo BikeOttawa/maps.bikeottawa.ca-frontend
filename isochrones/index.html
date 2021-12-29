@@ -484,6 +484,9 @@ map.on('load', function(e) {
     }
 });
 
+// Required for iOS Safari. Otherwise the marker will lag behind due to scroll bounce
+// https://newbedev.com/ipad-safari-disable-scrolling-and-bounce-effect
+document.body.addEventListener('touchmove', function(e){e.preventDefault()}, { passive: false });
         </script>
     </body>
 
