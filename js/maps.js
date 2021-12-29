@@ -48,6 +48,7 @@ function editTag(id, name, value=''){
 const g_TagsDefinitions = [ {tag:'name', name:'Name',hint:'',showEmpty:true, options:['editable']},        //[actual OSM tag, display name for tag in popup, tooltip, show empty tag]
                         {tag:'highway', name:'Type', hint:'',showEmpty:false, options:['text']},
                         {tag:'winter_service', name:'Snowplowing', hint:'Is pathway plowed in winter', showEmpty:true, options:['','yes','no']},
+                        {tag:'footway', name:'Type', hint:'Footway type', showEmpty:false, options:['','sidewalk','crossing']},
                         {tag:'winter_service:quality', name:'Plow quality', hint:'Optional: how well is the path typically plowed', showEmpty:true, options:['','good','intermediate','bad']},
                         {tag:'width', name:'Width', hint:'Width in meters', showEmpty:true, options:['',0.5,1,1.5,2,2.5,3,4,5,10], suffix:' m'},
                         {tag:'surface', name:'Surface', hint:'Pathway/road surface', showEmpty:true, options:['','asphalt','concrete','ground','fine_gravel','gravel','paving_stones','grass','wood','sand']},
@@ -139,7 +140,14 @@ displayOsmElementInfo = function (element, lngLat, showTags, changesetComment, t
           }
         }
         else{
-          popup+=`<li><div id="showMapillary"><a href="https://www.mapillary.com/app/?focus=photo&pKey=${mapval}" target="_blank"><img class="enlarge-onhover" src="https://d1cuyjsrcm0gby.cloudfront.net/${mapval}/thumb-640.jpg"></a></div></li>`
+          // mapval
+          const iframe = `<iframe
+            src="https://www.mapillary.com/embed?image_key=${mapval}&style=photo"
+            height="360"
+            width="480"
+            frameborder="0" class="enlarge-onhover">
+          </iframe>`
+          popup+=`<li><div id="showMapillary">${iframe}</div></li>`
         }
 
         if(title!=''){

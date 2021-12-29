@@ -52,6 +52,9 @@
       <label for='notplowed' id='notplowed-label' class='button icon check quiet col12' style='text-align:left;'>Not Plowed</label>
       <input type='checkbox' id='unknown' checked='checked'>
       <label for='unknown' id='unknown-label' class='button icon check quiet col12' style='text-align:left;'>Unknown</label>
+      <br>
+      <input type='checkbox' id='sidewalks'>
+      <label for='sidewalks' id='sidewalks-label' class='button icon check quiet col12' style='text-align:left;'>Show sidewalks</label>
       <br><br>
       <input type='checkbox' id='plowtracks'>
       <label for='plowtracks' id='plowtracks-label' class='button icon check quiet col12' style='text-align:left;'><span style="display: inline-block;width:50px; height:8px;background-color: #ff00bf"></span>&nbsp;&nbsp;City Plow Routes</label>
@@ -85,7 +88,8 @@
 const layers = [
     {id:"plowed", name:'Plowed', color:'#0099CC', opacity:0.9, filter:['==', 'winter_service', 'yes']},
     {id:"notplowed", name:'Not Plowed', color:'#DD5454', opacity:0.9, filter:['==', 'winter_service', 'no']},
-    {id:"unknown", name:'Unknown', color:'#F0C808', opacity:0.9, filter:['!in', 'winter_service', 'yes', 'no']}
+    {id:"unknown", name:'Unknown', color:'#F0C808', opacity:0.9, filter:['all',['!in', 'winter_service', 'yes', 'no'],['!in', 'footway', 'sidewalk']]},
+    {id:"sidewalks", name:'Sidewalks', color:'#00f5b4', opacity:0.9, filter:['==', 'footway', 'sidewalk'], visible: "none", maxWidth: 5}
 ];
 
 mapboxgl.accessToken = mapbox_token;
@@ -122,9 +126,10 @@ map.addControl(new mapboxgl.GeolocateControl({
 
 addStyleSwitcher();
 
-document.getElementById('plowed').onclick = toggleFilter
-document.getElementById('notplowed').onclick = toggleFilter
-document.getElementById('unknown').onclick = toggleFilter
+document.getElementById('plowed').onclick = toggleLayer
+document.getElementById('notplowed').onclick = toggleLayer
+document.getElementById('unknown').onclick = toggleLayer
+document.getElementById('sidewalks').onclick = toggleLayer
 document.getElementById('plowtracks').onclick = togglePlowTracks
 
 if (!/Mobi/.test(navigator.userAgent)) {
@@ -155,34 +160,35 @@ const g_modified={
 
 function init() {
 
-  map.addLayer({
-    "id": 'pathways',
+  layers.forEach(layer => {
+    map.addLayer({
+    "id": layer.id,
     "type": "line",
     "source": {
         type: 'vector',
-        url: 'mapbox://' + mapbox_username + '.winter',
+        url: 'mapbox://' + mapbox_username + '.pathways',
     },
     "source-layer": 'layer',
     "layout": {
         "line-join": "round",
-        "line-cap": "round"
+        "line-cap": "round",
+        "visibility": layer.visible ?? "visible",
     },
+    "filter": layer.filter,
     "paint": {
-        "line-color": ['match',
-              ['get', 'winter_service'],
-              'yes', layers[0].color,
-              'no', layers[1].color,
-              /* other */ layers[2].color],
+        "line-color": layer.color,
         "line-width": [
                       'interpolate',
                       ['exponential', 1.5],
                       ['zoom'],
                       10, 1,
-                      17, 10
+                      17, layer.maxWidth ?? 10
                     ],
-        "line-opacity": 0.9
+        "line-opacity": layer.opacity
       }
     });
+  })
+
     map.addLayer({
       "id": 'plowtracks',
       "type": "line",
@@ -205,7 +211,7 @@ function init() {
 
     for(var layer of layers){
       document.getElementById(layer.id+'-label').innerHTML = '<span style="display: inline-block;width:50px; height:8px;background-color: '+layer.color+'"></span>&nbsp;&nbsp;'+layer.name;
-    }
+      }
 
     map.addSource('highlight', { type: 'geojson' , data: null});
     map.addLayer({
@@ -252,18 +258,8 @@ map.on('style.load', function () {
     init()
 });
 
-function toggleFilter(checkbox) {
-  const filter = ["any"];
-  if(document.getElementById('plowed').checked){
-    filter.push(layers[0].filter);
-  }
-  if(document.getElementById('notplowed').checked){
-    filter.push(layers[1].filter);
-  }
-  if(document.getElementById('unknown').checked){
-    filter.push(layers[2].filter);
-  }
-  map.setFilter('pathways', filter);
+function toggleLayer(event) {
+    map.setLayoutProperty(event.target.id, 'visibility', document.getElementById(event.target.id).checked ? 'visible' : 'none')
 }
 
 function togglePlowTracks(checkbox) {
@@ -282,15 +278,15 @@ map.on('moveend', function(e) {
 map.on('click', function(e) {
 
   const features = map.queryRenderedFeatures(e.point, {
-              layers: ['pathways']
-          });
+      layers: layers.map(l => l.id)
+  });
   if (!features.length) {
       return;
   }
   const feature = features[0];
-  displayOsmElementInfo(feature.properties.id, e.lngLat,['name','highway','surface','winter_service','winter_service:quality','fixme'], 'Winter pathways based on mapillary and local knowledge - https://maps.bikeottawa.ca/winter')
+  displayOsmElementInfo(feature.properties.id, e.lngLat,['name','highway','surface','winter_service','winter_service:quality','footway','fixme'], 'Winter pathways based on mapillary and local knowledge - https://maps.bikeottawa.ca/winter')
   .then(tags => {
-    feature.properties["winter_service"]=tags["winter_service"];
+    feature.properties["winter_service"] = tags["winter_service"];
     g_modified.features.push(feature);
     map.getSource('modified').setData(g_modified);
   })
@@ -304,13 +300,13 @@ map.on('click', function(e) {
 
 map.on('mousemove', function(e) {
     const features = map.queryRenderedFeatures(e.point, {
-                layers: ['pathways']
+                layers: layers.map(l => l.id)
             });
     map.getCanvas().style.cursor = (features.length) ? 'pointer' : '';
 });
 
 map.on('load', function(e) {
-    addUpdatedDate(mapbox_username + '.winter')
+    addUpdatedDate(mapbox_username + '.pathways')
     document.getElementById("loader").style.visibility = "hidden";
     url = parseUrl(window.location.search.substr(1).split('&'));
     const lat = url['lat']
