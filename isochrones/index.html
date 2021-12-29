@@ -18,6 +18,14 @@
 .bottom-caption { display: inline-block; }
 .bottom-item { display: inline-block; width: 30px; text-align: center; font-size: 12px; }
 .mapboxgl-popup-content { color:#000 }
+.marker {
+  background-image: url('../img/bike-icon.png');
+  background-size: cover;
+  width: 32px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: move;
+}
 
         </style>
 
@@ -163,6 +171,41 @@ map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
 map.addControl(new mapboxgl.ScaleControl(), 'bottom-left');
 map.addControl(new mapboxgl.AttributionControl({ compact: true }), 'bottom-right');
 
+const marker_element = document.createElement('div');
+marker_element.className = 'marker';
+
+const marker = new mapboxgl.Marker({
+  element: marker_element,
+  draggable: true
+})
+.setLngLat([-75.697927,45.417431])
+.addTo(map);
+
+function onDragEnd() {
+    const lngLat = marker.getLngLat();
+    fetchIsochrones();
+}
+
+function onDragStart() {
+    map.getSource('route').setData({
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [ 0, 0 ]
+        }
+    });
+    map.getSource('route-point').setData({
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [ 0, 0 ]
+        }
+    });
+}
+
+marker.on('dragend', onDragEnd);
+marker.on('dragstart', onDragStart);
+
 const geocoderControl = new MapboxGeocoder({
     accessToken: mapboxgl.accessToken,
     bbox: [-76.385193,44.963826,-75.011902,45.614998],
@@ -175,19 +218,6 @@ map.addControl(geocoderControl, 'bottom-left');
 // mouse interface
 var canvas = map.getCanvasContainer();
 
-var isDragging;
-var isCursorOverPoint;
-
-var pointSource = {
-    "type": "FeatureCollection",
-    "features": [{
-        "type": "Feature",
-        "geometry": {
-            "type": "Point",
-            "coordinates": [-75.697927,45.417431]
-        }
-    }]
-};
 var gridSource = {
     "type": "FeatureCollection",
     "features": []
@@ -213,49 +243,6 @@ var routeLine = {
         "coordinates": [[0,0]]
     }
 };
-
-function mouseDown(e) {
-    if (!isCursorOverPoint) return;
-    map.getSource('route').setData({
-        "type": "Feature",
-        "geometry": {
-            "type": "Point",
-            "coordinates": [ 0, 0 ]
-        }
-    });
-    map.getSource('route-point').setData({
-        "type": "Feature",
-        "geometry": {
-            "type": "Point",
-            "coordinates": [ 0, 0 ]
-        }
-    });
-    isDragging = true;
-
-    // Set a cursor indicator
-    canvas.style.cursor = 'grab';
-
-    // Mouse events
-    map.on('mousemove', onMove);
-    map.once('mouseup', onUp);
-}
-
-function onMove(e) {
-    if (!isDragging) return;
-    var coords = e.lngLat;
-    pointSource.features[0].geometry.coordinates = [coords.lng, coords.lat];
-    map.getSource('point').setData(pointSource);
-
-    // Set a UI indicator for dragging.
-    canvas.style.cursor = 'grabbing';
-}
-
-function onUp(e) {
-    canvas.style.cursor = '';
-
-    // Unbind mouse events
-    map.off('mousemove', onMove);
-}
 
 // create map
 function init() {
@@ -284,10 +271,6 @@ function init() {
     map.addSource('grid', {
         "type" : "geojson",
         "data": gridSource
-    });
-    map.addSource('point', {
-        "type": "geojson",
-        "data": pointSource
     });
     isochroneLayers.forEach(function (layer, i) {
         if(i == isochroneLayers.length - 1) {
@@ -325,20 +308,6 @@ function init() {
         if(layer.time != 0) {
             document.getElementById("m"+layer.time).style.backgroundColor = layer.color;
         }
-    });
-
-    map.loadImage("../img/bike-icon.png", function(error, image) {
-        if (error) throw error;
-        map.addImage("custom-marker", image);
-        map.addLayer({
-            "id": "point",
-            "type": "symbol",
-            "source": "point",
-            layout: {
-                "icon-image": "custom-marker",
-                "icon-size": 0.75
-            }
-        });
     });
     map.addSource('route', {
         type: 'geojson',
@@ -389,7 +358,8 @@ function init() {
 const request = new XMLHttpRequest();
 
 function fetchRoute(lngLat) {
-    const query = encodeURIComponent([pointSource.features[0].geometry.coordinates.join(','),[lngLat.lng, lngLat.lat].join(',')].join(';'));
+    const markerLngLat = marker.getLngLat();
+    const query = encodeURIComponent([[markerLngLat.lng,markerLngLat.lat].join(','),[lngLat.lng, lngLat.lat].join(',')].join(';'));
     const api = "https://maps.bikeottawa.ca/route/v1/"+document.querySelector('input[name="dir"]:checked').value;
     request.abort();
     request.open('GET', api + '/'+ query + '?alternatives=false&steps=true&geometries=geojson', true);
@@ -427,15 +397,14 @@ function fetchIsochrones() {
     document.getElementById('info').classList.add('hidden');
     document.getElementById('map').classList.add('loading');
 
-    let pLng = pointSource.features[0].geometry.coordinates[0];
-    let pLat = pointSource.features[0].geometry.coordinates[1];
+    const markerLngLat = marker.getLngLat();
 
     var intervals = Array.from(
         document.querySelectorAll('.intervals input[type="checkbox"]:checked')
     ).map(function(el) { return el.value });
     var params = {
-        lng: pLng,
-        lat: pLat,
+        lng: markerLngLat.lng,
+        lat: markerLngLat.lat,
         radius: 3.5,
         deintersect: 'true',
         concavity: 2,
@@ -450,7 +419,7 @@ function fetchIsochrones() {
     Object.keys(params).forEach(key => url.href += key + '=' + params[key] + '&');
     (intervals.length > 0 ? intervals : [3, 6, 9, 12, 15]).forEach(interval => url.href += 'intervals=' + interval + '&');
 
-    console.groupCollapsed(pLng, pLat);
+    console.groupCollapsed(markerLngLat.lng, markerLngLat.lat);
     console.time('request');
     fetch(url)
         .then(response => response.json())
@@ -466,7 +435,7 @@ function fetchIsochrones() {
             document.getElementById('error').style="display:block";
             document.getElementById('map').classList.remove('loading');
           });
-    window.history.replaceState(null, null, window.location.pathname+'?&lat='+pLat+'&lng='+pLng+'&lts='+params.dir+'&');
+    window.history.replaceState(null, null, window.location.pathname+'?&lat='+markerLngLat.lat+'&lng='+markerLngLat.lng+'&lts='+params.dir+'&');
 }
 
 document.getElementById('lts1').onchange = fetchIsochrones;
@@ -486,34 +455,12 @@ document.getElementById('legend-lts2').onclick = toggleLayer;
 document.getElementById('legend-lts3').onclick = toggleLayer;
 document.getElementById('legend-lts4').onclick = toggleLayer;
 
-map.on('mouseenter', 'point', function() {
-    isCursorOverPoint = true;
-    map.dragPan.disable();
-    canvas.style.cursor = 'move';
-});
-
-map.on('mouseleave', 'point', function() {
-  isCursorOverPoint = false;
-  map.dragPan.enable();
-  canvas.style.cursor = '';
-});
-
 map.on('click', function(e) {
     fetchRoute(e.lngLat)
 });
 
-map.on('mousedown', mouseDown);
-
-map.on('mouseup', function(e) {
-  if (!isDragging) return;
-  isDragging = false;
-
-  fetchIsochrones();
-});
-
 geocoderControl.on('result', function(ev) {
-    pointSource.features[0].geometry.coordinates = ev.result.geometry.coordinates;
-    map.getSource('point').setData(ev.result.geometry);
+    marker.setLngLat(ev.result.geometry.coordinates);
     fetchIsochrones();
 });
 
@@ -531,8 +478,7 @@ map.on('load', function(e) {
     const lts = url['lts']
     if(lat && lng){
         map.flyTo({ center: [lng, lat] });
-        pointSource.features[0].geometry.coordinates = [lng, lat];
-        map.getSource('point').setData(pointSource.features[0].geometry);
+        marker.setLngLat([lng, lat]);
         document.getElementById(lts ? lts : 'lts4').checked = true;
         fetchIsochrones();
     }
