@@ -187,7 +187,7 @@ map.on('load', function(e) {
 
 function addDateToAttribution(){
   const request = new XMLHttpRequest()
-  request.open('GET','https://api.mapbox.com/tilesets/v1/' + mapbox_username + '?access_token=' + mapbox_token)
+  request.open('GET','https://api.mapbox.com/tilesets/v1/' + mapbox_username + '?access_token=' + mapbox_secret_token)
   request.onload = function () {
     if (request.status >= 200 && request.status < 400) {
       var data = JSON.parse(request.responseText);
