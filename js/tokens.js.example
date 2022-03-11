@@ -1,0 +1,6 @@
+// Place your Mapbox and Mapillary tokens and such here and rename this file to tokens.js
+// The Mapbox secret token should have TILESETS:LIST and TILESETS:READ scopes
+const mapbox_username = 'XXXXXXXXXXXXXXXXXXXX';
+const mapbox_secret_token = 'sk.XXXXXXXXXXXXXXXXXXXXX';
+const mapbox_token = 'pk.XXXXXXXXXXXXXXXXXXXX';
+const mapillary_token = 'XXX|XXXXXXXXXXXX|XXXXXXX';

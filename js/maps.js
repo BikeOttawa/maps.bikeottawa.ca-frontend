@@ -1,7 +1,7 @@
 
 function addUpdatedDate(layerName){
   const request = new XMLHttpRequest()
-  request.open('GET','https://api.mapbox.com/tilesets/v1/bikeottawa?access_token=sk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdyYTJmN2EwMmtoMzJwc3JxM2hoZ3ozIn0.YB1JNmncsPvktmgGU_zK8A')
+  request.open('GET','https://api.mapbox.com/tilesets/v1/' + mapbox_username + '?access_token=' + mapbox_secret_token)
   request.onload = function () {
     if (request.status >= 200 && request.status < 400) {
       const data = JSON.parse(request.responseText);

@@ -4,6 +4,7 @@
     <meta charset='utf-8' />
     <title>Ottawa desire paths</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src="../js/tokens.js"></script>
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js'></script>
     <script  data-cfasync="false" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css' rel='stylesheet' />
@@ -54,11 +55,11 @@
 
 <script>
 var ltsLayers = [
-    {id:"desire", name:'Desire lanes', color:'#DD5454', opacity:0.9, width:4, tileset:'mapbox://bikeottawa.desire', layer:'layer'}
+    {id:"desire", name:'Desire lanes', color:'#DD5454', opacity:0.9, width:4, tileset:'mapbox://' + mapbox_username + '.desire', layer:'layer'}
     ];
 
 
-  mapboxgl.accessToken = 'pk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdqaWxrN3gwZXQ4MnFxbjAwZXRpbG8zIn0.XhAdk2ASwdipubccCWTfoQ';
+  mapboxgl.accessToken = mapbox_token;
   var map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/satellite-streets-v11',
@@ -186,12 +187,12 @@ map.on('load', function(e) {
 
 function addDateToAttribution(){
   const request = new XMLHttpRequest()
-  request.open('GET','https://api.mapbox.com/tilesets/v1/bikeottawa?access_token=sk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdyYTJmN2EwMmtoMzJwc3JxM2hoZ3ozIn0.YB1JNmncsPvktmgGU_zK8A')
+  request.open('GET','https://api.mapbox.com/tilesets/v1/' + mapbox_username + '?access_token=' + mapbox_secret_token)
   request.onload = function () {
     if (request.status >= 200 && request.status < 400) {
       var data = JSON.parse(request.responseText);
       if(data && data instanceof Array){
-        const date = new Date(data.find(x => x.id === 'bikeottawa.desire').modified)
+        const date = new Date(data.find(x => x.id === (mapbox_username + '.desire')).modified)
         document.querySelector('.mapboxgl-ctrl-attrib').innerHTML = '<a href="https://bikeottawa.ca">© BikeOttawa</a> <a href="https://www.mapbox.com/about/maps/" target="_blank">© Mapbox</a> <a href="http://www.openstreetmap.org/about/" target="_blank">© OpenStreetMap</a>'+' ['+date.toLocaleString()+']';
       }
     }

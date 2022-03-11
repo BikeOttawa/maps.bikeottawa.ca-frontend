@@ -4,6 +4,7 @@
     <head>
         <meta charset='utf-8' />
         <title>Ottawa Collision Map</title>
+        <script src="../js/tokens.js"></script>
         <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js'></script>
         <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css' rel='stylesheet' />
         <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
@@ -147,7 +148,7 @@ collisions.forEach(function (filter, i) {
 });
 
 // mapbox
-mapboxgl.accessToken = 'pk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdqaWxrN3gwZXQ4MnFxbjAwZXRpbG8zIn0.XhAdk2ASwdipubccCWTfoQ';
+mapboxgl.accessToken = mapbox_token;
 const map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/dark-v10',

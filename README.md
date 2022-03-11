@@ -10,4 +10,5 @@ Requires maps.bikeottawa.ca-backend to run on the server for Routing and Isochro
 - Map of desire lines
 - Collision map for years 2014-2016 based on the city collision open data
 
-
+## Tokens
+The frontend requires Mapbox and Mapillary tokens to function. Place these in `js/tokens.js`. There is a `js/tokens.js.example` you can use as a template.

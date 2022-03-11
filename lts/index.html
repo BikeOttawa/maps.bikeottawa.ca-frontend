@@ -5,6 +5,7 @@
         <meta charset='utf-8' />
         <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
         <title>Ottawa Cycling Level of Traffic Stress Map</title>
+        <script src="../js/tokens.js"></script>
         <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js'></script>
         <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css' rel='stylesheet' />
         <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
@@ -97,7 +98,7 @@ var ltsLayers = [
 ];
 
 // mapbox
-mapboxgl.accessToken = 'pk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdqaWxrN3gwZXQ4MnFxbjAwZXRpbG8zIn0.XhAdk2ASwdipubccCWTfoQ';
+mapboxgl.accessToken = mapbox_token;
 var map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/light-v10',
@@ -143,7 +144,7 @@ function init() {
             "type": "line",
             "source": {
                 type: 'vector',
-                url: 'mapbox://bikeottawa.lts',
+                url: 'mapbox://' + mapbox_username + '.lts',
             },
             "filter": layer.filter,
             "source-layer": "layer",
@@ -219,7 +220,7 @@ map.on('style.load', function () {
 });
 
 map.on('load', function(e) {
-    addUpdatedDate('bikeottawa.lts');
+    addUpdatedDate(mapbox_username + '.lts');
     document.getElementById("loader").style.visibility = "hidden";
 
     url = parseUrl(window.location.search.substr(1).split('&'));

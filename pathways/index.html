@@ -4,6 +4,7 @@
     <meta charset='utf-8' />
     <title>Ottawa Pathways Map</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src="../js/tokens.js"></script>
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js'></script>
     <script  data-cfasync="false" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js'></script>
@@ -126,7 +127,7 @@ const layers = [
     {id:"unknown", name:'Unknown width', color:'#F0C808', opacity:0.9, filter:['==',['to-number',['get', 'width']], 0]/*["==", ["get", "width"], null]*/}
 ];
 const Mapbox = {
-    url: 'bikeottawa.pathways',
+    url: mapbox_username + '.pathways',
     layer: 'layer',
     layerName: 'pathways'
 };
@@ -153,7 +154,7 @@ const ChartBackgroundColors = [
   "#d23be7"
 ];
 
-mapboxgl.accessToken = 'pk.eyJ1IjoiYmlrZW90dGF3YSIsImEiOiJjamdqaWxrN3gwZXQ4MnFxbjAwZXRpbG8zIn0.XhAdk2ASwdipubccCWTfoQ';
+mapboxgl.accessToken = mapbox_token;
 var map = new mapboxgl.Map({
   container: 'map',
   style: 'mapbox://styles/mapbox/'+document.querySelector('input[name="rtoggle"]:checked').id,
