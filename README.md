@@ -1,6 +1,6 @@
 # maps.bikeottawa.ca-frontend
 Static frontend for maps.bikeottawa.ca.
-Requires maps.bikeottawa.ca-backend to run on the server for Routing and Isochrones apps to work
+Requires [maps.bikeottawa.ca-backend](https://github.com/BikeOttawa/maps.bikeottawa.ca-backend) to run on the server for Routing and Isochrones apps to work
 
 ## Features 6 maps
 - Level of Stress map for Ottawa
