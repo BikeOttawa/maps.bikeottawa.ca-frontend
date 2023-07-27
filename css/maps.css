@@ -62,3 +62,24 @@ input[type=text].mapboxgl-ctrl-geocoder--input {    /*fixing geocode clash with 
 .mapboxgl-ctrl-geocoder--icon-search {
   top: 7px;
 }
+
+#legend {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0,0,0,0.5);
+  border-radius: 4px;
+  margin: 8px;
+}
+
+#legendbtn {
+  margin: 8px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 4px;
+}
+
+@media only screen and (max-width: 600px) {
+  #legend, #legendbtn {
+    margin: 0px;
+  }
+}

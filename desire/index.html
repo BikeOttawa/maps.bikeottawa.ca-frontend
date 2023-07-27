@@ -9,6 +9,7 @@
     <script  data-cfasync="false" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css' rel='stylesheet' />
     <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
+    <link href='../css/maps.css' rel='stylesheet' />
     <style>
         body { margin:0; padding:0; }
         #app { position:absolute; top:0; right:0; bottom:0; left:0; }
@@ -28,7 +29,7 @@
 <body>
 <div id='app' class='col12 contain clip'>
 <div id='map'></div>
-<div class='col4 pad1  scroll-styled pin-topright  '>
+<div class='col4  scroll-styled pin-topright  '>
   <div id='legendbtn' class='fill-darken2 pad1 icon book hidden button fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
   <div id='legend' class='fill-lighten3  round'>
     <div id='closebtn' class='fill-darken2 pad1 icon close button fr' onclick="$('#legendbtn').toggle();$('#legend').toggle()"></div>
